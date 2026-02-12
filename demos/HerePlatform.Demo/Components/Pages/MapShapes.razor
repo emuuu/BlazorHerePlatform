@@ -7,6 +7,41 @@
 <h3>Shapes Demo</h3>
 <p>Demonstrates Polyline, Polygon, Circle, and Rectangle on the map.</p>
 
+<details class="mb-3">
+    <summary class="fw-bold" role="button">Usage</summary>
+    <pre class="bg-light border rounded p-3 mt-2 mb-0"><code>// Polyline
+var line = await Polyline.CreateAsync(Js, new PolylineOptions
+{
+    Path = new List&lt;LatLngLiteral&gt; { new(52.52, 13.39), new(52.52, 13.42) },
+    Style = new StyleOptions { StrokeColor = "#0066FF", LineWidth = 4 }
+});
+await line.AddToMap(map.InteropObject);
+
+// Polygon
+var poly = await Polygon.CreateAsync(Js, new PolygonOptions
+{
+    Path = new List&lt;LatLngLiteral&gt; { new(52.525, 13.37), new(52.525, 13.385), new(52.515, 13.37) },
+    Style = new StyleOptions { FillColor = "rgba(0,204,0,0.3)", StrokeColor = "#00CC00" }
+});
+await poly.AddToMap(map.InteropObject);
+
+// Circle
+var circle = await Circle.CreateAsync(Js, new CircleOptions
+{
+    Center = new LatLngLiteral(52.5163, 13.3777), Radius = 500,
+    Style = new StyleOptions { FillColor = "rgba(255,0,0,0.2)", StrokeColor = "#FF0000" }
+});
+await circle.AddToMap(map.InteropObject);
+
+// Rectangle
+var rect = await Rect.CreateAsync(Js, new RectOptions
+{
+    Bounds = new GeoRect(52.525, 13.41, 52.515, 13.43),
+    Style = new StyleOptions { StrokeColor = "#FF9900", LineDash = [8, 4] }
+});
+await rect.AddToMap(map.InteropObject);</code></pre>
+</details>
+
 <HereMap @ref="_map"
          Options="@_mapOptions"
          OnAfterInit="@OnMapInit"

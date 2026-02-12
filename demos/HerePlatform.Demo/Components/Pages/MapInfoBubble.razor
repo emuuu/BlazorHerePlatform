@@ -5,7 +5,25 @@
 <PageTitle>InfoBubble</PageTitle>
 
 <h3>InfoBubble Demo</h3>
-<p>Demonstrates opening and closing InfoBubbles (HERE's equivalent of Google's InfoWindow).</p>
+<p>Demonstrates opening and closing InfoBubbles programmatically (HERE's equivalent of Google's InfoWindow). For a declarative approach via <code>ChildContent</code>, see the <a href="/map-markers">Markers Demo</a>.</p>
+
+<details class="mb-3">
+    <summary class="fw-bold" role="button">Usage</summary>
+    <pre class="bg-light border rounded p-3 mt-2 mb-0"><code>// Create an InfoBubble
+var bubble = await InfoBubble.CreateAsync(Js,
+    new LatLngLiteral(52.5163, 13.3777),
+    new InfoBubbleOptions
+    {
+        Content = "&lt;div&gt;&lt;strong&gt;Title&lt;/strong&gt;&lt;br/&gt;Description&lt;/div&gt;"
+    });
+
+// Open / Close (requires map with EnableUI = true)
+await bubble.Open(map.InteropObject);
+await bubble.Close(map.InteropObject);
+
+// Update content dynamically
+await bubble.SetContent("&lt;div&gt;New content&lt;/div&gt;");</code></pre>
+</details>
 
 <HereMap @ref="_map"
          Options="@_mapOptions"

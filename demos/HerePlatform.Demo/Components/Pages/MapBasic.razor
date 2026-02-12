@@ -6,6 +6,28 @@
 <h3>Basic Map</h3>
 <p>A simple HERE Map centered on Berlin with default settings. Switch between all supported layer types below.</p>
 
+<details class="mb-3">
+    <summary class="fw-bold" role="button">Usage</summary>
+    <pre class="bg-light border rounded p-3 mt-2 mb-0"><code>&lt;HereMap @@ref="_map"
+         Options="@@_mapOptions"
+         OnAfterInit="@@OnMapInit"
+         Height="500px" /&gt;
+
+@@code {
+    private HereMap? _map;
+
+    private MapOptions _mapOptions = new()
+    {
+        Center = new LatLngLiteral(52.52, 13.405),
+        Zoom = 12,
+        LayerType = MapLayerType.VectorNormalMap,
+        EnableUI = true,
+        EnableInteraction = true,
+        UiLocale = "de-DE"
+    };
+}</code></pre>
+</details>
+
 <div class="mb-2">
     <label class="form-label fw-bold">UI Locale:</label>
     <select class="form-select form-select-sm d-inline-block" style="width:180px"

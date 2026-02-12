@@ -7,6 +7,43 @@
 <h3>Autosuggest Demo</h3>
 <p>Search for addresses using the HERE Autosuggest API. Select a result to show it on the map.</p>
 
+<details class="mb-3">
+    <summary class="fw-bold" role="button">Usage</summary>
+    <pre class="bg-light border rounded p-3 mt-2 mb-0"><code>&lt;!-- Basic usage --&gt;
+&lt;HereAutosuggest Placeholder="Enter an address..."
+                 Options="@@_searchOptions"
+                 OnItemSelected="@@OnSelected"
+                 OnCleared="@@OnCleared" /&gt;
+
+&lt;!-- With custom item template --&gt;
+&lt;HereAutosuggest Options="@@_searchOptions" OnItemSelected="@@OnSelected"&gt;
+    &lt;SuggestionItemTemplate&gt;
+        &lt;span class="badge"&gt;@@context.ResultType&lt;/span&gt;
+        &lt;strong&gt;@@context.Title&lt;/strong&gt;
+    &lt;/SuggestionItemTemplate&gt;
+&lt;/HereAutosuggest&gt;
+
+&lt;!-- With fully custom list template --&gt;
+&lt;HereAutosuggest Options="@@_searchOptions" OnItemSelected="@@OnSelected"&gt;
+    &lt;SuggestionListTemplate&gt;
+        @@foreach (var item in context.Items)
+        {
+            &lt;div @@onmousedown="() =&gt; context.SelectItem(item)"&gt;
+                @@item.Title
+            &lt;/div&gt;
+        }
+    &lt;/SuggestionListTemplate&gt;
+&lt;/HereAutosuggest&gt;
+
+@@code {
+    private AutosuggestOptions _searchOptions = new()
+    {
+        Lang = "de", In = "countryCode:DEU", Limit = 5,
+        At = new LatLngLiteral(52.52, 13.405)
+    };
+}</code></pre>
+</details>
+
 <div class="row mb-3">
     <div class="col-md-6">
         <label class="form-label fw-bold">Design Variant</label>

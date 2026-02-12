@@ -6,6 +6,23 @@
 <h3>Map Controls Demo</h3>
 <p>Demonstrates programmatic map manipulation: zoom, center, tilt, heading.</p>
 
+<details class="mb-3">
+    <summary class="fw-bold" role="button">Usage</summary>
+    <pre class="bg-light border rounded p-3 mt-2 mb-0"><code>// Zoom
+await map.InteropObject.SetZoom(14);
+var zoom = await map.InteropObject.GetZoom();
+
+// Center
+await map.InteropObject.SetCenter(new LatLngLiteral(48.8566, 2.3522));
+var center = await map.InteropObject.GetCenter();
+
+// Tilt (3D perspective)
+await map.InteropObject.SetTilt(45);
+
+// Heading (rotation)
+await map.InteropObject.SetHeading(90);</code></pre>
+</details>
+
 <HereMap @ref="_map"
          Options="@_mapOptions"
          OnAfterInit="@OnMapInit"

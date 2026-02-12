@@ -7,6 +7,27 @@
 <h3>Markers Demo</h3>
 <p>Demonstrates adding, clicking, and dragging markers on the map. The two landmark markers use <code>ChildContent</code> to show an InfoBubble on click (static HTML, no Blazor interactivity in the bubble).</p>
 
+<details class="mb-3">
+    <summary class="fw-bold" role="button">Usage</summary>
+    <pre class="bg-light border rounded p-3 mt-2 mb-0"><code>&lt;!-- Marker with auto-InfoBubble via ChildContent --&gt;
+&lt;MarkerComponent Lat="52.5163" Lng="13.3777"&gt;
+    &lt;div style="padding:8px"&gt;
+        &lt;strong&gt;Brandenburg Gate&lt;/strong&gt;
+        &lt;p&gt;Built 1788–1791&lt;/p&gt;
+    &lt;/div&gt;
+&lt;/MarkerComponent&gt;
+
+&lt;!-- Clickable marker with event callback --&gt;
+&lt;MarkerComponent Lat="52.52" Lng="13.405"
+                 Clickable="true"
+                 OnClick="@@OnMarkerClicked" /&gt;
+
+&lt;!-- Draggable marker --&gt;
+&lt;MarkerComponent Lat="52.52" Lng="13.41"
+                 Draggable="true"
+                 OnDragEnd="@@OnMarkerDragged" /&gt;</code></pre>
+</details>
+
 <AdvancedHereMap @ref="_advMap"
                  Options="@_mapOptions"
                  OnAfterInit="@OnMapInit"
