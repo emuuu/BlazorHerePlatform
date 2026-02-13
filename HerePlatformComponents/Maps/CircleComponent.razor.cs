@@ -79,6 +79,42 @@ public partial class CircleComponent : IAsyncDisposable
     public int? Precision { get; set; }
 
     /// <summary>
+    /// Line cap style: "round", "square", "butt".
+    /// </summary>
+    [Parameter, JsonIgnore]
+    public string? LineCap { get; set; }
+
+    /// <summary>
+    /// Line join style: "round", "miter", "bevel".
+    /// </summary>
+    [Parameter, JsonIgnore]
+    public string? LineJoin { get; set; }
+
+    /// <summary>
+    /// Array of dash pattern [dash, gap, dash, gap, ...].
+    /// </summary>
+    [Parameter, JsonIgnore]
+    public double[]? LineDash { get; set; }
+
+    /// <summary>
+    /// Offset into the dash pattern.
+    /// </summary>
+    [Parameter, JsonIgnore]
+    public double? LineDashOffset { get; set; }
+
+    /// <summary>
+    /// Z-index for stacking order.
+    /// </summary>
+    [Parameter, JsonIgnore]
+    public int? ZIndex { get; set; }
+
+    /// <summary>
+    /// If true, the circle can be dragged.
+    /// </summary>
+    [Parameter, JsonIgnore]
+    public bool Draggable { get; set; }
+
+    /// <summary>
     /// If true, the circle is clickable.
     /// </summary>
     [Parameter, JsonIgnore]
@@ -107,8 +143,6 @@ public partial class CircleComponent : IAsyncDisposable
     /// </summary>
     [Parameter, JsonIgnore]
     public double? Elevation { get; set; }
-
-    #region Pointer / Interaction EventCallbacks
 
     [Parameter, JsonIgnore]
     public EventCallback<MapPointerEventArgs> OnClick { get; set; }
@@ -151,10 +185,6 @@ public partial class CircleComponent : IAsyncDisposable
 
     [Parameter, JsonIgnore]
     public EventCallback<MapDragEventArgs> OnDragEnd { get; set; }
-
-    #endregion
-
-    #region Internal event handlers (called by AdvancedHereMap)
 
     internal async Task HandlePointerEvent(string eventName, MapPointerEventArgs args)
     {
@@ -202,14 +232,24 @@ public partial class CircleComponent : IAsyncDisposable
             await callback.InvokeAsync(args);
     }
 
-    #endregion
+    internal async Task HandleGeometryChanged(double lat, double lng)
+    {
+        CenterLat = lat;
+        CenterLng = lng;
+
+        if (CenterLatChanged.HasDelegate)
+            await CenterLatChanged.InvokeAsync(lat);
+        if (CenterLngChanged.HasDelegate)
+            await CenterLngChanged.InvokeAsync(lng);
+    }
 
     internal bool HasAnyEventCallback =>
         OnClick.HasDelegate || OnDoubleClick.HasDelegate || OnLongPress.HasDelegate ||
         OnContextMenu.HasDelegate || OnContextMenuClose.HasDelegate ||
         OnPointerDown.HasDelegate || OnPointerUp.HasDelegate || OnPointerMove.HasDelegate ||
         OnPointerEnter.HasDelegate || OnPointerLeave.HasDelegate || OnPointerCancel.HasDelegate ||
-        OnDragStart.HasDelegate || OnDrag.HasDelegate || OnDragEnd.HasDelegate;
+        OnDragStart.HasDelegate || OnDrag.HasDelegate || OnDragEnd.HasDelegate ||
+        CenterLatChanged.HasDelegate || CenterLngChanged.HasDelegate;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -237,7 +277,13 @@ public partial class CircleComponent : IAsyncDisposable
                 FillColor = FillColor,
                 LineWidth = LineWidth,
                 Precision = Precision,
-                Clickable = Clickable || HasAnyEventCallback,
+                LineCap = LineCap,
+                LineJoin = LineJoin,
+                LineDash = LineDash,
+                LineDashOffset = LineDashOffset,
+                ZIndex = ZIndex,
+                Draggable = Draggable,
+                Clickable = Clickable || Draggable || HasAnyEventCallback,
                 Visible = Visible,
                 Extrusion = Extrusion,
                 Elevation = Elevation,
@@ -262,6 +308,12 @@ public partial class CircleComponent : IAsyncDisposable
             parameters.DidParameterChange(FillColor) ||
             parameters.DidParameterChange(LineWidth) ||
             parameters.DidParameterChange(Precision) ||
+            parameters.DidParameterChange(LineCap) ||
+            parameters.DidParameterChange(LineJoin) ||
+            parameters.DidParameterChange(LineDash) ||
+            parameters.DidParameterChange(LineDashOffset) ||
+            parameters.DidParameterChange(ZIndex) ||
+            parameters.DidParameterChange(Draggable) ||
             parameters.DidParameterChange(Clickable) ||
             parameters.DidParameterChange(Visible);
 
@@ -285,7 +337,7 @@ public partial class CircleComponent : IAsyncDisposable
         catch (JSDisconnectedException) { }
         catch (InvalidOperationException) { }
 
-        MapRef.RemoveCircle(this);
+        MapRef?.RemoveCircle(this);
         GC.SuppressFinalize(this);
     }
 
@@ -298,6 +350,12 @@ public partial class CircleComponent : IAsyncDisposable
         public string? FillColor { get; init; }
         public double? LineWidth { get; init; }
         public int? Precision { get; init; }
+        public string? LineCap { get; init; }
+        public string? LineJoin { get; init; }
+        public double[]? LineDash { get; init; }
+        public double? LineDashOffset { get; init; }
+        public int? ZIndex { get; init; }
+        public bool Draggable { get; init; }
         public bool? Clickable { get; init; }
         public bool? Visible { get; init; }
         public double? Extrusion { get; init; }

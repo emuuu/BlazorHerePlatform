@@ -18,6 +18,13 @@ public class PolylineComponentOptionsTests
         Assert.That(component.Clickable, Is.False);
         Assert.That(component.Visible, Is.True);
         Assert.That(component.Data, Is.Null);
+        Assert.That(component.LineJoin, Is.Null);
+        Assert.That(component.LineDashOffset, Is.Null);
+        Assert.That(component.Arrows, Is.Null);
+        Assert.That(component.ZIndex, Is.Null);
+        Assert.That(component.Extrusion, Is.Null);
+        Assert.That(component.Elevation, Is.Null);
+        Assert.That(component.Draggable, Is.False);
     }
 
     [Test]
@@ -97,6 +104,85 @@ public class PolylineComponentOptionsTests
         component.Data = data;
 
         Assert.That(component.Data, Is.SameAs(data));
+    }
+
+    [Test]
+    public void LineJoin_IsSettable()
+    {
+        var component = new PolylineComponent();
+        component.LineJoin = "miter";
+
+        Assert.That(component.LineJoin, Is.EqualTo("miter"));
+    }
+
+    [Test]
+    public void LineDashOffset_IsSettable()
+    {
+        var component = new PolylineComponent();
+        component.LineDashOffset = 3.5;
+
+        Assert.That(component.LineDashOffset, Is.EqualTo(3.5));
+    }
+
+    [Test]
+    public void Arrows_IsSettable()
+    {
+        var component = new PolylineComponent();
+        component.Arrows = true;
+
+        Assert.That(component.Arrows, Is.True);
+    }
+
+    [Test]
+    public void ZIndex_IsSettable()
+    {
+        var component = new PolylineComponent();
+        component.ZIndex = 5;
+
+        Assert.That(component.ZIndex, Is.EqualTo(5));
+    }
+
+    [Test]
+    public void Extrusion_IsSettable()
+    {
+        var component = new PolylineComponent();
+        component.Extrusion = 100.0;
+
+        Assert.That(component.Extrusion, Is.EqualTo(100.0));
+    }
+
+    [Test]
+    public void Elevation_IsSettable()
+    {
+        var component = new PolylineComponent();
+        component.Elevation = 50.0;
+
+        Assert.That(component.Elevation, Is.EqualTo(50.0));
+    }
+
+    [Test]
+    public void Draggable_IsSettable()
+    {
+        var component = new PolylineComponent();
+        component.Draggable = true;
+
+        Assert.That(component.Draggable, Is.True);
+    }
+
+    [Test]
+    public async Task HandleGeometryChanged_UpdatesPath()
+    {
+        var component = new PolylineComponent();
+        var newPath = new List<LatLngLiteral>
+        {
+            new(52.52, 13.39),
+            new(52.53, 13.40)
+        };
+
+        await component.HandleGeometryChanged(newPath);
+
+        Assert.That(component.Path, Is.SameAs(newPath));
+        Assert.That(component.Path, Has.Exactly(2).Items);
     }
 
     [Test]

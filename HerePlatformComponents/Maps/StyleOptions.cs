@@ -40,4 +40,19 @@ public class StyleOptions
     /// Dash scale mode for the HARP engine: "CONTINUOUS" or "DISCRETE".
     /// </summary>
     public string? LineDashScaleMode { get; set; }
+
+    /// <summary>
+    /// Line join style: "round", "miter", "bevel".
+    /// </summary>
+    public string? LineJoin { get; set; }
+
+    /// <summary>
+    /// Offset into the dash pattern.
+    /// </summary>
+    public double? LineDashOffset { get; set; }
+
+    /// <summary>
+    /// Miter limit when LineJoin is "miter".
+    /// </summary>
+    public double? MiterLimit { get; set; }
 }

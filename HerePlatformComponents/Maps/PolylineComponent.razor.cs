@@ -29,10 +29,13 @@ public partial class PolylineComponent : IAsyncDisposable
     private AdvancedHereMap MapRef { get; set; } = default!;
 
     /// <summary>
-    /// Path defining the polyline.
+    /// Path defining the polyline. Two-way bindable via <c>@bind-Path</c>.
     /// </summary>
     [Parameter, JsonIgnore]
     public List<LatLngLiteral>? Path { get; set; }
+
+    [Parameter, JsonIgnore]
+    public EventCallback<List<LatLngLiteral>?> PathChanged { get; set; }
 
     /// <summary>
     /// Stroke color in CSS format.
@@ -59,6 +62,48 @@ public partial class PolylineComponent : IAsyncDisposable
     public double[]? LineDash { get; set; }
 
     /// <summary>
+    /// Line join style: "round", "miter", "bevel".
+    /// </summary>
+    [Parameter, JsonIgnore]
+    public string? LineJoin { get; set; }
+
+    /// <summary>
+    /// Offset into the dash pattern.
+    /// </summary>
+    [Parameter, JsonIgnore]
+    public double? LineDashOffset { get; set; }
+
+    /// <summary>
+    /// If true, renders directional arrows on the polyline.
+    /// </summary>
+    [Parameter, JsonIgnore]
+    public bool? Arrows { get; set; }
+
+    /// <summary>
+    /// Z-index for stacking order.
+    /// </summary>
+    [Parameter, JsonIgnore]
+    public int? ZIndex { get; set; }
+
+    /// <summary>
+    /// 3D extrusion height in meters (HARP engine).
+    /// </summary>
+    [Parameter, JsonIgnore]
+    public double? Extrusion { get; set; }
+
+    /// <summary>
+    /// 3D base elevation in meters (HARP engine).
+    /// </summary>
+    [Parameter, JsonIgnore]
+    public double? Elevation { get; set; }
+
+    /// <summary>
+    /// If true, the polyline can be dragged.
+    /// </summary>
+    [Parameter, JsonIgnore]
+    public bool Draggable { get; set; }
+
+    /// <summary>
     /// If true, the polyline is clickable.
     /// </summary>
     [Parameter, JsonIgnore]
@@ -75,8 +120,6 @@ public partial class PolylineComponent : IAsyncDisposable
     /// </summary>
     [Parameter, JsonIgnore]
     public object? Data { get; set; }
-
-    #region Pointer / Interaction EventCallbacks
 
     [Parameter, JsonIgnore]
     public EventCallback<MapPointerEventArgs> OnClick { get; set; }
@@ -119,10 +162,6 @@ public partial class PolylineComponent : IAsyncDisposable
 
     [Parameter, JsonIgnore]
     public EventCallback<MapDragEventArgs> OnDragEnd { get; set; }
-
-    #endregion
-
-    #region Internal event handlers (called by AdvancedHereMap)
 
     internal async Task HandlePointerEvent(string eventName, MapPointerEventArgs args)
     {
@@ -170,14 +209,21 @@ public partial class PolylineComponent : IAsyncDisposable
             await callback.InvokeAsync(args);
     }
 
-    #endregion
+    internal async Task HandleGeometryChanged(List<LatLngLiteral> path)
+    {
+        Path = path;
+
+        if (PathChanged.HasDelegate)
+            await PathChanged.InvokeAsync(path);
+    }
 
     internal bool HasAnyEventCallback =>
         OnClick.HasDelegate || OnDoubleClick.HasDelegate || OnLongPress.HasDelegate ||
         OnContextMenu.HasDelegate || OnContextMenuClose.HasDelegate ||
         OnPointerDown.HasDelegate || OnPointerUp.HasDelegate || OnPointerMove.HasDelegate ||
         OnPointerEnter.HasDelegate || OnPointerLeave.HasDelegate || OnPointerCancel.HasDelegate ||
-        OnDragStart.HasDelegate || OnDrag.HasDelegate || OnDragEnd.HasDelegate;
+        OnDragStart.HasDelegate || OnDrag.HasDelegate || OnDragEnd.HasDelegate ||
+        PathChanged.HasDelegate;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -203,7 +249,14 @@ public partial class PolylineComponent : IAsyncDisposable
                 LineWidth = LineWidth,
                 LineCap = LineCap,
                 LineDash = LineDash,
-                Clickable = Clickable || HasAnyEventCallback,
+                LineJoin = LineJoin,
+                LineDashOffset = LineDashOffset,
+                Arrows = Arrows,
+                ZIndex = ZIndex,
+                Extrusion = Extrusion,
+                Elevation = Elevation,
+                Draggable = Draggable,
+                Clickable = Clickable || Draggable || HasAnyEventCallback,
                 Visible = Visible,
                 MapId = MapRef.MapId,
             },
@@ -224,6 +277,13 @@ public partial class PolylineComponent : IAsyncDisposable
             parameters.DidParameterChange(LineWidth) ||
             parameters.DidParameterChange(LineCap) ||
             parameters.DidParameterChange(LineDash) ||
+            parameters.DidParameterChange(LineJoin) ||
+            parameters.DidParameterChange(LineDashOffset) ||
+            parameters.DidParameterChange(Arrows) ||
+            parameters.DidParameterChange(ZIndex) ||
+            parameters.DidParameterChange(Extrusion) ||
+            parameters.DidParameterChange(Elevation) ||
+            parameters.DidParameterChange(Draggable) ||
             parameters.DidParameterChange(Clickable) ||
             parameters.DidParameterChange(Visible);
 
@@ -247,7 +307,7 @@ public partial class PolylineComponent : IAsyncDisposable
         catch (JSDisconnectedException) { }
         catch (InvalidOperationException) { }
 
-        MapRef.RemovePolyline(this);
+        MapRef?.RemovePolyline(this);
         GC.SuppressFinalize(this);
     }
 
@@ -258,6 +318,13 @@ public partial class PolylineComponent : IAsyncDisposable
         public double? LineWidth { get; init; }
         public string? LineCap { get; init; }
         public double[]? LineDash { get; init; }
+        public string? LineJoin { get; init; }
+        public double? LineDashOffset { get; init; }
+        public bool? Arrows { get; init; }
+        public int? ZIndex { get; init; }
+        public double? Extrusion { get; init; }
+        public double? Elevation { get; init; }
+        public bool Draggable { get; init; }
         public bool? Clickable { get; init; }
         public bool? Visible { get; init; }
         public Guid? MapId { get; init; }

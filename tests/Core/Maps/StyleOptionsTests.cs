@@ -17,6 +17,9 @@ public class StyleOptionsTests
         Assert.That(style.LineDash, Is.Null);
         Assert.That(style.LineDashImage, Is.Null);
         Assert.That(style.LineDashScaleMode, Is.Null);
+        Assert.That(style.LineJoin, Is.Null);
+        Assert.That(style.LineDashOffset, Is.Null);
+        Assert.That(style.MiterLimit, Is.Null);
     }
 
     [Test]
@@ -30,7 +33,10 @@ public class StyleOptionsTests
             LineCap = "round",
             LineDash = [10, 5, 2, 5],
             LineDashImage = "dash-pattern.png",
-            LineDashScaleMode = "CONTINUOUS"
+            LineDashScaleMode = "CONTINUOUS",
+            LineJoin = "miter",
+            LineDashOffset = 5.0,
+            MiterLimit = 10.0
         };
 
         Assert.That(style.StrokeColor, Is.EqualTo("rgba(0, 0, 255, 0.5)"));
@@ -40,5 +46,8 @@ public class StyleOptionsTests
         Assert.That(style.LineDash, Is.EqualTo(new double[] { 10, 5, 2, 5 }));
         Assert.That(style.LineDashImage, Is.EqualTo("dash-pattern.png"));
         Assert.That(style.LineDashScaleMode, Is.EqualTo("CONTINUOUS"));
+        Assert.That(style.LineJoin, Is.EqualTo("miter"));
+        Assert.That(style.LineDashOffset, Is.EqualTo(5.0));
+        Assert.That(style.MiterLimit, Is.EqualTo(10.0));
     }
 }

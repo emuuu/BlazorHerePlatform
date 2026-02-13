@@ -42,28 +42,45 @@
         StrokeColor="#0066FF"
         LineWidth="4"
         LineCap="round"
+        LineJoin="@_lineJoin"
         Visible="@_showPolyline"
+        ZIndex="@_polylineZIndex"
+        Arrows="@_showArrows"
         OnClick="@(e => _status = $"Polyline clicked at ({e.Position?.Lat:F4}, {e.Position?.Lng:F4})")" />
 
+    @if (_showDashedPolyline)
+    {
+        <PolylineComponent
+            Path="@_dashedPath"
+            StrokeColor="#9900CC"
+            LineWidth="3"
+            LineDash="@(new double[] { 10, 6 })"
+            LineDashOffset="@_dashOffset"
+            Visible="true" />
+    }
+
     <CircleComponent
-        CenterLat="52.5163"
-        CenterLng="13.3777"
+        @bind-CenterLat="_circleLat"
+        @bind-CenterLng="_circleLng"
         Radius="@_circleRadius"
         StrokeColor="#FF0000"
         FillColor="rgba(255, 0, 0, 0.2)"
         LineWidth="2"
         Visible="@_showCircle"
+        Draggable="@_draggableCircle"
         OnClick="@(e => _status = $"Circle clicked at ({e.Position?.Lat:F4}, {e.Position?.Lng:F4})")" />
 
     <RectComponent
-        Top="52.525"
-        Left="13.410"
-        Bottom="52.515"
-        Right="13.430"
+        @bind-Top="_rectTop"
+        @bind-Left="_rectLeft"
+        @bind-Bottom="_rectBottom"
+        @bind-Right="_rectRight"
         StrokeColor="#FF9900"
         FillColor="rgba(255, 153, 0, 0.25)"
         LineWidth="2"
         Visible="@_showRect"
+        Draggable="@_draggableRect"
+        ZIndex="@_rectZIndex"
         OnClick="@(e => _status = $"Rect clicked at ({e.Position?.Lat:F4}, {e.Position?.Lng:F4})")" />
 </AdvancedHereMap>
 
@@ -81,9 +98,70 @@
     </div>
 
     <label class="ms-3">
-        Circle Radius: <input type="range" min="100" max="2000" step="50" @bind="_circleRadius" @bind:event="oninput" /> @_circleRadius m
+        Circle Radius: <input type="range" min="100" max="2000" step="50" @bind="_circleRadius" @bind:event="oninput" @bind:culture="@CultureInfo.InvariantCulture" /> @_circleRadius m
     </label>
 </div>
+
+<div class="mt-2 d-flex gap-3 flex-wrap align-items-center">
+    <div>
+        <label>LineJoin:</label>
+        <div class="btn-group btn-group-sm ms-1">
+            <button class="btn @(_lineJoin == "round" ? "btn-primary" : "btn-outline-primary")" @onclick="@(() => _lineJoin = "round")">round</button>
+            <button class="btn @(_lineJoin == "miter" ? "btn-primary" : "btn-outline-primary")" @onclick="@(() => _lineJoin = "miter")">miter</button>
+            <button class="btn @(_lineJoin == "bevel" ? "btn-primary" : "btn-outline-primary")" @onclick="@(() => _lineJoin = "bevel")">bevel</button>
+        </div>
+    </div>
+
+    <div class="form-check form-switch">
+        <input class="form-check-input" type="checkbox" @bind="_showArrows" />
+        <label class="form-check-label">Arrows</label>
+    </div>
+
+    <div class="form-check form-switch">
+        <input class="form-check-input" type="checkbox" @bind="_showDashedPolyline" />
+        <label class="form-check-label">Dashed Line</label>
+    </div>
+
+    <div>
+        <label>Dash Offset: @_dashOffset.ToString("F0", CultureInfo.InvariantCulture)</label>
+        <input type="range" min="0" max="20" step="1" @bind="_dashOffset" @bind:event="oninput" @bind:culture="@CultureInfo.InvariantCulture" style="width:120px;" />
+    </div>
+
+    <div>
+        <label>Polyline ZIndex: @_polylineZIndex</label>
+        <input type="range" min="0" max="10" step="1" @bind="_polylineZIndex" @bind:event="oninput" style="width:100px;" />
+    </div>
+
+    <div>
+        <label>Rect ZIndex: @_rectZIndex</label>
+        <input type="range" min="0" max="10" step="1" @bind="_rectZIndex" @bind:event="oninput" style="width:100px;" />
+    </div>
+
+    <div class="form-check form-switch">
+        <input class="form-check-input" type="checkbox" @bind="_draggableCircle" />
+        <label class="form-check-label">Draggable Circle</label>
+    </div>
+
+    <div class="form-check form-switch">
+        <input class="form-check-input" type="checkbox" @bind="_draggableRect" />
+        <label class="form-check-label">Draggable Rect</label>
+    </div>
+</div>
+
+@if (_draggableCircle || _draggableRect)
+{
+    <div class="mt-2 small text-muted">
+        <strong>Two-way binding (drag shapes to update):</strong>
+        @if (_draggableCircle)
+        {
+            <span class="ms-2">Circle: (@_circleLat.ToString("F4", CultureInfo.InvariantCulture), @_circleLng.ToString("F4", CultureInfo.InvariantCulture))</span>
+        }
+        @if (_draggableRect)
+        {
+            <span class="ms-2">Rect: T=@_rectTop.ToString("F4", CultureInfo.InvariantCulture) L=@_rectLeft.ToString("F4", CultureInfo.InvariantCulture) B=@_rectBottom.ToString("F4", CultureInfo.InvariantCulture) R=@_rectRight.ToString("F4", CultureInfo.InvariantCulture)</span>
+        }
+    </div>
+}
 
 @if (!string.IsNullOrEmpty(_status))
 {
@@ -106,6 +184,20 @@
     private bool _showRect = true;
     private double _circleRadius = 500;
     private string? _status;
+    private string _lineJoin = "round";
+    private bool _showArrows;
+    private bool _showDashedPolyline;
+    private double _dashOffset;
+    private int _polylineZIndex = 0;
+    private int _rectZIndex = 0;
+    private bool _draggableRect;
+    private bool _draggableCircle;
+    private double _circleLat = 52.5163;
+    private double _circleLng = 13.3777;
+    private double _rectTop = 52.525;
+    private double _rectLeft = 13.410;
+    private double _rectBottom = 52.515;
+    private double _rectRight = 13.430;
 
     private List<LatLngLiteral> _polylinePath = new()
     {
@@ -113,5 +205,13 @@
         new(52.5230, 13.4000),
         new(52.5180, 13.4100),
         new(52.5210, 13.4200)
+    };
+
+    private List<LatLngLiteral> _dashedPath = new()
+    {
+        new(52.5170, 13.3900),
+        new(52.5190, 13.4050),
+        new(52.5150, 13.4150),
+        new(52.5175, 13.4250)
     };
 }

@@ -29,10 +29,13 @@ public partial class PolygonComponent : IAsyncDisposable
     private AdvancedHereMap MapRef { get; set; } = default!;
 
     /// <summary>
-    /// Path defining the polygon boundary.
+    /// Path defining the polygon boundary. Two-way bindable via <c>@bind-Path</c>.
     /// </summary>
     [Parameter, JsonIgnore]
     public List<LatLngLiteral>? Path { get; set; }
+
+    [Parameter, JsonIgnore]
+    public EventCallback<List<LatLngLiteral>?> PathChanged { get; set; }
 
     /// <summary>
     /// Stroke color in CSS format.
@@ -77,6 +80,42 @@ public partial class PolygonComponent : IAsyncDisposable
     public List<List<LatLngLiteral>>? Holes { get; set; }
 
     /// <summary>
+    /// Line cap style: "round", "square", "butt".
+    /// </summary>
+    [Parameter, JsonIgnore]
+    public string? LineCap { get; set; }
+
+    /// <summary>
+    /// Line join style: "round", "miter", "bevel".
+    /// </summary>
+    [Parameter, JsonIgnore]
+    public string? LineJoin { get; set; }
+
+    /// <summary>
+    /// Array of dash pattern [dash, gap, dash, gap, ...].
+    /// </summary>
+    [Parameter, JsonIgnore]
+    public double[]? LineDash { get; set; }
+
+    /// <summary>
+    /// Offset into the dash pattern.
+    /// </summary>
+    [Parameter, JsonIgnore]
+    public double? LineDashOffset { get; set; }
+
+    /// <summary>
+    /// Z-index for stacking order.
+    /// </summary>
+    [Parameter, JsonIgnore]
+    public int? ZIndex { get; set; }
+
+    /// <summary>
+    /// If true, the polygon can be dragged.
+    /// </summary>
+    [Parameter, JsonIgnore]
+    public bool Draggable { get; set; }
+
+    /// <summary>
     /// 3D extrusion height in meters (HARP engine).
     /// </summary>
     [Parameter, JsonIgnore]
@@ -87,8 +126,6 @@ public partial class PolygonComponent : IAsyncDisposable
     /// </summary>
     [Parameter, JsonIgnore]
     public double? Elevation { get; set; }
-
-    #region Pointer / Interaction EventCallbacks
 
     /// <summary>
     /// Fired when the polygon is tapped/clicked.
@@ -175,10 +212,6 @@ public partial class PolygonComponent : IAsyncDisposable
     [Parameter, JsonIgnore]
     public EventCallback<MapDragEventArgs> OnDragEnd { get; set; }
 
-    #endregion
-
-    #region Internal event handlers (called by AdvancedHereMap)
-
     internal async Task HandlePointerEvent(string eventName, MapPointerEventArgs args)
     {
         var callback = eventName switch
@@ -225,7 +258,13 @@ public partial class PolygonComponent : IAsyncDisposable
             await callback.InvokeAsync(args);
     }
 
-    #endregion
+    internal async Task HandleGeometryChanged(List<LatLngLiteral> path)
+    {
+        Path = path;
+
+        if (PathChanged.HasDelegate)
+            await PathChanged.InvokeAsync(path);
+    }
 
     /// <summary>
     /// Returns true if any pointer/interaction event callback is bound.
@@ -235,7 +274,8 @@ public partial class PolygonComponent : IAsyncDisposable
         OnContextMenu.HasDelegate || OnContextMenuClose.HasDelegate ||
         OnPointerDown.HasDelegate || OnPointerUp.HasDelegate || OnPointerMove.HasDelegate ||
         OnPointerEnter.HasDelegate || OnPointerLeave.HasDelegate || OnPointerCancel.HasDelegate ||
-        OnDragStart.HasDelegate || OnDrag.HasDelegate || OnDragEnd.HasDelegate;
+        OnDragStart.HasDelegate || OnDrag.HasDelegate || OnDragEnd.HasDelegate ||
+        PathChanged.HasDelegate;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -260,7 +300,13 @@ public partial class PolygonComponent : IAsyncDisposable
                 StrokeColor = StrokeColor,
                 FillColor = FillColor,
                 LineWidth = LineWidth,
-                Clickable = Clickable || HasAnyEventCallback,
+                LineCap = LineCap,
+                LineJoin = LineJoin,
+                LineDash = LineDash,
+                LineDashOffset = LineDashOffset,
+                ZIndex = ZIndex,
+                Draggable = Draggable,
+                Clickable = Clickable || Draggable || HasAnyEventCallback,
                 Visible = Visible,
                 Holes = Holes,
                 Extrusion = Extrusion,
@@ -283,6 +329,12 @@ public partial class PolygonComponent : IAsyncDisposable
             parameters.DidParameterChange(StrokeColor) ||
             parameters.DidParameterChange(FillColor) ||
             parameters.DidParameterChange(LineWidth) ||
+            parameters.DidParameterChange(LineCap) ||
+            parameters.DidParameterChange(LineJoin) ||
+            parameters.DidParameterChange(LineDash) ||
+            parameters.DidParameterChange(LineDashOffset) ||
+            parameters.DidParameterChange(ZIndex) ||
+            parameters.DidParameterChange(Draggable) ||
             parameters.DidParameterChange(Clickable) ||
             parameters.DidParameterChange(Visible) ||
             parameters.DidParameterChange(Holes) ||
@@ -302,7 +354,7 @@ public partial class PolygonComponent : IAsyncDisposable
         if (IsDisposed) return;
         IsDisposed = true;
         await Js.InvokeVoidAsync("blazorHerePlatform.objectManager.disposePolygonComponent", Guid);
-        MapRef.RemovePolygon(this);
+        MapRef?.RemovePolygon(this);
         GC.SuppressFinalize(this);
     }
 
@@ -312,6 +364,12 @@ public partial class PolygonComponent : IAsyncDisposable
         public string? StrokeColor { get; init; }
         public string? FillColor { get; init; }
         public double? LineWidth { get; init; }
+        public string? LineCap { get; init; }
+        public string? LineJoin { get; init; }
+        public double[]? LineDash { get; init; }
+        public double? LineDashOffset { get; init; }
+        public int? ZIndex { get; init; }
+        public bool Draggable { get; init; }
         public bool? Clickable { get; init; }
         public bool? Visible { get; init; }
         public List<List<LatLngLiteral>>? Holes { get; init; }

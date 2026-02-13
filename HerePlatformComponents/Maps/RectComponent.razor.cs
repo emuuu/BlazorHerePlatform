@@ -28,28 +28,40 @@ public partial class RectComponent : IAsyncDisposable
     private AdvancedHereMap MapRef { get; set; } = default!;
 
     /// <summary>
-    /// Top latitude of the bounding rectangle.
+    /// Top latitude of the bounding rectangle. Two-way bindable via <c>@bind-Top</c>.
     /// </summary>
     [Parameter, JsonIgnore]
     public double Top { get; set; }
 
+    [Parameter, JsonIgnore]
+    public EventCallback<double> TopChanged { get; set; }
+
     /// <summary>
-    /// Left longitude of the bounding rectangle.
+    /// Left longitude of the bounding rectangle. Two-way bindable via <c>@bind-Left</c>.
     /// </summary>
     [Parameter, JsonIgnore]
     public double Left { get; set; }
 
+    [Parameter, JsonIgnore]
+    public EventCallback<double> LeftChanged { get; set; }
+
     /// <summary>
-    /// Bottom latitude of the bounding rectangle.
+    /// Bottom latitude of the bounding rectangle. Two-way bindable via <c>@bind-Bottom</c>.
     /// </summary>
     [Parameter, JsonIgnore]
     public double Bottom { get; set; }
 
+    [Parameter, JsonIgnore]
+    public EventCallback<double> BottomChanged { get; set; }
+
     /// <summary>
-    /// Right longitude of the bounding rectangle.
+    /// Right longitude of the bounding rectangle. Two-way bindable via <c>@bind-Right</c>.
     /// </summary>
     [Parameter, JsonIgnore]
     public double Right { get; set; }
+
+    [Parameter, JsonIgnore]
+    public EventCallback<double> RightChanged { get; set; }
 
     /// <summary>
     /// Stroke color in CSS format.
@@ -68,6 +80,42 @@ public partial class RectComponent : IAsyncDisposable
     /// </summary>
     [Parameter, JsonIgnore]
     public double? LineWidth { get; set; }
+
+    /// <summary>
+    /// Line cap style: "round", "square", "butt".
+    /// </summary>
+    [Parameter, JsonIgnore]
+    public string? LineCap { get; set; }
+
+    /// <summary>
+    /// Line join style: "round", "miter", "bevel".
+    /// </summary>
+    [Parameter, JsonIgnore]
+    public string? LineJoin { get; set; }
+
+    /// <summary>
+    /// Array of dash pattern [dash, gap, dash, gap, ...].
+    /// </summary>
+    [Parameter, JsonIgnore]
+    public double[]? LineDash { get; set; }
+
+    /// <summary>
+    /// Offset into the dash pattern.
+    /// </summary>
+    [Parameter, JsonIgnore]
+    public double? LineDashOffset { get; set; }
+
+    /// <summary>
+    /// Z-index for stacking order.
+    /// </summary>
+    [Parameter, JsonIgnore]
+    public int? ZIndex { get; set; }
+
+    /// <summary>
+    /// If true, the rectangle can be dragged.
+    /// </summary>
+    [Parameter, JsonIgnore]
+    public bool Draggable { get; set; }
 
     /// <summary>
     /// If true, the rectangle is clickable.
@@ -98,8 +146,6 @@ public partial class RectComponent : IAsyncDisposable
     /// </summary>
     [Parameter, JsonIgnore]
     public double? Elevation { get; set; }
-
-    #region Pointer / Interaction EventCallbacks
 
     [Parameter, JsonIgnore]
     public EventCallback<MapPointerEventArgs> OnClick { get; set; }
@@ -142,10 +188,6 @@ public partial class RectComponent : IAsyncDisposable
 
     [Parameter, JsonIgnore]
     public EventCallback<MapDragEventArgs> OnDragEnd { get; set; }
-
-    #endregion
-
-    #region Internal event handlers (called by AdvancedHereMap)
 
     internal async Task HandlePointerEvent(string eventName, MapPointerEventArgs args)
     {
@@ -193,14 +235,30 @@ public partial class RectComponent : IAsyncDisposable
             await callback.InvokeAsync(args);
     }
 
-    #endregion
+    internal async Task HandleGeometryChanged(double top, double left, double bottom, double right)
+    {
+        Top = top;
+        Left = left;
+        Bottom = bottom;
+        Right = right;
+
+        if (TopChanged.HasDelegate)
+            await TopChanged.InvokeAsync(top);
+        if (LeftChanged.HasDelegate)
+            await LeftChanged.InvokeAsync(left);
+        if (BottomChanged.HasDelegate)
+            await BottomChanged.InvokeAsync(bottom);
+        if (RightChanged.HasDelegate)
+            await RightChanged.InvokeAsync(right);
+    }
 
     internal bool HasAnyEventCallback =>
         OnClick.HasDelegate || OnDoubleClick.HasDelegate || OnLongPress.HasDelegate ||
         OnContextMenu.HasDelegate || OnContextMenuClose.HasDelegate ||
         OnPointerDown.HasDelegate || OnPointerUp.HasDelegate || OnPointerMove.HasDelegate ||
         OnPointerEnter.HasDelegate || OnPointerLeave.HasDelegate || OnPointerCancel.HasDelegate ||
-        OnDragStart.HasDelegate || OnDrag.HasDelegate || OnDragEnd.HasDelegate;
+        OnDragStart.HasDelegate || OnDrag.HasDelegate || OnDragEnd.HasDelegate ||
+        TopChanged.HasDelegate || LeftChanged.HasDelegate || BottomChanged.HasDelegate || RightChanged.HasDelegate;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -228,7 +286,13 @@ public partial class RectComponent : IAsyncDisposable
                 StrokeColor = StrokeColor,
                 FillColor = FillColor,
                 LineWidth = LineWidth,
-                Clickable = Clickable || HasAnyEventCallback,
+                LineCap = LineCap,
+                LineJoin = LineJoin,
+                LineDash = LineDash,
+                LineDashOffset = LineDashOffset,
+                ZIndex = ZIndex,
+                Draggable = Draggable,
+                Clickable = Clickable || Draggable || HasAnyEventCallback,
                 Visible = Visible,
                 Extrusion = Extrusion,
                 Elevation = Elevation,
@@ -253,6 +317,12 @@ public partial class RectComponent : IAsyncDisposable
             parameters.DidParameterChange(StrokeColor) ||
             parameters.DidParameterChange(FillColor) ||
             parameters.DidParameterChange(LineWidth) ||
+            parameters.DidParameterChange(LineCap) ||
+            parameters.DidParameterChange(LineJoin) ||
+            parameters.DidParameterChange(LineDash) ||
+            parameters.DidParameterChange(LineDashOffset) ||
+            parameters.DidParameterChange(ZIndex) ||
+            parameters.DidParameterChange(Draggable) ||
             parameters.DidParameterChange(Clickable) ||
             parameters.DidParameterChange(Visible);
 
@@ -276,7 +346,7 @@ public partial class RectComponent : IAsyncDisposable
         catch (JSDisconnectedException) { }
         catch (InvalidOperationException) { }
 
-        MapRef.RemoveRect(this);
+        MapRef?.RemoveRect(this);
         GC.SuppressFinalize(this);
     }
 
@@ -289,6 +359,12 @@ public partial class RectComponent : IAsyncDisposable
         public string? StrokeColor { get; init; }
         public string? FillColor { get; init; }
         public double? LineWidth { get; init; }
+        public string? LineCap { get; init; }
+        public string? LineJoin { get; init; }
+        public double[]? LineDash { get; init; }
+        public double? LineDashOffset { get; init; }
+        public int? ZIndex { get; init; }
+        public bool Draggable { get; init; }
         public bool? Clickable { get; init; }
         public bool? Visible { get; init; }
         public double? Extrusion { get; init; }

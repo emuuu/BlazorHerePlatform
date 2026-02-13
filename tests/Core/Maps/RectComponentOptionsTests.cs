@@ -20,6 +20,12 @@ public class RectComponentOptionsTests
         Assert.That(component.Clickable, Is.False);
         Assert.That(component.Visible, Is.True);
         Assert.That(component.Data, Is.Null);
+        Assert.That(component.LineCap, Is.Null);
+        Assert.That(component.LineJoin, Is.Null);
+        Assert.That(component.LineDash, Is.Null);
+        Assert.That(component.LineDashOffset, Is.Null);
+        Assert.That(component.ZIndex, Is.Null);
+        Assert.That(component.Draggable, Is.False);
     }
 
     [Test]
@@ -89,6 +95,73 @@ public class RectComponentOptionsTests
         component.Data = data;
 
         Assert.That(component.Data, Is.SameAs(data));
+    }
+
+    [Test]
+    public void LineCap_IsSettable()
+    {
+        var component = new RectComponent();
+        component.LineCap = "square";
+
+        Assert.That(component.LineCap, Is.EqualTo("square"));
+    }
+
+    [Test]
+    public void LineJoin_IsSettable()
+    {
+        var component = new RectComponent();
+        component.LineJoin = "round";
+
+        Assert.That(component.LineJoin, Is.EqualTo("round"));
+    }
+
+    [Test]
+    public void LineDash_IsSettable()
+    {
+        var component = new RectComponent();
+        component.LineDash = [4, 2];
+
+        Assert.That(component.LineDash, Is.EqualTo(new double[] { 4, 2 }));
+    }
+
+    [Test]
+    public void LineDashOffset_IsSettable()
+    {
+        var component = new RectComponent();
+        component.LineDashOffset = 1.5;
+
+        Assert.That(component.LineDashOffset, Is.EqualTo(1.5));
+    }
+
+    [Test]
+    public void ZIndex_IsSettable()
+    {
+        var component = new RectComponent();
+        component.ZIndex = 7;
+
+        Assert.That(component.ZIndex, Is.EqualTo(7));
+    }
+
+    [Test]
+    public void Draggable_IsSettable()
+    {
+        var component = new RectComponent();
+        component.Draggable = true;
+
+        Assert.That(component.Draggable, Is.True);
+    }
+
+    [Test]
+    public async Task HandleGeometryChanged_UpdatesBounds()
+    {
+        var component = new RectComponent();
+
+        await component.HandleGeometryChanged(52.525, 13.410, 52.515, 13.430);
+
+        Assert.That(component.Top, Is.EqualTo(52.525));
+        Assert.That(component.Left, Is.EqualTo(13.410));
+        Assert.That(component.Bottom, Is.EqualTo(52.515));
+        Assert.That(component.Right, Is.EqualTo(13.430));
     }
 
     [Test]
