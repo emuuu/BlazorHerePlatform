@@ -29,11 +29,19 @@
 
 &lt;!-- Two-way binding: drag updates variables, changing variables moves the pin --&gt;
 &lt;MarkerComponent @@bind-Lat="_lat" @@bind-Lng="_lng"
-                 Draggable="true" /&gt;</code></pre>
+                 Draggable="true" /&gt;
+
+&lt;!-- Map view binding: pan/zoom updates variables, changing variables moves the map --&gt;
+&lt;AdvancedHereMap @@bind-Center="_center" @@bind-Zoom="_zoom"
+                 Options="@@_mapOptions"&gt;
+    ...
+&lt;/AdvancedHereMap&gt;</code></pre>
 </details>
 
 <AdvancedHereMap @ref="_advMap"
                  Options="@_mapOptions"
+                 @bind-Center="_viewCenter"
+                 @bind-Zoom="_viewZoom"
                  OnAfterInit="@OnMapInit"
                  Height="500px">
 
@@ -73,7 +81,7 @@
 <div class="row mt-3">
     <div class="col-md-6">
         <div class="card">
-            <div class="card-header fw-bold">Two-Way Binding</div>
+            <div class="card-header fw-bold">Marker Two-Way Binding</div>
             <div class="card-body">
                 <p class="card-text small text-muted">Drag the orange marker or change the coordinates below. Both stay in sync via <code>@@bind-Lat</code> / <code>@@bind-Lng</code>.</p>
                 <div class="row g-2">
@@ -92,6 +100,27 @@
                     </div>
                 </div>
                 <small class="text-muted mt-1 d-block">Position: @_boundLat.ToString("F5"), @_boundLng.ToString("F5")</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header fw-bold">Map View Binding</div>
+            <div class="card-body">
+                <p class="card-text small text-muted">Pan or zoom the map — values update automatically via <code>@@bind-Center</code> / <code>@@bind-Zoom</code>. Change zoom to move the map programmatically.</p>
+                <div class="row g-2">
+                    <div class="col">
+                        <label class="form-label">Center</label>
+                        <input type="text" class="form-control form-control-sm" readonly
+                               value="@($"{_viewCenter.Lat:F4}, {_viewCenter.Lng:F4}")" />
+                    </div>
+                    <div class="col">
+                        <label class="form-label">Zoom</label>
+                        <input type="number" step="1" min="1" max="20" class="form-control form-control-sm"
+                               value="@_viewZoom.ToString("F1")"
+                               @onchange="OnZoomInputChanged" />
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -118,6 +147,8 @@
     private int _markerIndex;
     private double _boundLat = 52.5200;
     private double _boundLng = 13.4050;
+    private LatLngLiteral _viewCenter = new(52.52, 13.405);
+    private double _viewZoom = 13;
 
     private MapOptions _mapOptions = new()
     {
@@ -161,6 +192,14 @@
     {
         _boundLat = 52.5200;
         _boundLng = 13.4050;
+    }
+
+    private void OnZoomInputChanged(ChangeEventArgs e)
+    {
+        if (double.TryParse(e.Value?.ToString(), out var zoom))
+        {
+            _viewZoom = Math.Clamp(zoom, 1, 20);
+        }
     }
 
     private void ClearMarkers()

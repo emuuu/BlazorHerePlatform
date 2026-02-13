@@ -1,5 +1,6 @@
 @using HerePlatformComponents.Maps
 @using HerePlatformComponents.Maps.Events
+@using HerePlatformComponents.Maps.Extension
 @using Microsoft.JSInterop
 @inherits ComponentBase
 @inject IJSRuntime Js
@@ -54,6 +55,66 @@
 
     [Parameter]
     public RenderFragment? ChildContent { get; set; }
+
+    #region Two-Way Bindable View Parameters
+
+    /// <summary>
+    /// Map center position. Two-way bindable via <c>@bind-Center</c>.
+    /// When set, overrides Options.Center. Updated when the user pans the map.
+    /// </summary>
+    [Parameter]
+    public LatLngLiteral? Center { get; set; }
+
+    /// <summary>
+    /// Callback for two-way binding of <see cref="Center"/>.
+    /// Fired when the user finishes panning (on mapviewchangeend).
+    /// </summary>
+    [Parameter]
+    public EventCallback<LatLngLiteral> CenterChanged { get; set; }
+
+    /// <summary>
+    /// Map zoom level. Two-way bindable via <c>@bind-Zoom</c>.
+    /// When set, overrides Options.Zoom. Updated when the user zooms the map.
+    /// </summary>
+    [Parameter]
+    public double? Zoom { get; set; }
+
+    /// <summary>
+    /// Callback for two-way binding of <see cref="Zoom"/>.
+    /// Fired when the user finishes zooming (on mapviewchangeend).
+    /// </summary>
+    [Parameter]
+    public EventCallback<double> ZoomChanged { get; set; }
+
+    /// <summary>
+    /// Map tilt angle in degrees. Two-way bindable via <c>@bind-Tilt</c>.
+    /// When set, overrides Options.Tilt. Updated on user tilt gesture.
+    /// </summary>
+    [Parameter]
+    public double? Tilt { get; set; }
+
+    /// <summary>
+    /// Callback for two-way binding of <see cref="Tilt"/>.
+    /// Fired when the user finishes tilting (on mapviewchangeend).
+    /// </summary>
+    [Parameter]
+    public EventCallback<double> TiltChanged { get; set; }
+
+    /// <summary>
+    /// Map heading (rotation) in degrees. Two-way bindable via <c>@bind-Heading</c>.
+    /// When set, overrides Options.Heading. Updated on user rotation gesture.
+    /// </summary>
+    [Parameter]
+    public double? Heading { get; set; }
+
+    /// <summary>
+    /// Callback for two-way binding of <see cref="Heading"/>.
+    /// Fired when the user finishes rotating (on mapviewchangeend).
+    /// </summary>
+    [Parameter]
+    public EventCallback<double> HeadingChanged { get; set; }
+
+    #endregion
 
     #region Map-level Pointer / Interaction EventCallbacks
 
@@ -187,6 +248,43 @@
     {
         CallbackRef = DotNetObjectReference.Create(this);
         base.OnInitialized();
+    }
+
+    public override async Task SetParametersAsync(ParameterView parameters)
+    {
+        // Before map is initialized: merge individual params into Options for initial render
+        if (MapRef?.InteropObject is null)
+        {
+            await base.SetParametersAsync(parameters);
+
+            if (Options != null)
+            {
+                if (Center.HasValue) Options.Center = Center.Value;
+                if (Zoom.HasValue) Options.Zoom = Zoom.Value;
+                if (Tilt.HasValue) Options.Tilt = Tilt;
+                if (Heading.HasValue) Options.Heading = Heading;
+            }
+
+            return;
+        }
+
+        // After init: detect which view parameters changed before base updates them
+        var centerChanged = parameters.DidParameterChange(Center);
+        var zoomChanged = parameters.DidParameterChange(Zoom);
+        var tiltChanged = parameters.DidParameterChange(Tilt);
+        var headingChanged = parameters.DidParameterChange(Heading);
+
+        await base.SetParametersAsync(parameters);
+
+        // Push programmatic changes to the JS map
+        if (centerChanged && Center.HasValue)
+            await MapRef.InteropObject.SetCenter(Center.Value);
+        if (zoomChanged && Zoom.HasValue)
+            await MapRef.InteropObject.SetZoom(Zoom.Value);
+        if (tiltChanged && Tilt.HasValue)
+            await MapRef.InteropObject.SetTilt(Tilt.Value);
+        if (headingChanged && Heading.HasValue)
+            await MapRef.InteropObject.SetHeading(Heading.Value);
     }
 
     private async Task AfterInit()
@@ -364,6 +462,31 @@
 
         if (callback.HasDelegate)
             await callback.InvokeAsync(args);
+
+        // Two-way binding: update bound parameters on view change end
+        if (eventName == "mapviewchangeend")
+        {
+            if (CenterChanged.HasDelegate && args.Center.HasValue)
+            {
+                Center = args.Center.Value;
+                await CenterChanged.InvokeAsync(args.Center.Value);
+            }
+            if (ZoomChanged.HasDelegate)
+            {
+                Zoom = args.Zoom;
+                await ZoomChanged.InvokeAsync(args.Zoom);
+            }
+            if (TiltChanged.HasDelegate)
+            {
+                Tilt = args.Tilt;
+                await TiltChanged.InvokeAsync(args.Tilt);
+            }
+            if (HeadingChanged.HasDelegate)
+            {
+                Heading = args.Heading;
+                await HeadingChanged.InvokeAsync(args.Heading);
+            }
+        }
     }
 
     [JSInvokable]
