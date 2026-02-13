@@ -1,0 +1,163 @@
+@page "/map-traffic"
+@rendermode InteractiveServer
+@using HerePlatformComponents.Maps.Services
+@using HerePlatformComponents.Maps.Services.Traffic
+
+<PageTitle>Traffic</PageTitle>
+
+<h3>Traffic Demo</h3>
+<p>View traffic incidents in the current map area. Click "Load Incidents" to fetch data.</p>
+
+<details class="mb-3">
+    <summary class="fw-bold" role="button">Usage</summary>
+    <pre class="bg-light border rounded p-3 mt-2 mb-0"><code>@@inject ITrafficService TrafficService
+
+var result = await TrafficService.GetTrafficIncidentsAsync(
+    north: 52.56, south: 52.48,
+    east: 13.45, west: 13.35);
+
+foreach (var incident in result.Incidents)
+{
+    Console.WriteLine($"{incident.Type}: {incident.RoadName}");
+    // Position, Severity, Description, StartTime, EndTime
+}</code></pre>
+</details>
+
+<AdvancedHereMap @ref="_advMap" Options="@_mapOptions" Height="500px">
+
+    @foreach (var incident in _incidents)
+    {
+        if (incident.Position.HasValue)
+        {
+            <MarkerComponent Lat="@incident.Position.Value.Lat" Lng="@incident.Position.Value.Lng"
+                             IconUrl="@GetSeveritySvg(incident.Severity)">
+                <ChildContent>
+                    <div style="min-width:180px">
+                        <strong>@GetTypeLabel(incident.Type)</strong>
+                        @if (!string.IsNullOrEmpty(incident.RoadName))
+                        {
+                            <br /><span>@incident.RoadName</span>
+                        }
+                        @if (!string.IsNullOrEmpty(incident.Description))
+                        {
+                            <br /><small>@incident.Description</small>
+                        }
+                        @if (!string.IsNullOrEmpty(incident.StartTime))
+                        {
+                            <br /><small style="color:#888">@FormatTime(incident.StartTime)</small>
+                        }
+                    </div>
+                </ChildContent>
+            </MarkerComponent>
+        }
+    }
+
+</AdvancedHereMap>
+
+<div class="mt-3 d-flex gap-3 flex-wrap">
+    <button class="btn btn-primary" @onclick="LoadIncidents" disabled="@_isLoading">
+        @(_isLoading ? "Loading..." : "Load Incidents")
+    </button>
+
+    <button class="btn btn-outline-danger" @onclick="ClearIncidents">Clear</button>
+</div>
+
+@if (_incidents.Count > 0)
+{
+    <div class="mt-3 alert alert-success">
+        Loaded @_incidents.Count incidents.
+    </div>
+}
+
+@if (!string.IsNullOrEmpty(_status))
+{
+    <div class="mt-3 alert alert-info">@_status</div>
+}
+
+@code {
+    private AdvancedHereMap? _advMap;
+    private List<TrafficIncident> _incidents = new();
+    private bool _isLoading;
+    private string? _status;
+
+    [Inject]
+    private ITrafficService TrafficService { get; set; } = default!;
+
+    private MapOptions _mapOptions = new()
+    {
+        Center = new LatLngLiteral(52.52, 13.405),
+        Zoom = 12,
+        EnableUI = true,
+        EnableInteraction = true
+    };
+
+    private async Task LoadIncidents()
+    {
+        _isLoading = true;
+        _status = null;
+        StateHasChanged();
+
+        try
+        {
+            // Use Berlin area bounding box
+            var result = await TrafficService.GetTrafficIncidentsAsync(
+                north: 52.56, south: 52.48, east: 13.45, west: 13.35);
+
+            _incidents = result.Incidents ?? new List<TrafficIncident>();
+
+            if (_incidents.Count == 0)
+            {
+                _status = "No incidents found in this area.";
+            }
+        }
+        catch (Exception ex)
+        {
+            _status = $"Error: {ex.Message}";
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    private void ClearIncidents()
+    {
+        _incidents.Clear();
+        _status = null;
+    }
+
+    private static string GetSeveritySvg(int severity)
+    {
+        var (fill, stroke, symbol) = severity switch
+        {
+            >= 3 => ("#c0392b", "#922b21", "!"),
+            2    => ("#e67e22", "#ba6418", "!"),
+            1    => ("#f39c12", "#d68910", "\u25B2"),
+            _    => ("#7f8c8d", "#616a6b", "?")
+        };
+        return "<svg xmlns='http://www.w3.org/2000/svg' width='28' height='36' viewBox='0 0 28 36'>" +
+            $"<path d='M14 0C6.3 0 0 6.3 0 14c0 10.5 14 22 14 22s14-11.5 14-22C28 6.3 21.7 0 14 0z' fill='{fill}' stroke='{stroke}' stroke-width='1.5'/>" +
+            $"<text x='14' y='17' text-anchor='middle' font-size='14' font-weight='bold' fill='white' font-family='sans-serif'>{symbol}</text>" +
+            "</svg>";
+    }
+
+    private static string GetTypeLabel(string? type) => (type?.ToUpperInvariant()) switch
+    {
+        "ACCIDENT" => "Accident",
+        "CONSTRUCTION" => "Construction",
+        "ROAD_CLOSURE" => "Road Closure",
+        "LANE_RESTRICTION" => "Lane Restriction",
+        "CONGESTION" => "Congestion",
+        "WEATHER" => "Weather",
+        "ROAD_HAZARD" => "Road Hazard",
+        "PLANNED_EVENT" => "Planned Event",
+        _ => type?.Replace("_", " ") ?? "Incident"
+    };
+
+    private static string FormatTime(string? isoTime)
+    {
+        if (DateTime.TryParse(isoTime, out var dt))
+            return dt.ToString("dd.MM. HH:mm");
+        return isoTime ?? "";
+    }
+}

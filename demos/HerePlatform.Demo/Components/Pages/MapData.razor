@@ -1,0 +1,196 @@
+@page "/map-data"
+@rendermode InteractiveServer
+@using HerePlatformComponents.Maps.Data
+
+<PageTitle>Data Import</PageTitle>
+
+<h3>Data Import Demo</h3>
+<p>Load GeoJSON and KML data onto the map.</p>
+
+<details class="mb-3">
+    <summary class="fw-bold" role="button">Usage</summary>
+    <pre class="bg-light border rounded p-3 mt-2 mb-0"><code>@@using HerePlatformComponents.Maps.Data
+
+&lt;AdvancedHereMap Options="@@_mapOptions" Height="500px"&gt;
+
+    &lt;!-- Load GeoJSON from URL --&gt;
+    &lt;GeoJsonReaderComponent
+        Url="https://example.com/data.geojson"
+        Visible="true"
+        OnLoaded="@@(e =&gt; Console.WriteLine($&amp;quot;{e.ObjectCount} objects&amp;quot;))" /&gt;
+
+    &lt;!-- Or load inline GeoJSON --&gt;
+    &lt;GeoJsonReaderComponent
+        GeoJsonString="@@_geoJson"
+        Visible="true" /&gt;
+
+    &lt;!-- Load KML from URL --&gt;
+    &lt;KmlReaderComponent
+        Url="https://example.com/data.kml"
+        Visible="true"
+        OnLoaded="@@OnKmlLoaded" /&gt;
+
+&lt;/AdvancedHereMap&gt;</code></pre>
+</details>
+
+<AdvancedHereMap @ref="_advMap" Options="@_mapOptions" Height="500px">
+
+    @if (_showGeoJson && !string.IsNullOrEmpty(_geoJsonSource))
+    {
+        @if (_geoJsonMode == "url")
+        {
+            <GeoJsonReaderComponent Url="@_geoJsonSource" Visible="true" OnLoaded="OnGeoJsonLoaded" />
+        }
+        else
+        {
+            <GeoJsonReaderComponent GeoJsonString="@_geoJsonSource" Visible="true" OnLoaded="OnGeoJsonLoaded" />
+        }
+    }
+
+    @if (_showKml && !string.IsNullOrEmpty(_kmlUrl))
+    {
+        <KmlReaderComponent Url="@_kmlUrl" Visible="true" OnLoaded="OnKmlLoaded" />
+    }
+
+</AdvancedHereMap>
+
+<div class="mt-3">
+    <ul class="nav nav-tabs" role="tablist">
+        <li class="nav-item">
+            <button class="nav-link @(_activeTab == "geojson" ? "active" : "")"
+                @onclick="@(() => _activeTab = "geojson")">GeoJSON</button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link @(_activeTab == "kml" ? "active" : "")"
+                @onclick="@(() => _activeTab = "kml")">KML</button>
+        </li>
+    </ul>
+
+    <div class="tab-content p-3 border border-top-0">
+        @if (_activeTab == "geojson")
+        {
+            <div>
+                <div class="form-check form-switch mb-2">
+                    <input class="form-check-input" type="checkbox" @bind="_showGeoJson" />
+                    <label class="form-check-label">Show GeoJSON Layer</label>
+                </div>
+
+                <div class="mb-2">
+                    <span class="text-muted me-2">Presets:</span>
+                    <div class="btn-group">
+                        <button class="btn btn-sm btn-outline-secondary" @onclick="PresetInlineGeoJson">Inline Polygon</button>
+                        <button class="btn btn-sm btn-outline-secondary" @onclick="PresetInlinePoints">Inline Points</button>
+                    </div>
+                </div>
+
+                <label class="form-label">GeoJSON (@(_geoJsonMode == "url" ? "URL" : "Inline")):</label>
+                <textarea class="form-control" rows="4" @bind="_geoJsonSource"></textarea>
+
+                <div class="mt-2 btn-group">
+                    <button class="btn btn-sm @(_geoJsonMode == "inline" ? "btn-primary" : "btn-outline-primary")"
+                        @onclick="@(() => _geoJsonMode = "inline")">Inline</button>
+                    <button class="btn btn-sm @(_geoJsonMode == "url" ? "btn-primary" : "btn-outline-primary")"
+                        @onclick="@(() => _geoJsonMode = "url")">URL</button>
+                </div>
+            </div>
+        }
+        else if (_activeTab == "kml")
+        {
+            <div>
+                <div class="form-check form-switch mb-2">
+                    <input class="form-check-input" type="checkbox" @bind="_showKml" />
+                    <label class="form-check-label">Show KML Layer</label>
+                </div>
+
+                <label class="form-label">KML URL:</label>
+                <input type="text" class="form-control" @bind="_kmlUrl" />
+                <small class="text-muted">Enter a URL to a .kml file.</small>
+            </div>
+        }
+    </div>
+</div>
+
+@if (!string.IsNullOrEmpty(_status))
+{
+    <div class="mt-3 alert alert-info">@_status</div>
+}
+
+@code {
+    private AdvancedHereMap? _advMap;
+    private string _activeTab = "geojson";
+    private bool _showGeoJson;
+    private bool _showKml;
+    private string _geoJsonMode = "inline";
+    private string _geoJsonSource = "";
+    private string _kmlUrl = "";
+    private string? _status;
+
+    private MapOptions _mapOptions = new()
+    {
+        Center = new LatLngLiteral(52.52, 13.405),
+        Zoom = 10,
+        EnableUI = true,
+        EnableInteraction = true
+    };
+
+    protected override void OnInitialized()
+    {
+        PresetInlineGeoJson();
+    }
+
+    private void PresetInlineGeoJson()
+    {
+        _geoJsonMode = "inline";
+        _geoJsonSource = @"{
+  ""type"": ""FeatureCollection"",
+  ""features"": [
+    {
+      ""type"": ""Feature"",
+      ""geometry"": {
+        ""type"": ""Polygon"",
+        ""coordinates"": [[[13.35, 52.55], [13.45, 52.55], [13.45, 52.49], [13.35, 52.49], [13.35, 52.55]]]
+      },
+      ""properties"": { ""name"": ""Berlin Center"" }
+    },
+    {
+      ""type"": ""Feature"",
+      ""geometry"": {
+        ""type"": ""LineString"",
+        ""coordinates"": [[13.38, 52.52], [13.40, 52.53], [13.42, 52.51]]
+      },
+      ""properties"": { ""name"": ""A route"" }
+    }
+  ]
+}";
+        _showGeoJson = true;
+        _status = "Loaded inline GeoJSON polygon + line preset.";
+    }
+
+    private void PresetInlinePoints()
+    {
+        _geoJsonMode = "inline";
+        _geoJsonSource = @"{
+  ""type"": ""FeatureCollection"",
+  ""features"": [
+    { ""type"": ""Feature"", ""geometry"": { ""type"": ""Point"", ""coordinates"": [13.405, 52.52] }, ""properties"": { ""name"": ""Berlin"" } },
+    { ""type"": ""Feature"", ""geometry"": { ""type"": ""Point"", ""coordinates"": [11.582, 48.135] }, ""properties"": { ""name"": ""Munich"" } },
+    { ""type"": ""Feature"", ""geometry"": { ""type"": ""Point"", ""coordinates"": [8.682, 50.111] }, ""properties"": { ""name"": ""Frankfurt"" } },
+    { ""type"": ""Feature"", ""geometry"": { ""type"": ""Point"", ""coordinates"": [9.994, 53.551] }, ""properties"": { ""name"": ""Hamburg"" } }
+  ]
+}";
+        _showGeoJson = true;
+        _status = "Loaded inline GeoJSON points preset (4 German cities).";
+    }
+
+    private void OnGeoJsonLoaded(GeoJsonLoadedEventArgs args)
+    {
+        _status = $"GeoJSON loaded: {args.ObjectCount} objects.";
+        StateHasChanged();
+    }
+
+    private void OnKmlLoaded(GeoJsonLoadedEventArgs args)
+    {
+        _status = $"KML loaded: {args.ObjectCount} objects.";
+        StateHasChanged();
+    }
+}

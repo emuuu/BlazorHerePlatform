@@ -1,0 +1,239 @@
+@page "/map-routing"
+@rendermode InteractiveServer
+@using HerePlatformComponents.Maps.Events
+@using HerePlatformComponents.Maps.Services
+@using HerePlatformComponents.Maps.Services.Routing
+
+<PageTitle>Routing</PageTitle>
+
+<h3>Routing Demo</h3>
+<p>Click two points on the map to calculate a route, or use the presets below.</p>
+
+<details class="mb-3">
+    <summary class="fw-bold" role="button">Usage</summary>
+    <pre class="bg-light border rounded p-3 mt-2 mb-0"><code>@@inject IRoutingService RoutingService
+
+var request = new RoutingRequest
+{
+    Origin = new LatLngLiteral(52.52, 13.405),
+    Destination = new LatLngLiteral(48.8566, 2.3522),
+    TransportMode = TransportMode.Car,
+    ReturnPolyline = true
+};
+
+var result = await RoutingService.CalculateRouteAsync(request);
+
+// Display route on map
+&lt;AdvancedHereMap Options="@@_mapOptions" Height="500px"&gt;
+    &lt;PolylineComponent Path="@@_routePath"
+        StrokeColor="#0066FF" LineWidth="5" /&gt;
+&lt;/AdvancedHereMap&gt;</code></pre>
+</details>
+
+<AdvancedHereMap @ref="_advMap" Options="@_mapOptions" Height="500px"
+    OnClick="@OnMapClick">
+
+    @if (_origin.HasValue)
+    {
+        <MarkerComponent Lat="@_origin.Value.Lat" Lng="@_origin.Value.Lng" />
+    }
+
+    @if (_destination.HasValue)
+    {
+        <MarkerComponent Lat="@_destination.Value.Lat" Lng="@_destination.Value.Lng" />
+    }
+
+    @if (_routePath != null && _routePath.Count > 0)
+    {
+        <PolylineComponent Path="@_routePath" StrokeColor="@_strokeColor"
+            LineWidth="5" Visible="true" />
+    }
+
+</AdvancedHereMap>
+
+<div class="mt-3 d-flex gap-3 flex-wrap">
+    <div>
+        <h5>Transport Mode</h5>
+        <div class="btn-group">
+            <button class="btn btn-sm @(_transportMode == TransportMode.Car ? "btn-primary" : "btn-outline-primary")"
+                @onclick="@(() => SetTransportMode(TransportMode.Car))">Car</button>
+            <button class="btn btn-sm @(_transportMode == TransportMode.Pedestrian ? "btn-primary" : "btn-outline-primary")"
+                @onclick="@(() => SetTransportMode(TransportMode.Pedestrian))">Pedestrian</button>
+            <button class="btn btn-sm @(_transportMode == TransportMode.Bicycle ? "btn-primary" : "btn-outline-primary")"
+                @onclick="@(() => SetTransportMode(TransportMode.Bicycle))">Bicycle</button>
+            <button class="btn btn-sm @(_transportMode == TransportMode.Truck ? "btn-primary" : "btn-outline-primary")"
+                @onclick="@(() => SetTransportMode(TransportMode.Truck))">Truck</button>
+        </div>
+    </div>
+
+    <div>
+        <h5>Presets</h5>
+        <div class="btn-group">
+            <button class="btn btn-sm btn-outline-secondary" @onclick="PresetBerlinParis">Berlin → Paris</button>
+            <button class="btn btn-sm btn-outline-secondary" @onclick="PresetBerlinMunich">Berlin → Munich</button>
+        </div>
+    </div>
+
+    <div>
+        <button class="btn btn-sm btn-outline-danger" @onclick="ClearRoute">Clear</button>
+    </div>
+</div>
+
+@if (_isCalculating)
+{
+    <div class="mt-3 alert alert-info">Calculating route...</div>
+}
+
+@if (_routeSummary != null)
+{
+    <div class="mt-3 alert alert-success">
+        <strong>Route Summary:</strong>
+        Distance: @((_routeSummary.Length / 1000.0).ToString("F1")) km |
+        Duration: @FormatDuration(_routeSummary.Duration)
+        @if (_routeSummary.BaseDuration.HasValue)
+        {
+            <span> | Base duration: @FormatDuration(_routeSummary.BaseDuration.Value)</span>
+        }
+    </div>
+}
+
+@if (!string.IsNullOrEmpty(_status))
+{
+    <div class="mt-3 alert alert-info">@_status</div>
+}
+
+@code {
+    private AdvancedHereMap? _advMap;
+    private LatLngLiteral? _origin;
+    private LatLngLiteral? _destination;
+    private List<LatLngLiteral>? _routePath;
+    private RouteSummary? _routeSummary;
+    private TransportMode _transportMode = TransportMode.Car;
+    private string _strokeColor = "#0066FF";
+    private bool _isCalculating;
+    private string? _status;
+
+    [Inject]
+    private IRoutingService RoutingService { get; set; } = default!;
+
+    private MapOptions _mapOptions = new()
+    {
+        Center = new LatLngLiteral(51.0, 10.0),
+        Zoom = 6,
+        EnableUI = true,
+        EnableInteraction = true
+    };
+
+    private async Task OnMapClick(MapPointerEventArgs e)
+    {
+        if (!e.Position.HasValue) return;
+
+        if (!_origin.HasValue)
+        {
+            _origin = e.Position.Value;
+            _status = "Origin set. Click another point for destination.";
+        }
+        else if (!_destination.HasValue)
+        {
+            _destination = e.Position.Value;
+            _status = null;
+            await CalculateRoute();
+        }
+    }
+
+    private async Task SetTransportMode(TransportMode mode)
+    {
+        _transportMode = mode;
+        _strokeColor = mode switch
+        {
+            TransportMode.Car => "#0066FF",
+            TransportMode.Pedestrian => "#FF6600",
+            TransportMode.Bicycle => "#00CC00",
+            TransportMode.Truck => "#CC0000",
+            _ => "#0066FF"
+        };
+
+        if (_origin.HasValue && _destination.HasValue)
+        {
+            await CalculateRoute();
+        }
+    }
+
+    private async Task PresetBerlinParis()
+    {
+        _origin = new LatLngLiteral(52.52, 13.405);
+        _destination = new LatLngLiteral(48.8566, 2.3522);
+        await CalculateRoute();
+    }
+
+    private async Task PresetBerlinMunich()
+    {
+        _origin = new LatLngLiteral(52.52, 13.405);
+        _destination = new LatLngLiteral(48.1351, 11.582);
+        await CalculateRoute();
+    }
+
+    private async Task CalculateRoute()
+    {
+        if (!_origin.HasValue || !_destination.HasValue) return;
+
+        _isCalculating = true;
+        _routePath = null;
+        _routeSummary = null;
+        StateHasChanged();
+
+        try
+        {
+            var request = new RoutingRequest
+            {
+                Origin = _origin.Value,
+                Destination = _destination.Value,
+                TransportMode = _transportMode,
+                ReturnPolyline = true
+            };
+
+            var result = await RoutingService.CalculateRouteAsync(request);
+
+            if (result.Routes is { Count: > 0 })
+            {
+                var path = new List<LatLngLiteral>();
+                var route = result.Routes[0];
+                if (route.Sections != null)
+                {
+                    foreach (var section in route.Sections)
+                    {
+                        if (section.DecodedPolyline != null)
+                            path.AddRange(section.DecodedPolyline);
+
+                        _routeSummary ??= section.Summary;
+                    }
+                }
+                _routePath = path;
+            }
+        }
+        catch (Exception ex)
+        {
+            _status = $"Error: {ex.Message}";
+        }
+        finally
+        {
+            _isCalculating = false;
+        }
+    }
+
+    private void ClearRoute()
+    {
+        _origin = null;
+        _destination = null;
+        _routePath = null;
+        _routeSummary = null;
+        _status = "Click on the map to set origin.";
+    }
+
+    private string FormatDuration(int seconds)
+    {
+        var hours = seconds / 3600;
+        var mins = (seconds % 3600) / 60;
+        return hours > 0 ? $"{hours}h {mins}m" : $"{mins}m";
+    }
+}

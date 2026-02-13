@@ -1,0 +1,111 @@
+@page "/map-heatmap"
+@rendermode InteractiveServer
+@using HerePlatformComponents.Maps.Data
+
+<PageTitle>Heatmap</PageTitle>
+
+<h3>Heatmap Demo</h3>
+<p>Visualize data intensity on the map using a heatmap layer.</p>
+
+<details class="mb-3">
+    <summary class="fw-bold" role="button">Usage</summary>
+    <pre class="bg-light border rounded p-3 mt-2 mb-0"><code>@@using HerePlatformComponents.Maps.Data
+
+&lt;AdvancedHereMap Options="@@_mapOptions" Height="500px"&gt;
+
+    &lt;HeatmapComponent
+        DataPoints="@@_dataPoints"
+        Opacity="0.6"
+        Colors="@@_colors"
+        Visible="true" /&gt;
+
+&lt;/AdvancedHereMap&gt;
+
+@@code {
+    private List&lt;HeatmapDataPoint&gt; _dataPoints = new()
+    {
+        new(52.52, 13.405, 0.8),
+        new(52.53, 13.41, 0.5),
+    };
+
+    private Dictionary&lt;double, string&gt; _colors = new()
+    {
+        { 0, "blue" }, { 0.5, "yellow" }, { 1, "red" }
+    };
+}</code></pre>
+</details>
+
+<AdvancedHereMap @ref="_advMap" Options="@_mapOptions" Height="500px">
+
+    @if (_showHeatmap)
+    {
+        <HeatmapComponent DataPoints="@_dataPoints" Opacity="@_opacity"
+            Colors="@_colors" Visible="true" />
+    }
+
+</AdvancedHereMap>
+
+<div class="mt-3 d-flex gap-3 flex-wrap">
+    <div>
+        <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" @bind="_showHeatmap" />
+            <label class="form-check-label">Show Heatmap</label>
+        </div>
+    </div>
+
+    <div>
+        <label>Opacity: @_opacity.ToString("F2")</label>
+        <input type="range" class="form-range" min="0.1" max="1.0" step="0.1"
+            @bind="_opacity" @bind:event="oninput" style="width:200px;" />
+    </div>
+
+    <div>
+        <label>Points: @_dataPoints.Count</label>
+        <div class="btn-group">
+            <button class="btn btn-sm btn-outline-primary" @onclick="@(() => GeneratePoints(100))">100</button>
+            <button class="btn btn-sm btn-outline-primary" @onclick="@(() => GeneratePoints(500))">500</button>
+            <button class="btn btn-sm btn-outline-primary" @onclick="@(() => GeneratePoints(1000))">1000</button>
+        </div>
+    </div>
+</div>
+
+@code {
+    private AdvancedHereMap? _advMap;
+    private bool _showHeatmap = true;
+    private double _opacity = 0.6;
+    private List<HeatmapDataPoint> _dataPoints = new();
+    private Dictionary<double, string> _colors = new()
+    {
+        { 0, "blue" },
+        { 0.5, "yellow" },
+        { 1, "red" }
+    };
+
+    private MapOptions _mapOptions = new()
+    {
+        Center = new LatLngLiteral(52.52, 13.405),
+        Zoom = 12,
+        EnableUI = true,
+        EnableInteraction = true
+    };
+
+    protected override void OnInitialized()
+    {
+        GeneratePoints(200);
+    }
+
+    private void GeneratePoints(int count)
+    {
+        var rng = new Random(42);
+        _dataPoints = new List<HeatmapDataPoint>();
+
+        for (int i = 0; i < count; i++)
+        {
+            _dataPoints.Add(new HeatmapDataPoint(
+                52.52 + (rng.NextDouble() - 0.5) * 0.08,
+                13.405 + (rng.NextDouble() - 0.5) * 0.12,
+                rng.NextDouble()
+            ));
+        }
+    }
+}

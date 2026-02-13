@@ -1,0 +1,166 @@
+@page "/map-enhancements"
+@rendermode InteractiveServer
+
+<PageTitle>Map Enhancements</PageTitle>
+
+<h3>Map Enhancements Demo</h3>
+<p>Animated transitions, behavior control, polygon with holes, 3D extrusion, and map capture.</p>
+
+<details class="mb-3">
+    <summary class="fw-bold" role="button">Usage</summary>
+    <pre class="bg-light border rounded p-3 mt-2 mb-0"><code>&lt;AdvancedHereMap @@ref="_advMap" Options="@@_mapOptions" Height="500px"
+    Animate="@@_animate"
+    DisabledBehaviors="@@_disabledBehaviors"
+    @@bind-Center="_center" @@bind-Zoom="_zoom"&gt;
+
+    &lt;!-- Polygon with hole --&gt;
+    &lt;PolygonComponent Path="@@_outer" Holes="@@_holes"
+        FillColor="rgba(0,204,0,0.4)" /&gt;
+
+    &lt;!-- 3D extrusion --&gt;
+    &lt;PolygonComponent Path="@@_path"
+        Extrusion="100" Elevation="0" /&gt;
+
+&lt;/AdvancedHereMap&gt;
+
+@@code {
+    // Capture map as Base64 image
+    var image = await _advMap.InteropObject.CaptureAsync();
+}</code></pre>
+</details>
+
+<AdvancedHereMap @ref="_advMap" Options="@_mapOptions" Height="500px"
+    Animate="@_animate"
+    DisabledBehaviors="@_disabledBehaviors"
+    @bind-Center="_center"
+    @bind-Zoom="_zoom">
+
+    <!-- Polygon with hole -->
+    <PolygonComponent
+        Path="@_polygonPath"
+        Holes="@_polygonHoles"
+        StrokeColor="#00CC00"
+        FillColor="rgba(0, 204, 0, 0.4)"
+        LineWidth="2"
+        Clickable="true"
+        OnClick="@(e => _status = "Polygon with hole clicked")" />
+
+    <!-- 3D Extrusion polygon -->
+    <PolygonComponent
+        Path="@_extrusionPath"
+        StrokeColor="#3498DB"
+        FillColor="rgba(52, 152, 219, 0.6)"
+        LineWidth="2"
+        Extrusion="100"
+        Elevation="0" />
+
+</AdvancedHereMap>
+
+<div class="mt-3 d-flex gap-3 flex-wrap">
+    <div>
+        <h5>Animated Transitions</h5>
+        <div class="form-check form-switch mb-2">
+            <input class="form-check-input" type="checkbox" @bind="_animate" />
+            <label class="form-check-label">Animate</label>
+        </div>
+        <div class="btn-group">
+            <button class="btn btn-sm btn-outline-primary" @onclick="@(() => _center = new LatLngLiteral(48.8566, 2.3522))">Paris</button>
+            <button class="btn btn-sm btn-outline-primary" @onclick="@(() => _center = new LatLngLiteral(52.52, 13.405))">Berlin</button>
+            <button class="btn btn-sm btn-outline-primary" @onclick="@(() => _zoom = 16)">Zoom 16</button>
+            <button class="btn btn-sm btn-outline-primary" @onclick="@(() => _zoom = 10)">Zoom 10</button>
+        </div>
+    </div>
+
+    <div>
+        <h5>Behavior Control</h5>
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" @bind="_disablePanning" @bind:after="UpdateBehaviors" />
+            <label class="form-check-label">Disable Panning</label>
+        </div>
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" @bind="_disableWheelZoom" @bind:after="UpdateBehaviors" />
+            <label class="form-check-label">Disable Wheel Zoom</label>
+        </div>
+    </div>
+
+    <div>
+        <h5>Capture</h5>
+        <button class="btn btn-sm btn-outline-success" @onclick="CaptureMap">Capture Map</button>
+    </div>
+</div>
+
+@if (!string.IsNullOrEmpty(_capturedImage))
+{
+    <div class="mt-3">
+        <img src="@_capturedImage" alt="Captured map" style="max-width:400px;border:1px solid #ccc;" />
+    </div>
+}
+
+@if (!string.IsNullOrEmpty(_status))
+{
+    <div class="mt-3 alert alert-info">@_status</div>
+}
+
+@code {
+    private AdvancedHereMap? _advMap;
+    private bool _animate = true;
+    private LatLngLiteral _center = new(52.52, 13.405);
+    private double _zoom = 13;
+    private string? _status;
+    private string? _capturedImage;
+
+    private bool _disablePanning;
+    private bool _disableWheelZoom;
+    private BehaviorFeature _disabledBehaviors;
+
+    private MapOptions _mapOptions = new()
+    {
+        Center = new LatLngLiteral(52.52, 13.405),
+        Zoom = 13,
+        EnableUI = true,
+        EnableInteraction = true
+    };
+
+    // Outer polygon with a hole
+    private List<LatLngLiteral> _polygonPath = new()
+    {
+        new(52.530, 13.370),
+        new(52.530, 13.400),
+        new(52.510, 13.400),
+        new(52.510, 13.370)
+    };
+
+    private List<List<LatLngLiteral>> _polygonHoles = new()
+    {
+        new()
+        {
+            new(52.525, 13.378),
+            new(52.525, 13.392),
+            new(52.515, 13.392),
+            new(52.515, 13.378)
+        }
+    };
+
+    // Extrusion polygon
+    private List<LatLngLiteral> _extrusionPath = new()
+    {
+        new(52.522, 13.410),
+        new(52.522, 13.425),
+        new(52.515, 13.425),
+        new(52.515, 13.410)
+    };
+
+    private void UpdateBehaviors()
+    {
+        _disabledBehaviors = BehaviorFeature.None;
+        if (_disablePanning) _disabledBehaviors |= BehaviorFeature.Panning;
+        if (_disableWheelZoom) _disabledBehaviors |= BehaviorFeature.WheelZoom;
+    }
+
+    private async Task CaptureMap()
+    {
+        if (_advMap?.InteropObject == null) return;
+        _capturedImage = await _advMap.InteropObject.CaptureAsync();
+        _status = "Map captured!";
+    }
+}

@@ -1,67 +1,88 @@
 @page "/map-shapes"
 @rendermode InteractiveServer
-@inject IJSRuntime Js
 
 <PageTitle>Shapes</PageTitle>
 
 <h3>Shapes Demo</h3>
-<p>Demonstrates Polyline, Polygon, Circle, and Rectangle on the map.</p>
+<p>Declarative shape components — Polyline, Circle, and Rectangle as child components of AdvancedHereMap.</p>
 
 <details class="mb-3">
     <summary class="fw-bold" role="button">Usage</summary>
-    <pre class="bg-light border rounded p-3 mt-2 mb-0"><code>// Polyline
-var line = await Polyline.CreateAsync(Js, new PolylineOptions
-{
-    Path = new List&lt;LatLngLiteral&gt; { new(52.52, 13.39), new(52.52, 13.42) },
-    Style = new StyleOptions { StrokeColor = "#0066FF", LineWidth = 4 }
-});
-await line.AddToMap(map.InteropObject);
+    <pre class="bg-light border rounded p-3 mt-2 mb-0"><code>&lt;AdvancedHereMap Options="@@_mapOptions" Height="500px"&gt;
 
-// Polygon
-var poly = await Polygon.CreateAsync(Js, new PolygonOptions
-{
-    Path = new List&lt;LatLngLiteral&gt; { new(52.525, 13.37), new(52.525, 13.385), new(52.515, 13.37) },
-    Style = new StyleOptions { FillColor = "rgba(0,204,0,0.3)", StrokeColor = "#00CC00" }
-});
-await poly.AddToMap(map.InteropObject);
+    &lt;PolylineComponent
+        Path="@@_path"
+        StrokeColor="#0066FF"
+        LineWidth="4"
+        LineCap="round"
+        Visible="@@_showPolyline"
+        OnClick="@@(e =&gt; ...)" /&gt;
 
-// Circle
-var circle = await Circle.CreateAsync(Js, new CircleOptions
-{
-    Center = new LatLngLiteral(52.5163, 13.3777), Radius = 500,
-    Style = new StyleOptions { FillColor = "rgba(255,0,0,0.2)", StrokeColor = "#FF0000" }
-});
-await circle.AddToMap(map.InteropObject);
+    &lt;CircleComponent
+        CenterLat="52.5163"
+        CenterLng="13.3777"
+        Radius="@@_radius"
+        StrokeColor="#FF0000"
+        FillColor="rgba(255, 0, 0, 0.2)"
+        Visible="@@_showCircle" /&gt;
 
-// Rectangle
-var rect = await Rect.CreateAsync(Js, new RectOptions
-{
-    Bounds = new GeoRect(52.525, 13.41, 52.515, 13.43),
-    Style = new StyleOptions { StrokeColor = "#FF9900", LineDash = [8, 4] }
-});
-await rect.AddToMap(map.InteropObject);</code></pre>
+    &lt;RectComponent
+        Top="52.525" Left="13.410"
+        Bottom="52.515" Right="13.430"
+        StrokeColor="#FF9900"
+        FillColor="rgba(255, 153, 0, 0.25)"
+        Visible="@@_showRect" /&gt;
+
+&lt;/AdvancedHereMap&gt;</code></pre>
 </details>
 
-<HereMap @ref="_map"
-         Options="@_mapOptions"
-         OnAfterInit="@OnMapInit"
-         Height="500px" />
+<AdvancedHereMap Options="@_mapOptions" Height="500px">
+    <PolylineComponent
+        Path="@_polylinePath"
+        StrokeColor="#0066FF"
+        LineWidth="4"
+        LineCap="round"
+        Visible="@_showPolyline"
+        OnClick="@(e => _status = $"Polyline clicked at ({e.Position?.Lat:F4}, {e.Position?.Lng:F4})")" />
+
+    <CircleComponent
+        CenterLat="52.5163"
+        CenterLng="13.3777"
+        Radius="@_circleRadius"
+        StrokeColor="#FF0000"
+        FillColor="rgba(255, 0, 0, 0.2)"
+        LineWidth="2"
+        Visible="@_showCircle"
+        OnClick="@(e => _status = $"Circle clicked at ({e.Position?.Lat:F4}, {e.Position?.Lng:F4})")" />
+
+    <RectComponent
+        Top="52.525"
+        Left="13.410"
+        Bottom="52.515"
+        Right="13.430"
+        StrokeColor="#FF9900"
+        FillColor="rgba(255, 153, 0, 0.25)"
+        LineWidth="2"
+        Visible="@_showRect"
+        OnClick="@(e => _status = $"Rect clicked at ({e.Position?.Lat:F4}, {e.Position?.Lng:F4})")" />
+</AdvancedHereMap>
 
 <div class="mt-3">
-    <div class="btn-group" role="group">
-        <button class="btn btn-outline-primary @(_showPolyline ? "active" : "")" @onclick="TogglePolyline">
+    <div class="btn-group me-3" role="group">
+        <button class="btn btn-outline-primary @(_showPolyline ? "active" : "")" @onclick="@(() => _showPolyline = !_showPolyline)">
             Polyline
         </button>
-        <button class="btn btn-outline-success @(_showPolygon ? "active" : "")" @onclick="TogglePolygon">
-            Polygon
-        </button>
-        <button class="btn btn-outline-danger @(_showCircle ? "active" : "")" @onclick="ToggleCircle">
+        <button class="btn btn-outline-danger @(_showCircle ? "active" : "")" @onclick="@(() => _showCircle = !_showCircle)">
             Circle
         </button>
-        <button class="btn btn-outline-warning @(_showRect ? "active" : "")" @onclick="ToggleRect">
+        <button class="btn btn-outline-warning @(_showRect ? "active" : "")" @onclick="@(() => _showRect = !_showRect)">
             Rectangle
         </button>
     </div>
+
+    <label class="ms-3">
+        Circle Radius: <input type="range" min="100" max="2000" step="50" @bind="_circleRadius" @bind:event="oninput" /> @_circleRadius m
+    </label>
 </div>
 
 @if (!string.IsNullOrEmpty(_status))
@@ -72,18 +93,6 @@ await rect.AddToMap(map.InteropObject);</code></pre>
 }
 
 @code {
-    private HereMap? _map;
-    private Polyline? _polyline;
-    private Polygon? _polygon;
-    private Circle? _circle;
-    private Rect? _rect;
-
-    private bool _showPolyline;
-    private bool _showPolygon;
-    private bool _showCircle;
-    private bool _showRect;
-    private string? _status;
-
     private MapOptions _mapOptions = new()
     {
         Center = new LatLngLiteral(52.52, 13.405),
@@ -92,134 +101,17 @@ await rect.AddToMap(map.InteropObject);</code></pre>
         EnableInteraction = true
     };
 
-    private async Task OnMapInit()
+    private bool _showPolyline = true;
+    private bool _showCircle = true;
+    private bool _showRect = true;
+    private double _circleRadius = 500;
+    private string? _status;
+
+    private List<LatLngLiteral> _polylinePath = new()
     {
-        _status = "Map ready. Toggle shapes using the buttons above.";
-        await Task.CompletedTask;
-    }
-
-    private async Task TogglePolyline()
-    {
-        if (_map?.InteropObject == null) return;
-
-        if (_showPolyline && _polyline != null)
-        {
-            await _polyline.RemoveFromMap(_map.InteropObject);
-            _showPolyline = false;
-            _status = "Polyline removed.";
-        }
-        else
-        {
-            _polyline ??= await Polyline.CreateAsync(Js, new PolylineOptions
-            {
-                Path = new List<LatLngLiteral>
-                {
-                    new(52.5200, 13.3900),
-                    new(52.5230, 13.4000),
-                    new(52.5180, 13.4100),
-                    new(52.5210, 13.4200)
-                },
-                Style = new StyleOptions
-                {
-                    StrokeColor = "#0066FF",
-                    LineWidth = 4
-                }
-            });
-            await _polyline.AddToMap(_map.InteropObject);
-            _showPolyline = true;
-            _status = "Polyline added (blue line through Berlin center).";
-        }
-    }
-
-    private async Task TogglePolygon()
-    {
-        if (_map?.InteropObject == null) return;
-
-        if (_showPolygon && _polygon != null)
-        {
-            await _polygon.RemoveFromMap(_map.InteropObject);
-            _showPolygon = false;
-            _status = "Polygon removed.";
-        }
-        else
-        {
-            _polygon ??= await Polygon.CreateAsync(Js, new PolygonOptions
-            {
-                Path = new List<LatLngLiteral>
-                {
-                    new(52.5250, 13.3700),
-                    new(52.5250, 13.3850),
-                    new(52.5150, 13.3850),
-                    new(52.5150, 13.3700)
-                },
-                Style = new StyleOptions
-                {
-                    StrokeColor = "#00CC00",
-                    FillColor = "rgba(0, 204, 0, 0.3)",
-                    LineWidth = 3
-                }
-            });
-            await _polygon.AddToMap(_map.InteropObject);
-            _showPolygon = true;
-            _status = "Polygon added (green rectangle area in Tiergarten).";
-        }
-    }
-
-    private async Task ToggleCircle()
-    {
-        if (_map?.InteropObject == null) return;
-
-        if (_showCircle && _circle != null)
-        {
-            await _circle.RemoveFromMap(_map.InteropObject);
-            _showCircle = false;
-            _status = "Circle removed.";
-        }
-        else
-        {
-            _circle ??= await Circle.CreateAsync(Js, new CircleOptions
-            {
-                Center = new LatLngLiteral(52.5163, 13.3777),
-                Radius = 500,
-                Style = new StyleOptions
-                {
-                    StrokeColor = "#FF0000",
-                    FillColor = "rgba(255, 0, 0, 0.2)",
-                    LineWidth = 2
-                }
-            });
-            await _circle.AddToMap(_map.InteropObject);
-            _showCircle = true;
-            _status = "Circle added (500m radius around Victory Column).";
-        }
-    }
-
-    private async Task ToggleRect()
-    {
-        if (_map?.InteropObject == null) return;
-
-        if (_showRect && _rect != null)
-        {
-            await _rect.RemoveFromMap(_map.InteropObject);
-            _showRect = false;
-            _status = "Rectangle removed.";
-        }
-        else
-        {
-            _rect ??= await Rect.CreateAsync(Js, new RectOptions
-            {
-                Bounds = new GeoRect(52.525, 13.410, 52.515, 13.430),
-                Style = new StyleOptions
-                {
-                    StrokeColor = "#FF9900",
-                    FillColor = "rgba(255, 153, 0, 0.25)",
-                    LineWidth = 2,
-                    LineDash = [8, 4]
-                }
-            });
-            await _rect.AddToMap(_map.InteropObject);
-            _showRect = true;
-            _status = "Rectangle added (dashed orange box east of center).";
-        }
-    }
+        new(52.5200, 13.3900),
+        new(52.5230, 13.4000),
+        new(52.5180, 13.4100),
+        new(52.5210, 13.4200)
+    };
 }
