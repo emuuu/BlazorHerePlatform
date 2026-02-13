@@ -36,5 +36,6 @@ public static class DependencyInjectionExtensions
         services.AddScoped<IGeofencingService, GeofencingService>();
         services.AddScoped<IPlacesService, PlacesService>();
         services.AddScoped<IIsolineService, IsolineService>();
+        services.AddScoped<IMatrixRoutingService, MatrixRoutingService>();
     }
 }
