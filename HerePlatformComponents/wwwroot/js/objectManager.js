@@ -213,6 +213,77 @@ window.blazorHerePlatform.objectManager = function () {
         return eventData;
     }
 
+    // Build SpatialStyle object with extended properties (lineJoin, lineDashOffset, arrows).
+    function buildSpatialStyle(opts) {
+        const style = {};
+        if (opts.strokeColor) style.strokeColor = opts.strokeColor;
+        if (opts.fillColor) style.fillColor = opts.fillColor;
+        if (opts.lineWidth != null) style.lineWidth = opts.lineWidth;
+        if (opts.lineCap) style.lineCap = opts.lineCap;
+        if (opts.lineJoin) style.lineJoin = opts.lineJoin;
+        if (opts.lineDash) style.lineDash = opts.lineDash;
+        if (opts.lineDashOffset != null) style.lineDashOffset = opts.lineDashOffset;
+        if (opts.miterLimit != null) style.miterLimit = opts.miterLimit;
+        return style;
+    }
+
+    // Extract the current geometry from a shape object after drag.
+    function extractShapeGeometry(obj, objectType) {
+        try {
+            if (objectType === 'circle') {
+                const center = obj.getCenter();
+                return { centerLat: center.lat, centerLng: center.lng };
+            } else if (objectType === 'rect') {
+                const bb = obj.getBoundingBox();
+                return { top: bb.getTop(), left: bb.getLeft(), bottom: bb.getBottom(), right: bb.getRight() };
+            } else if (objectType === 'polygon') {
+                const exterior = obj.getGeometry().getExterior();
+                const path = [];
+                exterior.eachLatLngAlt(function (lat, lng) { path.push({ lat: lat, lng: lng }); });
+                return { path: path };
+            } else if (objectType === 'polyline') {
+                const lineString = obj.getGeometry();
+                const path = [];
+                lineString.eachLatLngAlt(function (lat, lng) { path.push({ lat: lat, lng: lng }); });
+                return { path: path };
+            }
+        } catch (e) {
+            console.warn('[BlazorHerePlatform] Failed to extract shape geometry:', e);
+        }
+        return null;
+    }
+
+    // Wire drag events on a shape (polyline, polygon, circle, rect).
+    // Mirrors the marker drag pattern from the HERE developer guide.
+    function wireDragEventsForShape(obj, objectType, id, callbackRef, map) {
+        if (!map) return;
+        map.addEventListener('dragstart', function (evt) {
+            if (evt.target !== obj) return;
+            const behavior = map['_blzBehavior'];
+            if (behavior) behavior.disable(H.mapevents.Behavior.Feature.PANNING);
+            const data = extractDragEventData(evt, map);
+            callbackRef.invokeMethodAsync('OnObjectDragEvent', objectType, id, 'dragstart', data);
+        }, false);
+        map.addEventListener('drag', function (evt) {
+            if (evt.target !== obj) return;
+            const data = extractDragEventData(evt, map);
+            callbackRef.invokeMethodAsync('OnObjectDragEvent', objectType, id, 'drag', data);
+        }, false);
+        map.addEventListener('dragend', function (evt) {
+            if (evt.target !== obj) return;
+            const behavior = map['_blzBehavior'];
+            if (behavior) behavior.enable(H.mapevents.Behavior.Feature.PANNING);
+            const data = extractDragEventData(evt, map);
+            callbackRef.invokeMethodAsync('OnObjectDragEvent', objectType, id, 'dragend', data);
+
+            // Send updated geometry for two-way binding
+            const geo = extractShapeGeometry(obj, objectType);
+            if (geo) {
+                callbackRef.invokeMethodAsync('OnShapeDragEndGeometry', objectType, id, geo);
+            }
+        }, false);
+    }
+
     // Wire all pointer/interaction events on a map object (marker, polygon)
     // and forward them to C# via the unified OnObject* JSInvokable methods.
     function wireObjectEvents(obj, objectType, id, callbackRef, map) {
@@ -416,6 +487,8 @@ window.blazorHerePlatform.objectManager = function () {
 
             if (options?.tilt != null) mapOptions.tilt = options.tilt;
             if (options?.heading != null) mapOptions.heading = options.heading;
+            if (options?.pixelRatio != null) mapOptions.pixelRatio = options.pixelRatio;
+            if (options?.fixedCenter != null) mapOptions.fixedCenter = options.fixedCenter;
 
             const engineOpt = harpEngineType ? { engineType: harpEngineType } : {};
             const map = new H.Map(container, baseLayer, { ...mapOptions, ...engineOpt });
@@ -684,6 +757,26 @@ window.blazorHerePlatform.objectManager = function () {
 
                 const parts = layerPath.split('.');
 
+                // Vector traffic layers are overlays, not base layers.
+                // Add/remove them without touching the current base layer.
+                if (parts[0] === 'vector' && parts[1] === 'traffic') {
+                    let layer = layers;
+                    for (const part of parts) {
+                        if (!layer || typeof layer !== 'object') break;
+                        var prevLayer = layer;
+                        layer = layer[part];
+                        if (layer === undefined) {
+                            console.warn('[BlazorHerePlatform] Layer path "' + layerPath + '" not found. Available keys:', Object.keys(prevLayer));
+                            return;
+                        }
+                    }
+                    if (layer) {
+                        map.addLayer(layer);
+                        map['_blzOverlays'].push(layer);
+                    }
+                    return;
+                }
+
                 // Hybrid layers need composite handling
                 if (parts[0] === 'hybrid') {
                     const group = parts[1];
@@ -712,8 +805,16 @@ window.blazorHerePlatform.objectManager = function () {
                 } else {
                     // Non-hybrid layers: resolve and set directly
                     let layer = layers;
+                    let resolvedPath = '';
                     for (const part of parts) {
+                        if (!layer || typeof layer !== 'object') break;
+                        var prevLayer = layer;
                         layer = layer[part];
+                        resolvedPath += (resolvedPath ? '.' : '') + part;
+                        if (layer === undefined) {
+                            console.warn('[BlazorHerePlatform] Layer path "' + layerPath + '" failed at "' + resolvedPath + '". Available keys:', Object.keys(prevLayer));
+                            return;
+                        }
                     }
                     if (layer) {
                         map.setBaseLayer(layer);
@@ -721,6 +822,92 @@ window.blazorHerePlatform.objectManager = function () {
                 }
             } catch (e) {
                 console.warn('[BlazorHerePlatform] Could not set base layer:', layerPath, e);
+            }
+        },
+
+        setMinZoom: function (mapGuid, minZoom) {
+            const map = mapObjects[mapGuid];
+            if (!map || map._blzPlaceholder) return;
+            map['_blzMinZoom'] = minZoom;
+            // Install clamping listener once
+            if (!map['_blzZoomClampInstalled']) {
+                map['_blzZoomClampInstalled'] = true;
+                map.addEventListener('mapviewchangeend', function () {
+                    var z = map.getZoom();
+                    var mn = map['_blzMinZoom'];
+                    var mx = map['_blzMaxZoom'];
+                    if (mn != null && z < mn) map.setZoom(mn, false);
+                    if (mx != null && z > mx) map.setZoom(mx, false);
+                });
+            }
+        },
+
+        setMaxZoom: function (mapGuid, maxZoom) {
+            const map = mapObjects[mapGuid];
+            if (!map || map._blzPlaceholder) return;
+            map['_blzMaxZoom'] = maxZoom;
+            if (!map['_blzZoomClampInstalled']) {
+                map['_blzZoomClampInstalled'] = true;
+                map.addEventListener('mapviewchangeend', function () {
+                    var z = map.getZoom();
+                    var mn = map['_blzMinZoom'];
+                    var mx = map['_blzMaxZoom'];
+                    if (mn != null && z < mn) map.setZoom(mn, false);
+                    if (mx != null && z > mx) map.setZoom(mx, false);
+                });
+            }
+        },
+
+        getMinZoom: function (mapGuid) {
+            const map = mapObjects[mapGuid];
+            if (!map || map._blzPlaceholder) return 0;
+            return map['_blzMinZoom'] || 0;
+        },
+
+        getMaxZoom: function (mapGuid) {
+            const map = mapObjects[mapGuid];
+            if (!map || map._blzPlaceholder) return 22;
+            return map['_blzMaxZoom'] || 22;
+        },
+
+        addOverlayLayer: function (mapGuid, layerPath) {
+            const map = mapObjects[mapGuid];
+            if (!map || map._blzPlaceholder) return;
+            const layers = map['_blzLayers'] || defaultLayers;
+            if (!layers) return;
+            try {
+                const parts = layerPath.split('.');
+                let layer = layers;
+                for (const part of parts) layer = layer[part];
+                if (layer) {
+                    map.addLayer(layer);
+                    if (!map['_blzOverlays']) map['_blzOverlays'] = [];
+                    map['_blzOverlays'].push(layer);
+                }
+            } catch (e) {
+                console.warn('[BlazorHerePlatform] Could not add overlay layer:', layerPath, e);
+            }
+        },
+
+        removeOverlayLayer: function (mapGuid, layerPath) {
+            const map = mapObjects[mapGuid];
+            if (!map || map._blzPlaceholder) return;
+            const layers = map['_blzLayers'] || defaultLayers;
+            if (!layers) return;
+            try {
+                const parts = layerPath.split('.');
+                let layer = layers;
+                for (const part of parts) layer = layer[part];
+                if (layer) {
+                    map.removeLayer(layer);
+                    var overlays = map['_blzOverlays'];
+                    if (overlays) {
+                        var idx = overlays.indexOf(layer);
+                        if (idx >= 0) overlays.splice(idx, 1);
+                    }
+                }
+            } catch (e) {
+                console.warn('[BlazorHerePlatform] Could not remove overlay layer:', layerPath, e);
             }
         },
 
@@ -983,6 +1170,9 @@ window.blazorHerePlatform.objectManager = function () {
                 draggable,
                 clickable,
                 zIndex,
+                opacity,
+                minZoom,
+                maxZoom,
                 visible,
                 iconUrl,
                 mapId,
@@ -994,35 +1184,48 @@ window.blazorHerePlatform.objectManager = function () {
                 callbackRef?.invokeMethodAsync(method, ...args);
             };
 
+            // If marker already exists, remove it so it gets recreated with full options.
             const existingMarker = mapObjects[id];
             if (existingMarker) {
-                existingMarker.setGeometry(position);
-                if (typeof existingMarker.setVisibility === 'function') {
-                    existingMarker.setVisibility(visible !== false);
+                // Remove zoom-visibility listener if present
+                if (existingMarker['_blzZoomListener'] && map) {
+                    map.removeEventListener('mapviewchangeend', existingMarker['_blzZoomListener']);
                 }
-                if (typeof existingMarker.setZIndex === 'function') {
-                    existingMarker.setZIndex(zIndex || 0);
+                try {
+                    var parent = existingMarker.getParentGroup && existingMarker.getParentGroup();
+                    if (parent) parent.removeObject(existingMarker);
+                    else if (map) map.removeObject(existingMarker);
+                } catch (e) {
+                    try { if (map) map.removeObject(existingMarker); } catch (e2) { }
                 }
-                return;
+                delete mapObjects[id];
             }
+
+            var a = (opacity != null && opacity < 1) ? opacity : 1;
 
             const markerOptions = { data: null };
             if (zIndex != null) markerOptions.zIndex = zIndex;
             if (visible === false) markerOptions.visibility = false;
             if (draggable) markerOptions.volatility = true;
 
+            // Build icon with opacity baked into fill/stroke colors
             if (iconUrl) {
                 try {
-                    markerOptions.icon = new H.map.Icon(iconUrl);
+                    // For custom SVG strings, apply opacity attribute on root
+                    var customSvg = iconUrl;
+                    if (a < 1 && customSvg.indexOf('<svg') === 0) {
+                        customSvg = customSvg.replace('<svg ', '<svg opacity="' + a + '" ');
+                    }
+                    markerOptions.icon = new H.map.Icon(customSvg);
                 } catch (e) {
                     console.warn('[BlazorHerePlatform] Failed to create icon from URL:', e);
                 }
             } else if (draggable) {
-                // Use a distinct orange SVG icon for draggable markers
                 try {
-                    const svg = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="32" viewBox="0 0 24 32">' +
-                        '<path d="M12 0C5.4 0 0 5.4 0 12c0 9 12 20 12 20s12-11 12-20C24 5.4 18.6 0 12 0z" fill="#E67E22" stroke="#C0392B" stroke-width="1"/>' +
-                        '<circle cx="12" cy="11" r="4" fill="white"/>' +
+                    var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="32" viewBox="0 0 24 32">' +
+                        '<path d="M12 0C5.4 0 0 5.4 0 12c0 9 12 20 12 20s12-11 12-20C24 5.4 18.6 0 12 0z" ' +
+                        'fill="rgba(230,126,34,' + a + ')" stroke="rgba(192,57,43,' + a + ')" stroke-width="1"/>' +
+                        '<circle cx="12" cy="11" r="4" fill="rgba(255,255,255,' + a + ')"/>' +
                         '</svg>';
                     markerOptions.icon = new H.map.Icon(svg);
                 } catch (e) {
@@ -1040,14 +1243,27 @@ window.blazorHerePlatform.objectManager = function () {
                 map.addObject(marker);
             }
 
-            // Wire all pointer/interaction events via the unified event system
+            // Manual zoom-level visibility: engine min/max is unreliable in HARP,
+            // so we listen for zoom changes and toggle visibility ourselves.
+            if ((minZoom != null || maxZoom != null) && map) {
+                var checkZoomVisibility = function () {
+                    var z = map.getZoom();
+                    var show = true;
+                    if (minZoom != null && z < minZoom) show = false;
+                    if (maxZoom != null && z > maxZoom) show = false;
+                    try { marker.setVisibility(show); } catch (e) { }
+                };
+                marker['_blzZoomListener'] = checkZoomVisibility;
+                map.addEventListener('mapviewchangeend', checkZoomVisibility);
+                checkZoomVisibility(); // apply immediately
+            }
+
+            // Wire click/pointer events on the new marker object
             if (clickable) {
                 wireObjectEvents(marker, 'marker', id, callbackRef, map);
             }
 
             // Auto-InfoBubble: on tap, read the hidden <template> innerHTML
-            // and open an InfoBubble at the marker position.
-            // Content is static HTML — no live Blazor interactivity inside the bubble.
             if (infoBubbleTemplateId && map) {
                 marker.addEventListener('tap', function () {
                     const tpl = document.getElementById(infoBubbleTemplateId);
@@ -1060,7 +1276,6 @@ window.blazorHerePlatform.objectManager = function () {
                     const ui = mapObjects[uiGuid];
                     if (!ui) return;
 
-                    // Close previous auto-bubble on this map (if any)
                     const prev = map['_blzAutoBubble'];
                     if (prev) {
                         try { ui.removeBubble(prev); } catch (e) { }
@@ -1072,11 +1287,9 @@ window.blazorHerePlatform.objectManager = function () {
                 });
             }
 
-            if (draggable && map) {
-                // Official HERE drag pattern (developer guide §6).
-                // Drag events fire on the MAP, not on individual objects.
-                // Use direct behavior reference from the map to avoid
-                // picking up orphaned behaviors from disposed maps.
+            // Drag events fire on the MAP — wire only once per marker ID to avoid duplicates
+            if (draggable && map && !map['_blzDragWired_' + id]) {
+                map['_blzDragWired_' + id] = true;
                 map.addEventListener('dragstart', function (evt) {
                     const target = evt.target;
                     const pointer = evt.currentPointer;
@@ -1090,7 +1303,6 @@ window.blazorHerePlatform.objectManager = function () {
                             pointer.viewportX - targetPosition.x,
                             pointer.viewportY - targetPosition.y
                         );
-                        // Forward drag event to C#
                         const data = extractDragEventData(evt, map);
                         callbackRef.invokeMethodAsync('OnObjectDragEvent', 'marker', id, 'dragstart', data);
                     }
@@ -1104,7 +1316,6 @@ window.blazorHerePlatform.objectManager = function () {
                             pointer.viewportX - target['offset'].x,
                             pointer.viewportY - target['offset'].y
                         ));
-                        // Forward drag event to C#
                         const data = extractDragEventData(evt, map);
                         callbackRef.invokeMethodAsync('OnObjectDragEvent', 'marker', id, 'drag', data);
                     }
@@ -1117,7 +1328,6 @@ window.blazorHerePlatform.objectManager = function () {
                         if (behavior) {
                             behavior.enable(H.mapevents.Behavior.Feature.PANNING);
                         }
-                        // Forward drag event to C#
                         const data = extractDragEventData(evt, map);
                         callbackRef.invokeMethodAsync('OnObjectDragEvent', 'marker', id, 'dragend', data);
                     }
@@ -1160,14 +1370,13 @@ window.blazorHerePlatform.objectManager = function () {
 
             const {
                 path,
-                strokeColor,
-                fillColor,
-                lineWidth,
                 clickable,
                 visible,
                 holes,
                 extrusion,
                 elevation,
+                zIndex,
+                draggable,
                 mapId
             } = options;
 
@@ -1197,34 +1406,37 @@ window.blazorHerePlatform.objectManager = function () {
                     existingPolygon.setGeometry(buildGeometry());
                 }
                 // Update style
-                const style = {};
-                if (strokeColor) style.strokeColor = strokeColor;
-                if (fillColor) style.fillColor = fillColor;
-                if (lineWidth != null) style.lineWidth = lineWidth;
+                const style = buildSpatialStyle(options);
                 if (Object.keys(style).length > 0) {
                     existingPolygon.setStyle(style);
                 }
                 if (typeof existingPolygon.setVisibility === 'function') {
                     existingPolygon.setVisibility(visible !== false);
                 }
+                if (zIndex != null && typeof existingPolygon.setZIndex === 'function') {
+                    existingPolygon.setZIndex(zIndex);
+                }
                 return;
             }
 
             // Create new polygon
             const polyOpts = {};
-            const style = {};
-            if (strokeColor) style.strokeColor = strokeColor;
-            if (fillColor) style.fillColor = fillColor;
-            if (lineWidth != null) style.lineWidth = lineWidth;
-            polyOpts.style = style;
+            polyOpts.style = buildSpatialStyle(options);
 
             if (extrusion != null) polyOpts.extrusion = extrusion;
             if (elevation != null) polyOpts.elevation = elevation;
+            if (draggable) polyOpts.volatility = true;
 
             const polygon = new H.map.Polygon(buildGeometry(), polyOpts);
 
             if (visible === false) {
                 polygon.setVisibility(false);
+            }
+            if (zIndex != null) {
+                polygon.setZIndex(zIndex);
+            }
+            if (draggable) {
+                polygon.draggable = true;
             }
 
             if (map) {
@@ -1234,6 +1446,9 @@ window.blazorHerePlatform.objectManager = function () {
             // Wire all pointer/interaction events via the unified event system
             if (clickable) {
                 wireObjectEvents(polygon, 'polygon', id, callbackRef, map);
+            }
+            if (draggable) {
+                wireDragEventsForShape(polygon, 'polygon', id, callbackRef, map);
             }
 
             addMapObject(id, polygon);
@@ -1266,6 +1481,13 @@ window.blazorHerePlatform.objectManager = function () {
                 lineWidth,
                 lineCap,
                 lineDash,
+                lineJoin,
+                lineDashOffset,
+                arrows,
+                zIndex,
+                extrusion,
+                elevation,
+                draggable,
                 clickable,
                 visible,
                 mapId
@@ -1282,16 +1504,18 @@ window.blazorHerePlatform.objectManager = function () {
                     existingPolyline.setGeometry(lineString);
                 }
                 // Update style
-                const style = {};
-                if (strokeColor) style.strokeColor = strokeColor;
-                if (lineWidth != null) style.lineWidth = lineWidth;
-                if (lineCap) style.lineCap = lineCap;
-                if (lineDash) style.lineDash = lineDash;
+                const style = buildSpatialStyle(options);
+                if (arrows && strokeColor) {
+                    style.arrows = { fillColor: strokeColor, width: 2, length: 3, frequency: 5 };
+                }
                 if (Object.keys(style).length > 0) {
                     existingPolyline.setStyle(style);
                 }
                 if (typeof existingPolyline.setVisibility === 'function') {
                     existingPolyline.setVisibility(visible !== false);
+                }
+                if (zIndex != null && typeof existingPolyline.setZIndex === 'function') {
+                    existingPolyline.setZIndex(zIndex);
                 }
                 return;
             }
@@ -1302,16 +1526,26 @@ window.blazorHerePlatform.objectManager = function () {
                 path.forEach(p => lineString.pushPoint(p));
             }
 
-            const style = {};
-            if (strokeColor) style.strokeColor = strokeColor;
-            if (lineWidth != null) style.lineWidth = lineWidth;
-            if (lineCap) style.lineCap = lineCap;
-            if (lineDash) style.lineDash = lineDash;
+            const style = buildSpatialStyle(options);
+            if (arrows && strokeColor) {
+                style.arrows = { fillColor: strokeColor, width: 2, length: 3, frequency: 5 };
+            }
 
-            const polyline = new H.map.Polyline(lineString, { style });
+            const polyOpts = { style };
+            if (extrusion != null) polyOpts.extrusion = extrusion;
+            if (elevation != null) polyOpts.elevation = elevation;
+            if (draggable) polyOpts.volatility = true;
+
+            const polyline = new H.map.Polyline(lineString, polyOpts);
 
             if (visible === false) {
                 polyline.setVisibility(false);
+            }
+            if (zIndex != null) {
+                polyline.setZIndex(zIndex);
+            }
+            if (draggable) {
+                polyline.draggable = true;
             }
 
             if (map) {
@@ -1320,6 +1554,9 @@ window.blazorHerePlatform.objectManager = function () {
 
             if (clickable) {
                 wireObjectEvents(polyline, 'polyline', id, callbackRef, map);
+            }
+            if (draggable) {
+                wireDragEventsForShape(polyline, 'polyline', id, callbackRef, map);
             }
 
             addMapObject(id, polyline);
@@ -1350,10 +1587,9 @@ window.blazorHerePlatform.objectManager = function () {
                 centerLat,
                 centerLng,
                 radius,
-                strokeColor,
-                fillColor,
-                lineWidth,
                 precision,
+                zIndex,
+                draggable,
                 clickable,
                 visible,
                 mapId
@@ -1367,32 +1603,36 @@ window.blazorHerePlatform.objectManager = function () {
                 existingCircle.setCenter(center);
                 existingCircle.setRadius(radius);
                 // Update style
-                const style = {};
-                if (strokeColor) style.strokeColor = strokeColor;
-                if (fillColor) style.fillColor = fillColor;
-                if (lineWidth != null) style.lineWidth = lineWidth;
+                const style = buildSpatialStyle(options);
                 if (Object.keys(style).length > 0) {
                     existingCircle.setStyle(style);
                 }
                 if (typeof existingCircle.setVisibility === 'function') {
                     existingCircle.setVisibility(visible !== false);
                 }
+                if (zIndex != null && typeof existingCircle.setZIndex === 'function') {
+                    existingCircle.setZIndex(zIndex);
+                }
                 return;
             }
 
             // Create new circle
-            const style = {};
-            if (strokeColor) style.strokeColor = strokeColor;
-            if (fillColor) style.fillColor = fillColor;
-            if (lineWidth != null) style.lineWidth = lineWidth;
+            const style = buildSpatialStyle(options);
 
             const circleOpts = { style };
             if (precision != null) circleOpts.precision = precision;
+            if (draggable) circleOpts.volatility = true;
 
             const circle = new H.map.Circle(center, radius, circleOpts);
 
             if (visible === false) {
                 circle.setVisibility(false);
+            }
+            if (zIndex != null) {
+                circle.setZIndex(zIndex);
+            }
+            if (draggable) {
+                circle.draggable = true;
             }
 
             if (map) {
@@ -1401,6 +1641,9 @@ window.blazorHerePlatform.objectManager = function () {
 
             if (clickable) {
                 wireObjectEvents(circle, 'circle', id, callbackRef, map);
+            }
+            if (draggable) {
+                wireDragEventsForShape(circle, 'circle', id, callbackRef, map);
             }
 
             addMapObject(id, circle);
@@ -1432,9 +1675,8 @@ window.blazorHerePlatform.objectManager = function () {
                 left,
                 bottom,
                 right,
-                strokeColor,
-                fillColor,
-                lineWidth,
+                zIndex,
+                draggable,
                 clickable,
                 visible,
                 mapId
@@ -1445,32 +1687,35 @@ window.blazorHerePlatform.objectManager = function () {
 
             const existingRect = mapObjects[id];
             if (existingRect) {
-                // H.map.Rect inherits setGeometry from GeoShape; pass a Rect geometry
                 existingRect.setGeometry(bounds);
-                // Update style
-                const style = {};
-                if (strokeColor) style.strokeColor = strokeColor;
-                if (fillColor) style.fillColor = fillColor;
-                if (lineWidth != null) style.lineWidth = lineWidth;
+                const style = buildSpatialStyle(options);
                 if (Object.keys(style).length > 0) {
                     existingRect.setStyle(style);
                 }
                 if (typeof existingRect.setVisibility === 'function') {
                     existingRect.setVisibility(visible !== false);
                 }
+                if (zIndex != null && typeof existingRect.setZIndex === 'function') {
+                    existingRect.setZIndex(zIndex);
+                }
                 return;
             }
 
             // Create new rect
-            const style = {};
-            if (strokeColor) style.strokeColor = strokeColor;
-            if (fillColor) style.fillColor = fillColor;
-            if (lineWidth != null) style.lineWidth = lineWidth;
+            const style = buildSpatialStyle(options);
+            const rectOpts = { style };
+            if (draggable) rectOpts.volatility = true;
 
-            const rect = new H.map.Rect(bounds, { style });
+            const rect = new H.map.Rect(bounds, rectOpts);
 
             if (visible === false) {
                 rect.setVisibility(false);
+            }
+            if (zIndex != null) {
+                rect.setZIndex(zIndex);
+            }
+            if (draggable) {
+                rect.draggable = true;
             }
 
             if (map) {
@@ -1479,6 +1724,9 @@ window.blazorHerePlatform.objectManager = function () {
 
             if (clickable) {
                 wireObjectEvents(rect, 'rect', id, callbackRef, map);
+            }
+            if (draggable) {
+                wireDragEventsForShape(rect, 'rect', id, callbackRef, map);
             }
 
             addMapObject(id, rect);
@@ -1535,6 +1783,50 @@ window.blazorHerePlatform.objectManager = function () {
             addMapObject(id, group);
         },
 
+        groupAddObjects: function (groupId, objectIds) {
+            const group = mapObjects[groupId];
+            if (!group) return;
+            for (const objId of objectIds) {
+                const obj = mapObjects[objId];
+                if (obj) {
+                    // Remove from current parent first
+                    try {
+                        const parent = obj.getParentGroup && obj.getParentGroup();
+                        if (parent) parent.removeObject(obj);
+                    } catch (e) { }
+                    group.addObject(obj);
+                }
+            }
+        },
+
+        groupRemoveObjects: function (groupId, objectIds) {
+            const group = mapObjects[groupId];
+            if (!group) return;
+            for (const objId of objectIds) {
+                const obj = mapObjects[objId];
+                if (obj) {
+                    try { group.removeObject(obj); } catch (e) { }
+                }
+            }
+        },
+
+        groupGetBounds: function (groupId) {
+            const group = mapObjects[groupId];
+            if (!group) return null;
+            try {
+                const bbox = group.getBoundingBox();
+                if (!bbox) return null;
+                return {
+                    top: bbox.getTop(),
+                    left: bbox.getLeft(),
+                    bottom: bbox.getBottom(),
+                    right: bbox.getRight()
+                };
+            } catch (e) {
+                return null;
+            }
+        },
+
         disposeGroupComponent: function (id) {
             const group = mapObjects[id];
             if (!group) return;
@@ -1561,6 +1853,9 @@ window.blazorHerePlatform.objectManager = function () {
                 clickable,
                 draggable,
                 zIndex,
+                opacity,
+                minZoom,
+                maxZoom,
                 visible,
                 mapId,
                 groupId,
@@ -1569,16 +1864,17 @@ window.blazorHerePlatform.objectManager = function () {
 
             const map = mapObjects[mapId];
 
+            // Recreate DomMarker on update to apply constructor-only options (min, max)
             const existingMarker = mapObjects[id];
             if (existingMarker) {
-                existingMarker.setGeometry(position);
-                if (typeof existingMarker.setVisibility === 'function') {
-                    existingMarker.setVisibility(visible !== false);
+                try {
+                    var parent = existingMarker.getParentGroup && existingMarker.getParentGroup();
+                    if (parent) parent.removeObject(existingMarker);
+                    else if (map) map.removeObject(existingMarker);
+                } catch (e) {
+                    try { if (map) map.removeObject(existingMarker); } catch (e2) { }
                 }
-                if (typeof existingMarker.setZIndex === 'function') {
-                    existingMarker.setZIndex(zIndex || 0);
-                }
-                return;
+                delete mapObjects[id];
             }
 
             // Read template HTML for DomIcon
@@ -1597,6 +1893,8 @@ window.blazorHerePlatform.objectManager = function () {
             if (domIcon) markerOptions.icon = domIcon;
             if (zIndex != null) markerOptions.zIndex = zIndex;
             if (visible === false) markerOptions.visibility = false;
+            if (minZoom != null) markerOptions.min = minZoom;
+            if (maxZoom != null) markerOptions.max = maxZoom;
             if (draggable) markerOptions.volatility = true;
 
             const marker = new H.map.DomMarker(position, markerOptions);
@@ -1648,7 +1946,7 @@ window.blazorHerePlatform.objectManager = function () {
                 return;
             }
 
-            const { lat, lng, isOpen, mapId, templateId } = options;
+            const { lat, lng, isOpen, autoPan, mapId, templateId } = options;
             const map = mapObjects[mapId];
             if (!map) return;
 
@@ -1681,7 +1979,9 @@ window.blazorHerePlatform.objectManager = function () {
 
             if (!isOpen) return; // Don't create if not open
 
-            const bubble = new H.ui.InfoBubble(position, { content: html || '' });
+            const bubbleOpts = { content: html || '' };
+            if (autoPan === false) bubbleOpts.autoPan = false;
+            const bubble = new H.ui.InfoBubble(position, bubbleOpts);
 
             // Listen for close via X button
             bubble.addEventListener('statechange', function (evt) {
@@ -1786,6 +2086,21 @@ window.blazorHerePlatform.objectManager = function () {
                     type: 'enginestatechange'
                 });
             });
+
+            // Resize event — observe map container
+            if (typeof ResizeObserver !== 'undefined' && map.getElement) {
+                var container = map.getElement();
+                if (container) {
+                    new ResizeObserver(function (entries) {
+                        for (var entry of entries) {
+                            callbackRef.invokeMethodAsync('OnMapResizeEvent', {
+                                width: entry.contentRect.width,
+                                height: entry.contentRect.height
+                            });
+                        }
+                    }).observe(container);
+                }
+            }
         },
 
         // Batch listener support
@@ -2033,7 +2348,7 @@ window.blazorHerePlatform.objectManager = function () {
                 }
             }
 
-            const { dataPoints, eps, minWeight, clusterSvgTemplate, noiseSvgTemplate, mapId } = options;
+            const { dataPoints, eps, minWeight, clusterSvgTemplate, noiseSvgTemplate, minZoom, maxZoom, mapId } = options;
             const map = mapObjects[mapId];
             if (!map) return;
 
@@ -2083,13 +2398,17 @@ window.blazorHerePlatform.objectManager = function () {
                 }
             };
 
-            var provider = new H.clustering.Provider(points, {
+            var providerOpts = {
                 clusteringOptions: {
                     eps: eps || 32,
                     minWeight: minWeight || 2
                 },
                 theme: theme
-            });
+            };
+            if (minZoom != null) providerOpts.min = minZoom;
+            if (maxZoom != null) providerOpts.max = maxZoom;
+
+            var provider = new H.clustering.Provider(points, providerOpts);
 
             var layer = new H.map.layer.ObjectLayer(provider);
             map.addLayer(layer);
@@ -2414,7 +2733,7 @@ window.blazorHerePlatform.objectManager = function () {
                 }
             }
 
-            const { dataPoints, opacity, colors, visible, mapId } = options;
+            const { dataPoints, opacity, colors, sampleDepth, visible, mapId } = options;
             const map = mapObjects[mapId];
             if (!map) return;
 
@@ -2456,6 +2775,7 @@ window.blazorHerePlatform.objectManager = function () {
                 type: 'value',
                 assumeValues: true
             };
+            if (sampleDepth != null) providerOpts.sampleDepth = sampleDepth;
 
             // Match the map's engine type (HARP requires explicit engineType)
             if (harpEngineType) {
@@ -3131,6 +3451,80 @@ window.blazorHerePlatform.objectManager = function () {
             });
         },
 
+        // Matrix Routing via HERE REST API v8
+        calculateMatrix: async function (request) {
+            if (!hereApiKey) {
+                console.warn('[BlazorHerePlatform] No API key for matrix routing.');
+                return { numOrigins: 0, numDestinations: 0, matrix: [] };
+            }
+
+            var origins = (request.origins || []).map(function (p) {
+                return { lat: p.lat, lng: p.lng };
+            });
+            var destinations = (request.destinations || []).map(function (p) {
+                return { lat: p.lat, lng: p.lng };
+            });
+
+            // Map transportMode + routingMode to HERE Matrix API v8 profile IDs:
+            // carFast, carShort, truckFast, pedestrian, bicycle
+            var transport = (request.transportMode || 'car').toLowerCase();
+            var routing = (request.routingMode || 'fast').toLowerCase();
+            var profile;
+            if (transport === 'pedestrian' || transport === 'bicycle') {
+                profile = transport;
+            } else if (transport === 'truck') {
+                profile = 'truckFast';
+            } else {
+                profile = 'car' + routing.charAt(0).toUpperCase() + routing.slice(1);
+            }
+
+            var body = {
+                origins: origins.map(function (o) { return { lat: o.lat, lng: o.lng }; }),
+                destinations: destinations.map(function (d) { return { lat: d.lat, lng: d.lng }; }),
+                regionDefinition: { type: 'world' },
+                matrixAttributes: ['travelTimes', 'distances'],
+                profile: profile
+            };
+            if (request.departureTime) {
+                body.departureTime = request.departureTime;
+            }
+
+            try {
+                var resp = await fetch('https://matrix.router.hereapi.com/v8/matrix?async=false&apiKey=' + encodeURIComponent(hereApiKey), {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body)
+                });
+                var data = await resp.json();
+
+                var numOrig = origins.length;
+                var numDest = destinations.length;
+                var entries = [];
+
+                if (data.matrix) {
+                    var times = data.matrix.travelTimes || [];
+                    var distances = data.matrix.distances || [];
+
+                    for (var oi = 0; oi < numOrig; oi++) {
+                        for (var di = 0; di < numDest; di++) {
+                            var idx = oi * numDest + di;
+                            entries.push({
+                                originIndex: oi,
+                                destinationIndex: di,
+                                duration: times[idx] || 0,
+                                length: distances[idx] || 0
+                            });
+                        }
+                    }
+                }
+
+                return { numOrigins: numOrig, numDestinations: numDest, matrix: entries };
+            } catch (e) {
+                console.warn('[BlazorHerePlatform] Matrix routing error:', e);
+                return { numOrigins: 0, numDestinations: 0, matrix: [] };
+            }
+        },
+
         // ──────────────────────────────────────────
         // Image Overlay Component
         // ──────────────────────────────────────────
@@ -3146,30 +3540,21 @@ window.blazorHerePlatform.objectManager = function () {
 
             var bounds = new H.geo.Rect(options.top, options.left, options.bottom, options.right);
 
+            // Remove existing overlay if present (H.map.Overlay has no setters for bounds/image)
             var existing = mapObjects[id];
             if (existing) {
-                // Update existing overlay
-                existing.setBounds(bounds);
-                if (typeof existing.setOpacity === 'function') {
-                    existing.setOpacity(options.opacity != null ? options.opacity : 1.0);
-                }
-                if (typeof existing.setVisibility === 'function') {
-                    existing.setVisibility(options.visible !== false);
-                }
-                return;
+                try { map.removeObject(existing); } catch (e) { /* already removed */ }
+                delete mapObjects[id];
             }
 
-            // Create new overlay
-            var overlay = new H.map.Overlay(bounds, options.imageUrl, {
-                volatility: true
-            });
-            if (options.opacity != null) {
-                overlay.setOpacity(options.opacity);
-            }
-            if (options.visible === false) {
-                overlay.setVisibility(false);
-            }
+            // Create overlay
+            var overlayOpts = { volatility: true };
+            if (options.visible === false) overlayOpts.visibility = false;
+            var overlay = new H.map.Overlay(bounds, options.imageUrl, overlayOpts);
             map.addObject(overlay);
+            if (options.opacity != null && options.opacity < 1) {
+                try { overlay.setOpacity(options.opacity); } catch (e) { /* unsupported */ }
+            }
             addMapObject(id, overlay);
         },
 

@@ -117,11 +117,11 @@ var result = await RoutingService.CalculateRouteAsync(request);
             <div class="d-flex gap-2 flex-wrap" style="font-size:0.85em;">
                 <div>
                     <label>Height (m)</label>
-                    <input type="number" class="form-control form-control-sm" @bind="_truckHeight" step="0.1" style="width:80px;" />
+                    <input type="number" class="form-control form-control-sm" @bind="_truckHeight" step="0.1" @bind:culture="@CultureInfo.InvariantCulture" style="width:80px;" />
                 </div>
                 <div>
                     <label>Width (m)</label>
-                    <input type="number" class="form-control form-control-sm" @bind="_truckWidth" step="0.1" style="width:80px;" />
+                    <input type="number" class="form-control form-control-sm" @bind="_truckWidth" step="0.1" @bind:culture="@CultureInfo.InvariantCulture" style="width:80px;" />
                 </div>
                 <div>
                     <label>Weight (kg)</label>
@@ -172,7 +172,7 @@ var result = await RoutingService.CalculateRouteAsync(request);
 {
     <div class="mt-3 alert alert-success">
         <strong>Route Summary:</strong>
-        Distance: @((_routeSummary.Length / 1000.0).ToString("F1")) km |
+        Distance: @((_routeSummary.Length / 1000.0).ToString("F1", CultureInfo.InvariantCulture)) km |
         Duration: @FormatDuration(_routeSummary.Duration)
         @if (_routeSummary.BaseDuration.HasValue)
         {

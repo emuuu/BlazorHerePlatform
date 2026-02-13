@@ -159,7 +159,7 @@
         }
         @if (_selectedItem.Position.HasValue)
         {
-            <br /><small>Coordinates: @_selectedItem.Position.Value.Lat.ToString("F5"), @_selectedItem.Position.Value.Lng.ToString("F5")</small>
+            <br /><small>Coordinates: @_selectedItem.Position.Value.Lat.ToString("F5", CultureInfo.InvariantCulture), @_selectedItem.Position.Value.Lng.ToString("F5", CultureInfo.InvariantCulture)</small>
         }
         @if (_selectedItem.ResultType is not null)
         {
