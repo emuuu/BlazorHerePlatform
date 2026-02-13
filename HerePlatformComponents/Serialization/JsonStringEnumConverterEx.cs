@@ -25,16 +25,16 @@ public class JsonStringEnumConverterEx<TEnum> : JsonConverter<TEnum> where TEnum
                 .Cast<EnumMemberAttribute>()
                 .FirstOrDefault();
 
-            _stringToEnum.Add(value.ToString()!, (TEnum)value);
+            _stringToEnum[value.ToString()!] = (TEnum)value;
 
             if (attr?.Value != null)
             {
-                _enumToString.Add((TEnum)value, attr.Value);
-                _stringToEnum.Add(attr.Value, (TEnum)value);
+                _enumToString[(TEnum)value] = attr.Value;
+                _stringToEnum[attr.Value] = (TEnum)value;
             }
             else
             {
-                _enumToString.Add((TEnum)value, value.ToString()!);
+                _enumToString[(TEnum)value] = value.ToString()!;
             }
         }
     }

@@ -1,10 +1,13 @@
 using System.Runtime.Serialization;
+using System.Text.Json.Serialization;
+using HerePlatformComponents.Serialization;
 
 namespace HerePlatformComponents.Maps.Services.Routing;
 
 /// <summary>
 /// ADR tunnel restriction category.
 /// </summary>
+[JsonConverter(typeof(JsonStringEnumConverterEx<TunnelCategory>))]
 public enum TunnelCategory
 {
     [EnumMember(Value = "B")]

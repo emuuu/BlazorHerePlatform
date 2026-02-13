@@ -1,10 +1,13 @@
 using System.Runtime.Serialization;
+using System.Text.Json.Serialization;
+using HerePlatformComponents.Serialization;
 
 namespace HerePlatformComponents.Maps.Services.Routing;
 
 /// <summary>
 /// Transport mode for routing.
 /// </summary>
+[JsonConverter(typeof(JsonStringEnumConverterEx<TransportMode>))]
 public enum TransportMode
 {
     [EnumMember(Value = "car")]

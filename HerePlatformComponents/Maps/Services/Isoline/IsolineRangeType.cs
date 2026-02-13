@@ -1,10 +1,13 @@
 using System.Runtime.Serialization;
+using System.Text.Json.Serialization;
+using HerePlatformComponents.Serialization;
 
 namespace HerePlatformComponents.Maps.Services.Isoline;
 
 /// <summary>
 /// Range type for isoline calculation.
 /// </summary>
+[JsonConverter(typeof(JsonStringEnumConverterEx<IsolineRangeType>))]
 public enum IsolineRangeType
 {
     [EnumMember(Value = "time")]
