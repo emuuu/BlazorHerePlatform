@@ -9,11 +9,16 @@
 
 <details class="mb-3">
     <summary class="fw-bold" role="button">Usage</summary>
-    <pre class="bg-light border rounded p-3 mt-2 mb-0"><code>&lt;!-- Basic usage --&gt;
+    <pre class="bg-light border rounded p-3 mt-2 mb-0"><code>&lt;!-- Basic usage (CSS is auto-injected via HeadContent) --&gt;
 &lt;HereAutosuggest Placeholder="Enter an address..."
                  Options="@@_searchOptions"
                  OnItemSelected="@@OnSelected"
                  OnCleared="@@OnCleared" /&gt;
+
+&lt;!-- With design variant --&gt;
+&lt;HereAutosuggest Design="AutosuggestDesign.Rounded"
+                 Options="@@_searchOptions"
+                 OnItemSelected="@@OnSelected" /&gt;
 
 &lt;!-- With custom item template --&gt;
 &lt;HereAutosuggest Options="@@_searchOptions" OnItemSelected="@@OnSelected"&gt;
@@ -23,25 +28,14 @@
     &lt;/SuggestionItemTemplate&gt;
 &lt;/HereAutosuggest&gt;
 
-&lt;!-- With fully custom list template --&gt;
-&lt;HereAutosuggest Options="@@_searchOptions" OnItemSelected="@@OnSelected"&gt;
-    &lt;SuggestionListTemplate&gt;
-        @@foreach (var item in context.Items)
-        {
-            &lt;div @@onmousedown="() =&gt; context.SelectItem(item)"&gt;
-                @@item.Title
-            &lt;/div&gt;
-        }
-    &lt;/SuggestionListTemplate&gt;
-&lt;/HereAutosuggest&gt;
-
-@@code {
-    private AutosuggestOptions _searchOptions = new()
-    {
-        Lang = "de", In = "countryCode:DEU", Limit = 5,
-        At = new LatLngLiteral(52.52, 13.405)
-    };
-}</code></pre>
+&lt;!-- Override styles via CSS custom properties --&gt;
+&lt;style&gt;
+    .here-autosuggest {
+        --here-as-dropdown-radius: 1rem;
+        --here-as-item-hover-bg: #e8f4fd;
+        --here-as-title-color: #333;
+    }
+&lt;/style&gt;</code></pre>
 </details>
 
 <div class="row mb-3">

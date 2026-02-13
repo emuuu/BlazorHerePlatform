@@ -1,5 +1,10 @@
 @namespace HerePlatformComponents.Maps.Search
+@inherits ComponentBase
 @implements IAsyncDisposable
+
+<HeadContent>
+    <link rel="stylesheet" href="_content/BlazorHerePlatform/css/here-autosuggest.css" />
+</HeadContent>
 
 <div class="here-autosuggest @VariantCssClass @CssClass" @onfocusout="OnFocusOut">
     @if (InputTemplate is not null)
@@ -10,7 +15,7 @@
     {
         <input @ref="_inputRef"
                type="text"
-               class="form-control"
+               class="form-control @InputVariantCssClass"
                placeholder="@Placeholder"
                disabled="@Disabled"
                value="@Value"
@@ -28,12 +33,12 @@
         }
         else
         {
-            <ul class="here-autosuggest-dropdown">
+            <ul class="here-autosuggest-dropdown @DropdownVariantCssClass">
                 @for (var i = 0; i < _items.Count; i++)
                 {
                     var index = i;
                     var item = _items[i];
-                    <li class="here-autosuggest-item @(index == _activeIndex ? "active" : "")"
+                    <li class="here-autosuggest-item @ItemVariantCssClass @(index == _activeIndex ? "active" : "")"
                         @onmousedown="() => SelectItem(item)"
                         @onmousedown:preventDefault>
                         @if (SuggestionItemTemplate is not null)

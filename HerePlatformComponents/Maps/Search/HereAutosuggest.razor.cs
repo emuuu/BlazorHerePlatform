@@ -125,6 +125,29 @@ public partial class HereAutosuggest : IAsyncDisposable
         _ => "here-autosuggest-default"
     };
 
+    private string InputVariantCssClass => Design switch
+    {
+        AutosuggestDesign.Compact => "here-input-compact",
+        AutosuggestDesign.Filled => "here-input-filled",
+        AutosuggestDesign.Outlined => "here-input-outlined",
+        AutosuggestDesign.Rounded => "here-input-rounded",
+        _ => ""
+    };
+
+    private string DropdownVariantCssClass => Design switch
+    {
+        AutosuggestDesign.Compact => "here-dropdown-compact",
+        AutosuggestDesign.Rounded => "here-dropdown-rounded",
+        _ => ""
+    };
+
+    private string ItemVariantCssClass => Design switch
+    {
+        AutosuggestDesign.Compact => "here-item-compact",
+        AutosuggestDesign.Rounded => "here-item-rounded",
+        _ => ""
+    };
+
     private AutosuggestInputContext BuildInputContext() => new()
     {
         Value = Value,
@@ -288,17 +311,16 @@ public partial class HereAutosuggest : IAsyncDisposable
             await OnItemSelected.InvokeAsync(item);
     }
 
-    private void OnFocusOut()
+    private async Task OnFocusOut()
     {
         // Small delay to allow click on dropdown item to fire first
-        _ = Task.Delay(200).ContinueWith(_ =>
+        await Task.Delay(200);
+
+        if (_isOpen)
         {
-            if (_isOpen)
-            {
-                CloseDropdown();
-                InvokeAsync(StateHasChanged);
-            }
-        });
+            CloseDropdown();
+            StateHasChanged();
+        }
     }
 
     private void CloseDropdown()
