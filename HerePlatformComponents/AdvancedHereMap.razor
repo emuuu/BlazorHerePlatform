@@ -113,8 +113,6 @@
     [Parameter]
     public RenderFragment? ChildContent { get; set; }
 
-    #region Two-Way Bindable View Parameters
-
     /// <summary>
     /// Map center position. Two-way bindable via <c>@bind-Center</c>.
     /// When set, overrides Options.Center. Updated when the user pans the map.
@@ -170,10 +168,6 @@
     /// </summary>
     [Parameter]
     public EventCallback<double> HeadingChanged { get; set; }
-
-    #endregion
-
-    #region Map-level Pointer / Interaction EventCallbacks
 
     /// <summary>
     /// Fired when the map background is tapped/clicked (no object hit).
@@ -265,10 +259,6 @@
     [Parameter]
     public EventCallback<MapWheelEventArgs> OnWheel { get; set; }
 
-    #endregion
-
-    #region Map-specific EventCallbacks
-
     /// <summary>
     /// Fired when the base layer changes.
     /// </summary>
@@ -280,6 +270,12 @@
     /// </summary>
     [Parameter]
     public EventCallback<EngineStateChangeEventArgs> OnEngineStateChange { get; set; }
+
+    /// <summary>
+    /// Fired when the map container is resized.
+    /// </summary>
+    [Parameter]
+    public EventCallback<MapResizeEventArgs> OnResize { get; set; }
 
     /// <summary>
     /// Fired continuously while the map view changes (zoom, pan, tilt).
@@ -298,8 +294,6 @@
     /// </summary>
     [Parameter]
     public EventCallback<MapViewChangeEventArgs> OnMapViewChangeEnd { get; set; }
-
-    #endregion
 
     protected override void OnInitialized()
     {
@@ -369,8 +363,6 @@
         await OnAfterInit.InvokeAsync();
     }
 
-    #region JSInvokable — Marker events
-
     [JSInvokable]
     public async Task OnMarkerClicked(Guid markerId)
     {
@@ -396,10 +388,6 @@
         }
     }
 
-    #endregion
-
-    #region JSInvokable — Polygon events
-
     [JSInvokable]
     public async Task OnPolygonClicked(Guid polygonId)
     {
@@ -409,10 +397,6 @@
             await polygonComponent.HandlePointerEvent("tap", new MapPointerEventArgs { Type = "tap" });
         }
     }
-
-    #endregion
-
-    #region JSInvokable — Unified object events (new)
 
     /// <summary>
     /// Called from JS for pointer events on markers and polygons.
@@ -516,9 +500,34 @@
         }
     }
 
-    #endregion
-
-    #region JSInvokable — InfoBubble events
+    /// <summary>
+    /// Called from JS after a shape drag ends with the updated geometry.
+    /// Updates the C# component state and fires two-way binding callbacks.
+    /// </summary>
+    [JSInvokable]
+    public async Task OnShapeDragEndGeometry(string objectType, Guid objectId, ShapeDragGeometry geometry)
+    {
+        if (objectType == "circle" && geometry.CenterLat.HasValue && geometry.CenterLng.HasValue
+            && _mapCircleComponents.TryGetValue(objectId, out var circle))
+        {
+            await circle.HandleGeometryChanged(geometry.CenterLat.Value, geometry.CenterLng.Value);
+        }
+        else if (objectType == "rect" && geometry.Top.HasValue
+            && _mapRectComponents.TryGetValue(objectId, out var rect))
+        {
+            await rect.HandleGeometryChanged(geometry.Top.Value, geometry.Left!.Value, geometry.Bottom!.Value, geometry.Right!.Value);
+        }
+        else if (objectType == "polygon" && geometry.Path != null
+            && _mapPolygonComponents.TryGetValue(objectId, out var polygon))
+        {
+            await polygon.HandleGeometryChanged(geometry.Path);
+        }
+        else if (objectType == "polyline" && geometry.Path != null
+            && _mapPolylineComponents.TryGetValue(objectId, out var polyline))
+        {
+            await polyline.HandleGeometryChanged(geometry.Path);
+        }
+    }
 
     [JSInvokable]
     public async Task OnInfoBubbleClosed(Guid bubbleId)
@@ -528,10 +537,6 @@
             await bubble.HandleClosed();
         }
     }
-
-    #endregion
-
-    #region JSInvokable — Cluster events
 
     [JSInvokable]
     public async Task OnClusterTapped(Guid clusterId, ClusterTapEventArgs args)
@@ -551,10 +556,6 @@
         }
     }
 
-    #endregion
-
-    #region JSInvokable — Data events
-
     [JSInvokable]
     public async Task OnGeoJsonLoaded(Guid componentId, GeoJsonLoadedEventArgs args)
     {
@@ -572,10 +573,6 @@
             await reader.HandleLoaded(args);
         }
     }
-
-    #endregion
-
-    #region JSInvokable — Map-level events (new)
 
     [JSInvokable]
     public async Task OnMapPointerEvent(string eventName, MapPointerEventArgs args)
@@ -687,7 +684,12 @@
             await OnEngineStateChange.InvokeAsync(args);
     }
 
-    #endregion
+    [JSInvokable]
+    public async Task OnMapResizeEvent(MapResizeEventArgs args)
+    {
+        if (OnResize.HasDelegate)
+            await OnResize.InvokeAsync(args);
+    }
 
     private Func<MapPointerEventArgs, Task>? _contextMenuHandler;
 
@@ -699,6 +701,38 @@
     internal void UnregisterContextMenuHandler()
     {
         _contextMenuHandler = null;
+    }
+
+    /// <summary>
+    /// Sets the minimum zoom level at runtime.
+    /// </summary>
+    public Task SetMinZoom(double minZoom)
+    {
+        return InteropObject?.SetMinZoom(minZoom) ?? Task.CompletedTask;
+    }
+
+    /// <summary>
+    /// Sets the maximum zoom level at runtime.
+    /// </summary>
+    public Task SetMaxZoom(double maxZoom)
+    {
+        return InteropObject?.SetMaxZoom(maxZoom) ?? Task.CompletedTask;
+    }
+
+    /// <summary>
+    /// Adds an overlay layer by path (e.g. "vector.normal.traffic").
+    /// </summary>
+    public Task AddLayerAsync(string layerPath)
+    {
+        return InteropObject?.AddLayerAsync(layerPath) ?? Task.CompletedTask;
+    }
+
+    /// <summary>
+    /// Removes an overlay layer by path.
+    /// </summary>
+    public Task RemoveLayerAsync(string layerPath)
+    {
+        return InteropObject?.RemoveLayerAsync(layerPath) ?? Task.CompletedTask;
     }
 
     /// <summary>

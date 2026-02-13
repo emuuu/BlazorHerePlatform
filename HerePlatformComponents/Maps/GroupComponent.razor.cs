@@ -1,3 +1,4 @@
+using HerePlatformComponents.Maps.Coordinates;
 using HerePlatformComponents.Maps.Extension;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
@@ -94,6 +95,33 @@ public partial class GroupComponent : IAsyncDisposable
         }
     }
 
+    /// <summary>
+    /// Adds a map object to this group by its GUID.
+    /// </summary>
+    public async Task AddObjectAsync(Guid objectGuid)
+    {
+        if (!_hasRendered) return;
+        await Js.InvokeVoidAsync("blazorHerePlatform.objectManager.groupAddObjects", Guid, new[] { objectGuid });
+    }
+
+    /// <summary>
+    /// Removes a map object from this group by its GUID.
+    /// </summary>
+    public async Task RemoveObjectAsync(Guid objectGuid)
+    {
+        if (!_hasRendered) return;
+        await Js.InvokeVoidAsync("blazorHerePlatform.objectManager.groupRemoveObjects", Guid, new[] { objectGuid });
+    }
+
+    /// <summary>
+    /// Gets the bounding box of all objects in this group.
+    /// </summary>
+    public async Task<GeoRect?> GetBoundsAsync()
+    {
+        if (!_hasRendered) return null;
+        return await Js.InvokeAsync<GeoRect?>("blazorHerePlatform.objectManager.groupGetBounds", Guid);
+    }
+
     public async ValueTask DisposeAsync()
     {
         if (IsDisposed) return;
@@ -106,7 +134,7 @@ public partial class GroupComponent : IAsyncDisposable
         catch (JSDisconnectedException) { }
         catch (InvalidOperationException) { }
 
-        MapRef.RemoveGroup(this);
+        MapRef?.RemoveGroup(this);
         GC.SuppressFinalize(this);
     }
 

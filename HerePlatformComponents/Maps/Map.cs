@@ -300,6 +300,66 @@ public class Map : EventEntityBase, IJsObjectRef, IAsyncDisposable
             Guid.ToString()).AsTask();
     }
 
+    /// <summary>
+    /// Sets the minimum zoom level at runtime.
+    /// </summary>
+    public Task SetMinZoom(double minZoom)
+    {
+        return _jsObjectRef.JSRuntime.InvokeVoidAsync(
+            "blazorHerePlatform.objectManager.setMinZoom",
+            Guid.ToString(), minZoom).AsTask();
+    }
+
+    /// <summary>
+    /// Sets the maximum zoom level at runtime.
+    /// </summary>
+    public Task SetMaxZoom(double maxZoom)
+    {
+        return _jsObjectRef.JSRuntime.InvokeVoidAsync(
+            "blazorHerePlatform.objectManager.setMaxZoom",
+            Guid.ToString(), maxZoom).AsTask();
+    }
+
+    /// <summary>
+    /// Gets the current minimum zoom level.
+    /// </summary>
+    public Task<double> GetMinZoom()
+    {
+        return _jsObjectRef.JSRuntime.InvokeAsync<double>(
+            "blazorHerePlatform.objectManager.getMinZoom",
+            Guid.ToString()).AsTask();
+    }
+
+    /// <summary>
+    /// Gets the current maximum zoom level.
+    /// </summary>
+    public Task<double> GetMaxZoom()
+    {
+        return _jsObjectRef.JSRuntime.InvokeAsync<double>(
+            "blazorHerePlatform.objectManager.getMaxZoom",
+            Guid.ToString()).AsTask();
+    }
+
+    /// <summary>
+    /// Adds an overlay layer by path (e.g. "vector.traffic.map").
+    /// </summary>
+    public Task AddLayerAsync(string layerPath)
+    {
+        return _jsObjectRef.JSRuntime.InvokeVoidAsync(
+            "blazorHerePlatform.objectManager.addOverlayLayer",
+            Guid.ToString(), layerPath).AsTask();
+    }
+
+    /// <summary>
+    /// Removes an overlay layer by path.
+    /// </summary>
+    public Task RemoveLayerAsync(string layerPath)
+    {
+        return _jsObjectRef.JSRuntime.InvokeVoidAsync(
+            "blazorHerePlatform.objectManager.removeOverlayLayer",
+            Guid.ToString(), layerPath).AsTask();
+    }
+
     private record LookAtData(double Tilt = 0, double Heading = 0);
 
     public override async ValueTask DisposeAsync()

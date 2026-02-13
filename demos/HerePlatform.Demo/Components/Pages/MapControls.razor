@@ -87,6 +87,39 @@ await map.InteropObject.SetHeading(90);</code></pre>
             </div>
         </div>
 
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Zoom Limits</h5>
+                    <div class="d-flex gap-2 align-items-center flex-wrap">
+                        <div>
+                            <label class="form-label mb-0">Min Zoom: @_minZoom</label>
+                            <input type="range" class="form-range" min="1" max="15" step="1"
+                                @bind="_minZoom" @bind:event="oninput" @bind:culture="@CultureInfo.InvariantCulture" @bind:after="ApplyMinZoom" style="width:120px;" />
+                        </div>
+                        <div>
+                            <label class="form-label mb-0">Max Zoom: @_maxZoom</label>
+                            <input type="range" class="form-range" min="5" max="20" step="1"
+                                @bind="_maxZoom" @bind:event="oninput" @bind:culture="@CultureInfo.InvariantCulture" @bind:after="ApplyMaxZoom" style="width:120px;" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Traffic Layer</h5>
+                    <div class="btn-group">
+                        <button class="btn btn-sm @(_trafficLayerAdded ? "btn-success" : "btn-outline-success")" @onclick="ToggleTrafficLayer">
+                            Traffic @(_trafficLayerAdded ? "ON" : "OFF")
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="col-md-12">
             <div class="card">
                 <div class="card-body">
@@ -95,7 +128,7 @@ await map.InteropObject.SetHeading(90);</code></pre>
                     @if (_currentCenter.HasValue)
                     {
                         <span class="ms-2">
-                            Center: @_currentCenter.Value.Lat.ToString("F4"), @_currentCenter.Value.Lng.ToString("F4")
+                            Center: @_currentCenter.Value.Lat.ToString("F4", CultureInfo.InvariantCulture), @_currentCenter.Value.Lng.ToString("F4", CultureInfo.InvariantCulture)
                         </span>
                     }
                 </div>
@@ -110,6 +143,9 @@ await map.InteropObject.SetHeading(90);</code></pre>
     private double _currentTilt;
     private double _currentHeading;
     private LatLngLiteral? _currentCenter;
+    private double _minZoom = 1;
+    private double _maxZoom = 20;
+    private bool _trafficLayerAdded;
 
     private MapOptions _mapOptions = new()
     {
@@ -169,5 +205,32 @@ await map.InteropObject.SetHeading(90);</code></pre>
         _currentTilt = await _map.InteropObject.GetTilt();
         _currentHeading = await _map.InteropObject.GetHeading();
         StateHasChanged();
+    }
+
+    private async Task ApplyMinZoom()
+    {
+        if (_map?.InteropObject == null) return;
+        await _map.InteropObject.SetMinZoom(_minZoom);
+    }
+
+    private async Task ApplyMaxZoom()
+    {
+        if (_map?.InteropObject == null) return;
+        await _map.InteropObject.SetMaxZoom(_maxZoom);
+    }
+
+    private async Task ToggleTrafficLayer()
+    {
+        if (_map?.InteropObject == null) return;
+        if (_trafficLayerAdded)
+        {
+            await _map.InteropObject.RemoveLayerAsync("vector.traffic.map");
+            _trafficLayerAdded = false;
+        }
+        else
+        {
+            await _map.InteropObject.AddLayerAsync("vector.traffic.map");
+            _trafficLayerAdded = true;
+        }
     }
 }

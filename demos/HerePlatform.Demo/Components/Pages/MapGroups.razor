@@ -29,7 +29,7 @@
 </details>
 
 <AdvancedHereMap Options="@_mapOptions" Height="500px">
-    <GroupComponent Visible="@_showGroup">
+    <GroupComponent @ref="_group" Visible="@_showGroup">
         <DomMarkerComponent Lat="52.5200" Lng="13.4050"
             Clickable="true"
             OnClick="@(e => _status = "DomMarker A clicked")">
@@ -55,7 +55,7 @@
         </DomMarkerComponent>
     </GroupComponent>
 
-    <InfoBubbleComponent Lat="52.5163" Lng="13.3777" @bind-IsOpen="_showInfoBubble">
+    <InfoBubbleComponent Lat="52.5163" Lng="13.3777" @bind-IsOpen="_showInfoBubble" AutoPan="@_autoPan">
         <div>
             <strong>Victory Column</strong><br />
             The Berlin Victory Column is a monument in Berlin, Germany.
@@ -70,6 +70,13 @@
     <button class="btn @(_showInfoBubble ? "btn-info" : "btn-outline-info") ms-2" @onclick="@(() => _showInfoBubble = !_showInfoBubble)">
         Toggle InfoBubble (@(_showInfoBubble ? "open" : "closed"))
     </button>
+    <div class="form-check form-switch ms-3 d-inline-block">
+        <input class="form-check-input" type="checkbox" @bind="_autoPan" />
+        <label class="form-check-label">AutoPan</label>
+    </div>
+    <button class="btn btn-outline-secondary btn-sm ms-2" @onclick="GetGroupBounds">
+        Get Group Bounds
+    </button>
 </div>
 
 @if (!string.IsNullOrEmpty(_status))
@@ -78,6 +85,8 @@
 }
 
 @code {
+    private GroupComponent? _group;
+
     private MapOptions _mapOptions = new()
     {
         Center = new LatLngLiteral(52.52, 13.405),
@@ -88,5 +97,21 @@
 
     private bool _showGroup = true;
     private bool _showInfoBubble = false;
+    private bool _autoPan = true;
     private string? _status;
+
+    private async Task GetGroupBounds()
+    {
+        if (_group == null) return;
+        var bounds = await _group.GetBoundsAsync();
+        if (bounds != null)
+        {
+            _status = $"Group bounds: Top={bounds.Top:F4}, Left={bounds.Left:F4}, Bottom={bounds.Bottom:F4}, Right={bounds.Right:F4}";
+        }
+        else
+        {
+            _status = "No bounds (group empty or not ready).";
+        }
+        StateHasChanged();
+    }
 }
