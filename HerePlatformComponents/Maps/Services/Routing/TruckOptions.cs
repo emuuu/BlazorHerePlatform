@@ -6,17 +6,17 @@ namespace HerePlatformComponents.Maps.Services.Routing;
 public class TruckOptions
 {
     /// <summary>
-    /// Vehicle height in meters.
+    /// Vehicle height in meters (converted to cm for the API).
     /// </summary>
     public double? Height { get; set; }
 
     /// <summary>
-    /// Vehicle width in meters.
+    /// Vehicle width in meters (converted to cm for the API).
     /// </summary>
     public double? Width { get; set; }
 
     /// <summary>
-    /// Vehicle length in meters.
+    /// Vehicle length in meters (converted to cm for the API).
     /// </summary>
     public double? Length { get; set; }
 

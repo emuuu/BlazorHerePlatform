@@ -2193,12 +2193,12 @@ window.blazorHerePlatform.objectManager = function () {
                     params.alternatives = request.alternatives;
                 }
 
-                // Truck parameters
+                // Truck parameters (C# uses meters/kg, API expects cm/kg)
                 if (request.truck) {
                     var t = request.truck;
-                    if (t.height != null) params['truck[height]'] = t.height;
-                    if (t.width != null) params['truck[width]'] = t.width;
-                    if (t.length != null) params['truck[length]'] = t.length;
+                    if (t.height != null) params['truck[height]'] = Math.round(t.height * 100);
+                    if (t.width != null) params['truck[width]'] = Math.round(t.width * 100);
+                    if (t.length != null) params['truck[length]'] = Math.round(t.length * 100);
                     if (t.grossWeight != null) params['truck[grossWeight]'] = t.grossWeight;
                     if (t.weightPerAxle != null) params['truck[weightPerAxle]'] = t.weightPerAxle;
                     if (t.axleCount != null) params['truck[axleCount]'] = t.axleCount;
