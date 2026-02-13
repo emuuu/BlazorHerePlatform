@@ -1,0 +1,9 @@
+@namespace HerePlatformComponents.Maps
+@inherits ComponentBase
+
+@if (_hasRendered)
+{
+    <CascadingValue Name="HereGroup" Value="@this" IsFixed="true">
+        @ChildContent
+    </CascadingValue>
+}
