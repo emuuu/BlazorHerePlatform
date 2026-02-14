@@ -93,7 +93,6 @@ public class MapComponent : ComponentBase, IDisposable, IAsyncDisposable
             {
                 var isPossibleRefreshError = ex.HasInnerExceptionsOfType<TaskCanceledException>();
                 isPossibleRefreshError |= ex.HasInnerExceptionsOfType<ObjectDisposedException>();
-                isPossibleRefreshError |= true;
 
                 if (!isPossibleRefreshError)
                 {
