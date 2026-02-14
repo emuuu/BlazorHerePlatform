@@ -1,3 +1,5 @@
+@inject NavigationManager Navigation
+
 @if (Headings is not null && Headings.Count > 0)
 {
     <aside class="on-this-page d-none d-xl-block">
@@ -6,8 +8,9 @@
             <ul class="list-unstyled">
                 @foreach (var heading in Headings)
                 {
+                    var anchorUrl = new Uri(Navigation.Uri).GetLeftPart(UriPartial.Path) + "#" + heading.Id;
                     <li class="@(heading.Level == 3 ? "ms-3" : "")">
-                        <a href="#@heading.Id" class="text-decoration-none text-muted d-block py-1 on-this-page-link">
+                        <a href="@anchorUrl" class="text-decoration-none text-muted d-block py-1 on-this-page-link">
                             @heading.Text
                         </a>
                     </li>
