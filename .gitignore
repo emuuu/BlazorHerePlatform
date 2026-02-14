@@ -366,3 +366,6 @@ FodyWeavers.xsd
 wsl-restore.sh
 nuget.config
 **/nuget.config
+
+# Generated demo source copies (build artifact)
+docs/BlazorHerePlatform.Docs/wwwroot/demos/
