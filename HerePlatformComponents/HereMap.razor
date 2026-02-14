@@ -6,7 +6,7 @@
 @inherits MapComponent
 @inject IJSRuntime JSRuntime
 
-<div @ref="@Element" id="@Id" class="@CssClass" style="@StyleStr"></div>
+<div @ref="@Element" id="@Id" class="@CssClass" style="@StyleStr" @attributes="UserAttributes"></div>
 
 @code {
     [Parameter]

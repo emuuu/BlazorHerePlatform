@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.JSInterop;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace HerePlatformComponents;
@@ -16,6 +17,9 @@ public class MapComponent : ComponentBase, IDisposable, IAsyncDisposable
 
     [Inject]
     public IServiceProvider ServiceProvider { get; protected set; } = default!;
+
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object?>? UserAttributes { get; set; }
 
     private IBlazorHerePlatformKeyService? _keyService;
     internal event EventHandler? MapInitialized;

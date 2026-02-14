@@ -6,7 +6,7 @@
     <link rel="stylesheet" href="_content/BlazorHerePlatform/css/here-autosuggest.css" />
 </HeadContent>
 
-<div class="here-autosuggest @VariantCssClass @CssClass" @onfocusout="OnFocusOut">
+<div class="here-autosuggest @VariantCssClass @CssClass" @onfocusout="OnFocusOut" @attributes="UserAttributes">
     @if (InputTemplate is not null)
     {
         @InputTemplate(BuildInputContext())

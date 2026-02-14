@@ -27,6 +27,9 @@ public partial class HereAutosuggest : IAsyncDisposable
     [Inject]
     private IServiceProvider ServiceProvider { get; set; } = default!;
 
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object?>? UserAttributes { get; set; }
+
     /// <summary>
     /// Placeholder text for the input field.
     /// </summary>
