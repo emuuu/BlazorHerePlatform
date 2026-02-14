@@ -54,5 +54,10 @@
         await OnAfterInit.InvokeAsync();
     }
 
+    /// <summary>
+    /// Returns false because the map's visual state is managed entirely by the
+    /// HERE Maps JS API. Blazor re-renders would disrupt the map container.
+    /// Use ReInitializeAsync() to rebuild the map after option changes.
+    /// </summary>
     protected override bool ShouldRender() => false;
 }

@@ -230,7 +230,7 @@ public partial class HereAutosuggest : IAsyncDisposable
         bool isReady = false;
         try
         {
-            isReady = await Js.InvokeAsync<bool>("blazorHerePlatform.objectManager.isHereMapsReady");
+            isReady = await Js.InvokeAsync<bool>("blazorHerePlatform.objectManager.canRenderMap");
         }
         catch { /* JS not available yet */ }
 
