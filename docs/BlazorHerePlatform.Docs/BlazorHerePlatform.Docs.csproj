@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>BlazorHerePlatform.Docs</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="10.0.3" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="10.0.3" PrivateAssets="all" />
+    <PackageReference Include="Markdig" Version="0.40.0" />
+    <PackageReference Include="YamlDotNet" Version="16.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../../HerePlatformComponents/HerePlatformComponents.csproj" />
+  </ItemGroup>
+
+  <Target Name="GenerateDocsData" BeforeTargets="Build">
+    <Exec Command="dotnet run --project ../BlazorHerePlatform.Docs.Generator -- $(MSBuildProjectDirectory)/wwwroot" />
+  </Target>
+
+</Project>

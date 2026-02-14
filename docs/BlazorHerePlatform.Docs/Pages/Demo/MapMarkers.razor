@@ -1,0 +1,312 @@
+@page "/demo/map-markers"
+
+<PageTitle>Markers</PageTitle>
+
+<h3>Markers Demo</h3>
+<p>Demonstrates adding, clicking, and dragging markers on the map. The orange marker supports two-way binding (<code>@@bind-Lat</code> / <code>@@bind-Lng</code>).</p>
+
+<details class="mb-3">
+    <summary class="fw-bold" role="button">Usage</summary>
+    <pre class="bg-light border rounded p-3 mt-2 mb-0"><code>@@using HerePlatformComponents.Maps.Events
+
+&lt;!-- bind-Center/bind-Zoom: two-way binding with the map viewport --&gt;
+&lt;AdvancedHereMap @@ref="_advMap" Options="@@_mapOptions"
+                 @@bind-Center="_viewCenter" @@bind-Zoom="_viewZoom"
+                 Height="500px"&gt;
+
+    &lt;!-- Two-way bound marker: drag updates _boundLat/_boundLng,
+         changing the values programmatically moves the pin --&gt;
+    &lt;MarkerComponent @@bind-Lat="_boundLat" @@bind-Lng="_boundLng"
+                     Draggable="true"
+                     Opacity="@@_markerOpacity"
+                     MinZoom="@@_markerMinZoom"
+                     MaxZoom="@@_markerMaxZoom" /&gt;
+
+    &lt;!-- Dynamic markers with click and drag events --&gt;
+    @@foreach (var marker in _markers)
+    {
+        &lt;MarkerComponent @@key="marker"
+                         Lat="@@marker.Lat" Lng="@@marker.Lng"
+                         Clickable="true"
+                         Draggable="@@marker.Draggable"
+                         Title="@@marker.Title"
+                         OnClick="@@(e =&gt; OnMarkerClicked(marker, e))"
+                         OnDragEnd="@@(e =&gt; OnMarkerDragged(marker, e))" /&gt;
+    }
+
+&lt;/AdvancedHereMap&gt;
+
+@@code {
+    private AdvancedHereMap? _advMap;
+    private List&lt;MarkerInfo&gt; _markers = new();
+    private double _boundLat = 52.5200;
+    private double _boundLng = 13.4050;
+    private double _markerOpacity = 1.0;
+    private double? _markerMinZoom = null;  // visible from this zoom
+    private double? _markerMaxZoom = null;  // hidden above this zoom
+    private LatLngLiteral _viewCenter = new(52.52, 13.405);
+    private double _viewZoom = 13;
+
+    private MapOptions _mapOptions = new()
+    {
+        Center = new LatLngLiteral(52.52, 13.405),
+        Zoom = 13,
+        EnableUI = true,
+        EnableInteraction = true
+    };
+
+    private void OnMarkerClicked(MarkerInfo marker, MapPointerEventArgs e)
+    {
+        // e.Position contains the geo-coordinates of the click
+    }
+
+    private void OnMarkerDragged(MarkerInfo marker, MapDragEventArgs e)
+    {
+        if (e.Position.HasValue)
+        {
+            marker.Lat = e.Position.Value.Lat;
+            marker.Lng = e.Position.Value.Lng;
+        }
+    }
+
+    private class MarkerInfo
+    {
+        public double Lat { get; set; }
+        public double Lng { get; set; }
+        public string Title { get; set; } = "";
+        public bool Draggable { get; set; }
+    }
+}</code></pre>
+</details>
+
+<AdvancedHereMap @ref="_advMap"
+                 Options="@_mapOptions"
+                 @bind-Center="_viewCenter"
+                 @bind-Zoom="_viewZoom"
+                 Height="clamp(250px, 50vh, 500px)">
+
+    @* Two-way bound marker: drag updates _boundLat/_boundLng, changing values moves the pin *@
+    @if (_showBoundMarker)
+    {
+        <MarkerComponent @bind-Lat="_boundLat" @bind-Lng="_boundLng"
+                         Draggable="true"
+                         Opacity="@_markerOpacity"
+                         MinZoom="@(_enableMinZoom ? _markerMinZoom : null)"
+                         MaxZoom="@(_enableMaxZoom ? _markerMaxZoom : null)" />
+    }
+
+    @* Dynamic markers with event callbacks *@
+    @foreach (var marker in _markers)
+    {
+        <MarkerComponent @key="marker"
+                         Lat="@marker.Lat"
+                         Lng="@marker.Lng"
+                         Clickable="true"
+                         Draggable="@marker.Draggable"
+                         Title="@marker.Title"
+                         Visible="true"
+                         OnClick="@(e => OnMarkerClicked(marker, e))"
+                         OnDragEnd="@(e => OnMarkerDragged(marker, e))" />
+    }
+</AdvancedHereMap>
+
+<div class="row mt-3">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header fw-bold">Marker Two-Way Binding</div>
+            <div class="card-body">
+                <p class="card-text small text-muted">Drag the orange marker or change the coordinates below. Both stay in sync via <code>@@bind-Lat</code> / <code>@@bind-Lng</code>.</p>
+                <div class="row g-2">
+                    <div class="col">
+                        <label class="form-label">Lat</label>
+                        <input type="number" step="0.0001" class="form-control form-control-sm"
+                               @bind="_boundLat" @bind:event="oninput" @bind:culture="@System.Globalization.CultureInfo.InvariantCulture" />
+                    </div>
+                    <div class="col">
+                        <label class="form-label">Lng</label>
+                        <input type="number" step="0.0001" class="form-control form-control-sm"
+                               @bind="_boundLng" @bind:event="oninput" @bind:culture="@System.Globalization.CultureInfo.InvariantCulture" />
+                    </div>
+                    <div class="col-auto d-flex align-items-end">
+                        <button class="btn btn-sm btn-outline-secondary" @onclick="ResetBoundMarker">Reset</button>
+                    </div>
+                </div>
+                <small class="text-muted mt-1 d-block">Position: @_boundLat.ToString("F5", System.Globalization.CultureInfo.InvariantCulture), @_boundLng.ToString("F5", System.Globalization.CultureInfo.InvariantCulture)</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header fw-bold">Map View Binding</div>
+            <div class="card-body">
+                <p class="card-text small text-muted">Pan or zoom the map — values update automatically via <code>@@bind-Center</code> / <code>@@bind-Zoom</code>. Change zoom to move the map programmatically.</p>
+                <div class="row g-2">
+                    <div class="col">
+                        <label class="form-label">Center</label>
+                        <input type="text" class="form-control form-control-sm" readonly
+                               value="@($"{_viewCenter.Lat:F4}, {_viewCenter.Lng:F4}")" />
+                    </div>
+                    <div class="col">
+                        <label class="form-label">Zoom</label>
+                        <input type="number" step="1" min="1" max="20" class="form-control form-control-sm"
+                               value="@_viewZoom.ToString("F1", System.Globalization.CultureInfo.InvariantCulture)"
+                               @onchange="OnZoomInputChanged" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="mt-3">
+    <button class="btn btn-primary" @onclick="AddMarkerAtCenter">Add Marker at Center</button>
+    <button class="btn btn-warning" @onclick="AddDraggableMarker">Add Draggable Marker</button>
+    <button class="btn btn-danger" @onclick="ClearMarkers">Clear All</button>
+    <span class="ms-3 badge bg-info">Marker count: @(_markers.Count + (_showBoundMarker ? 1 : 0))</span>
+</div>
+
+<div class="mt-2 d-flex gap-3 flex-wrap align-items-center">
+    <div>
+        <label>Opacity: @_markerOpacity.ToString("F1", CultureInfo.InvariantCulture)</label>
+        <input type="range" min="0.1" max="1.0" step="0.1" @bind="_markerOpacity" @bind:event="oninput" @bind:culture="@System.Globalization.CultureInfo.InvariantCulture" style="max-width:120px;" />
+    </div>
+    <div>
+        <label>
+            <input type="checkbox" @bind="_enableMinZoom" />
+            Visible from zoom @_markerMinZoom.ToString("F0", CultureInfo.InvariantCulture)
+        </label>
+        <input type="range" min="1" max="20" step="1"
+               @bind="_markerMinZoom" @bind:event="oninput" @bind:after="ClampMinZoom"
+               @bind:culture="@CultureInfo.InvariantCulture" style="max-width:100px;" />
+    </div>
+    <div>
+        <label>
+            <input type="checkbox" @bind="_enableMaxZoom" />
+            Visible until zoom @_markerMaxZoom.ToString("F0", CultureInfo.InvariantCulture)
+        </label>
+        <input type="range" min="1" max="20" step="1"
+               @bind="_markerMaxZoom" @bind:event="oninput" @bind:after="ClampMaxZoom"
+               @bind:culture="@CultureInfo.InvariantCulture" style="max-width:100px;" />
+    </div>
+</div>
+
+@if (!string.IsNullOrEmpty(_lastEvent))
+{
+    <div class="mt-3 alert alert-info">
+        @_lastEvent
+    </div>
+}
+
+@code {
+    private AdvancedHereMap? _advMap;
+    private List<MarkerInfo> _markers = new();
+    private string? _lastEvent;
+    private int _markerIndex;
+    private bool _showBoundMarker = true;
+    private double _boundLat = 52.5200;
+    private double _boundLng = 13.4050;
+    private double _markerOpacity = 1.0;
+    private bool _enableMinZoom;
+    private bool _enableMaxZoom;
+    private double _markerMinZoom = 1;
+    private double _markerMaxZoom = 20;
+    private LatLngLiteral _viewCenter = new(52.52, 13.405);
+    private double _viewZoom = 13;
+
+    private MapOptions _mapOptions = new()
+    {
+        Center = new LatLngLiteral(52.52, 13.405),
+        Zoom = 13,
+        EnableUI = true,
+        EnableInteraction = true
+    };
+
+    private void AddMarkerAtCenter()
+    {
+        _markerIndex++;
+        _markers.Add(new MarkerInfo(52.52 + Random.Shared.NextDouble() * 0.01 - 0.005,
+            13.405 + Random.Shared.NextDouble() * 0.01 - 0.005,
+            $"Marker #{_markerIndex}", false));
+        StateHasChanged();
+    }
+
+    private void AddDraggableMarker()
+    {
+        _markerIndex++;
+        _markers.Add(new MarkerInfo(
+            52.52 + Random.Shared.NextDouble() * 0.008 - 0.004,
+            13.405 + Random.Shared.NextDouble() * 0.008 - 0.004,
+            $"Draggable #{_markerIndex}", true));
+        _lastEvent = $"Added draggable marker #{_markerIndex}. Drag it to see position updates.";
+        StateHasChanged();
+    }
+
+    private void ResetBoundMarker()
+    {
+        _boundLat = 52.5200;
+        _boundLng = 13.4050;
+        _showBoundMarker = true;
+    }
+
+    private void OnZoomInputChanged(ChangeEventArgs e)
+    {
+        if (double.TryParse(e.Value?.ToString(), System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out var zoom))
+        {
+            _viewZoom = Math.Clamp(zoom, 1, 20);
+        }
+    }
+
+    private void ClampMinZoom()
+    {
+        if (_markerMinZoom > _markerMaxZoom)
+            _markerMaxZoom = _markerMinZoom;
+    }
+
+    private void ClampMaxZoom()
+    {
+        if (_markerMaxZoom < _markerMinZoom)
+            _markerMinZoom = _markerMaxZoom;
+    }
+
+    private void ClearMarkers()
+    {
+        _markers.Clear();
+        _showBoundMarker = false;
+        _lastEvent = "All markers cleared.";
+        StateHasChanged();
+    }
+
+    private void OnMarkerClicked(MarkerInfo marker, MapPointerEventArgs e)
+    {
+        _lastEvent = $"Clicked: {marker.Title} at ({marker.Lat:F4}, {marker.Lng:F4})" +
+            (e.Position.HasValue ? $" — pointer at ({e.Position.Value.Lat:F4}, {e.Position.Value.Lng:F4})" : "");
+        StateHasChanged();
+    }
+
+    private void OnMarkerDragged(MarkerInfo marker, MapDragEventArgs e)
+    {
+        if (e.Position.HasValue)
+        {
+            marker.Lat = e.Position.Value.Lat;
+            marker.Lng = e.Position.Value.Lng;
+        }
+        _lastEvent = $"Dragged: {marker.Title} to ({marker.Lat:F4}, {marker.Lng:F4})";
+        StateHasChanged();
+    }
+
+    private class MarkerInfo
+    {
+        public double Lat { get; set; }
+        public double Lng { get; set; }
+        public string Title { get; set; }
+        public bool Draggable { get; set; }
+
+        public MarkerInfo(double lat, double lng, string title, bool draggable)
+        {
+            Lat = lat;
+            Lng = lng;
+            Title = title;
+            Draggable = draggable;
+        }
+    }
+}

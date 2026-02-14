@@ -1,0 +1,618 @@
+[
+  {
+    "slug": "components/here-map",
+    "title": "HereMap",
+    "category": "Components",
+    "order": 1,
+    "description": "Minimal HERE map component.",
+    "demo": "map-basic",
+    "apiRef": "HereMap",
+    "headings": [
+      "Basic Usage",
+      "Parameters",
+      "Events",
+      "OnAfterInit",
+      "Methods",
+      "ReInitializeAsync"
+    ],
+    "searchText": "Basic Usage HereMap renders a single HERE Maps container with minimal configuration. It creates the map on first render and manages its lifecycle. The map suppresses Blazor re-renders (ShouldRender returns false) because visual state is managed entirely by the HERE Maps JS API. Use ReInitializeAsync to rebuild the map after option changes. Parameters | Parameter | Type | Default | Description | |-----------|------|---------|-------------| | Id | string? | null | HTML id attribute for the map con"
+  },
+  {
+    "slug": "components/advanced-here-map",
+    "title": "AdvancedHereMap",
+    "category": "Components",
+    "order": 2,
+    "description": "Full-featured declarative map with child components and two-way binding.",
+    "demo": "map-controls",
+    "apiRef": "AdvancedHereMap",
+    "headings": [
+      "Basic Usage",
+      "Two-Way Binding",
+      "Layer Types",
+      "Child Components",
+      "Events"
+    ],
+    "searchText": "Basic Usage AdvancedHereMap wraps HereMap and adds declarative child component support, two-way binding for view properties, and a comprehensive event system. Child components are rendered inside a CascadingValue and are only mounted after the underlying map is initialized. Two-Way Binding Bind map view properties directly to C# fields. Values update automatically when the user pans, zooms, tilts, or rotates the map. Setting a bound property programmatically pushes the change to the JS map. Set "
+  },
+  {
+    "slug": "components/marker",
+    "title": "MarkerComponent",
+    "category": "Components",
+    "order": 3,
+    "description": "Standard HERE marker with drag, click, and InfoBubble support.",
+    "demo": "map-markers",
+    "apiRef": "MarkerComponent",
+    "headings": [
+      "Basic Usage",
+      "Dragging",
+      "Custom Icons",
+      "InfoBubble via ChildContent",
+      "Events"
+    ],
+    "searchText": "Basic Usage Place MarkerComponent inside an AdvancedHereMap to add a marker at the specified coordinates. Common parameters: | Parameter | Type | Default | Description | |-----------|------|---------|-------------| | Lat | double | 0 | Latitude in degrees. Two-way bindable via @bind-Lat. | | Lng | double | 0 | Longitude in degrees. Two-way bindable via @bind-Lng. | | Clickable | bool | false | Enables tap/click events. | | Draggable | bool | false | Allows the user to drag the marker. | | Title "
+  },
+  {
+    "slug": "components/dom-marker",
+    "title": "DomMarkerComponent",
+    "category": "Components",
+    "order": 4,
+    "description": "DOM-based marker with custom HTML content.",
+    "apiRef": "DomMarkerComponent",
+    "headings": [
+      "Basic Usage",
+      "Custom HTML",
+      "Dragging with Two-Way Binding",
+      "Events"
+    ],
+    "searchText": "Basic Usage DomMarkerComponent renders a marker using a DOM element (H.map.DomIcon) instead of a canvas-drawn icon. Place it inside an AdvancedHereMap. Parameters: | Parameter | Type | Default | Description | |-----------|------|---------|-------------| | Lat | double | 0 | Latitude. Two-way bindable via @bind-Lat. | | Lng | double | 0 | Longitude. Two-way bindable via @bind-Lng. | | Clickable | bool | false | Enables click events. | | Draggable | bool | false | Allows dragging. | | Visible | bo"
+  },
+  {
+    "slug": "components/polyline",
+    "title": "PolylineComponent",
+    "category": "Components",
+    "order": 5,
+    "description": "Polyline shape for drawing lines on the map.",
+    "apiRef": "PolylineComponent",
+    "headings": [
+      "Basic Usage",
+      "Styling",
+      "Interactive Polylines"
+    ],
+    "searchText": "Basic Usage PolylineComponent draws a line through a series of geographic coordinates. Place it inside an AdvancedHereMap. Parameters: | Parameter | Type | Default | Description | |-----------|------|---------|-------------| | Path | List\u003CLatLngLiteral\u003E? | null | Coordinates defining the polyline. Two-way bindable via @bind-Path. | | StrokeColor | string? | null | Stroke color in CSS format. | | LineWidth | double? | null | Line width in pixels. | | LineCap | string? | null | Cap style: \u0022round\u0022,"
+  },
+  {
+    "slug": "components/polygon",
+    "title": "PolygonComponent",
+    "category": "Components",
+    "order": 6,
+    "description": "Polygon shape for drawing filled areas.",
+    "apiRef": "PolygonComponent",
+    "headings": [
+      "Basic Usage",
+      "Styling",
+      "Events"
+    ],
+    "searchText": "Basic Usage PolygonComponent draws a filled polygon on the map. Place it inside an AdvancedHereMap and provide a list of coordinates defining the boundary. Parameters: | Parameter | Type | Default | Description | |-----------|------|---------|-------------| | Path | List\u003CLatLngLiteral\u003E? | null | Boundary coordinates. Two-way bindable via @bind-Path. | | FillColor | string? | null | Fill color in CSS format. | | StrokeColor | string? | null | Stroke color in CSS format. | | LineWidth | double? | "
+  },
+  {
+    "slug": "components/circle",
+    "title": "CircleComponent",
+    "category": "Components",
+    "order": 7,
+    "description": "Circle shape with configurable center and radius.",
+    "apiRef": "CircleComponent",
+    "headings": [
+      "Basic Usage",
+      "Two-Way Binding",
+      "Styling"
+    ],
+    "searchText": "Basic Usage CircleComponent draws a circle on the map defined by a center point and a radius in meters. Place it inside an AdvancedHereMap. Parameters: | Parameter | Type | Default | Description | |-----------|------|---------|-------------| | CenterLat | double | 0 | Center latitude. Two-way bindable via @bind-CenterLat. | | CenterLng | double | 0 | Center longitude. Two-way bindable via @bind-CenterLng. | | Radius | double | 0 | Radius in meters. Two-way bindable via @bind-Radius. | | FillColo"
+  },
+  {
+    "slug": "components/rect",
+    "title": "RectComponent",
+    "category": "Components",
+    "order": 8,
+    "description": "Rectangle shape defined by geographic bounds.",
+    "apiRef": "RectComponent",
+    "headings": [
+      "Basic Usage",
+      "Styling"
+    ],
+    "searchText": "Basic Usage RectComponent draws a rectangle on the map defined by four geographic bounds: Top (north latitude), Left (west longitude), Bottom (south latitude), and Right (east longitude). Place it inside an AdvancedHereMap. Parameters: | Parameter | Type | Default | Description | |-----------|------|---------|-------------| | Top | double | 0 | North latitude. Two-way bindable via @bind-Top. | | Left | double | 0 | West longitude. Two-way bindable via @bind-Left. | | Bottom | double | 0 | South "
+  },
+  {
+    "slug": "components/infobubble",
+    "title": "InfoBubbleComponent",
+    "category": "Components",
+    "order": 9,
+    "description": "Info bubble popup for markers and map locations.",
+    "demo": "map-infobubble",
+    "apiRef": "InfoBubbleComponent",
+    "headings": [
+      "Basic Usage",
+      "Custom Content",
+      "Positioning"
+    ],
+    "searchText": "Basic Usage InfoBubbleComponent renders an H.ui.InfoBubble popup at a given geographic position. Place it inside an AdvancedHereMap and control its visibility with the IsOpen parameter. Parameters: | Parameter | Type | Default | Description | |-----------|------|---------|-------------| | Lat | double | 0 | Latitude of the anchor position. | | Lng | double | 0 | Longitude of the anchor position. | | IsOpen | bool | false | Whether the bubble is visible. Two-way bindable via @bind-IsOpen. | | Aut"
+  },
+  {
+    "slug": "components/group",
+    "title": "GroupComponent",
+    "category": "Components",
+    "order": 10,
+    "description": "Group container for organizing map objects.",
+    "demo": "map-groups",
+    "apiRef": "GroupComponent",
+    "headings": [
+      "Basic Usage",
+      "Nesting",
+      "Visibility Toggle",
+      "Parameters",
+      "Methods"
+    ],
+    "searchText": "Basic Usage GroupComponent is a container that organizes map objects (markers, polylines, polygons, etc.) into a logical group. Place it inside an AdvancedHereMap and nest child components within it. The group cascades itself as HereGroup so child components automatically register with it. Nesting Groups can be nested to create a hierarchy. Each level manages its own visibility and z-index independently. Use GetBoundsAsync() on a group reference to retrieve the bounding box of all objects it con"
+  },
+  {
+    "slug": "components/context-menu",
+    "title": "ContextMenuComponent",
+    "category": "Components",
+    "order": 11,
+    "description": "Right-click context menu for maps.",
+    "apiRef": "ContextMenuComponent",
+    "headings": [
+      "Basic Usage",
+      "Menu Items (ContextMenuItem)",
+      "ContextMenuItem Parameters",
+      "Events",
+      "ContextMenuEventArgs Properties"
+    ],
+    "searchText": "Basic Usage ContextMenuComponent adds a right-click context menu to an AdvancedHereMap. Define menu entries with ContextMenuItem children and handle selections via OnItemClick. Menu Items (ContextMenuItem) Each ContextMenuItem defines a single entry in the context menu. Items support a label, a disabled state, and custom data. ContextMenuItem Parameters | Parameter | Type | Default | Description | |-----------|------|---------|-------------| | Label | string? | null | Display text for the menu i"
+  },
+  {
+    "slug": "components/marker-cluster",
+    "title": "MarkerClusterComponent",
+    "category": "Components",
+    "order": 12,
+    "description": "Marker clustering for large datasets.",
+    "demo": "map-clustering",
+    "apiRef": "MarkerClusterComponent",
+    "headings": [
+      "Basic Usage",
+      "Cluster Options",
+      "Custom Themes",
+      "Events (OnClusterTap)",
+      "ClusterTapEventArgs Properties"
+    ],
+    "searchText": "Basic Usage MarkerClusterComponent groups nearby markers into clusters when the map is zoomed out. Place it inside an AdvancedHereMap and provide a list of ClusterDataPoint objects. Clustering requires the clustering module. Enable it in your API load options: Cluster Options Fine-tune clustering behavior with Eps (cluster radius in pixels) and MinWeight (minimum weight to form a cluster). | Parameter | Type | Default | Description | |-----------|------|---------|-------------| | DataPoints | Li"
+  },
+  {
+    "slug": "components/heatmap",
+    "title": "HeatmapComponent",
+    "category": "Components",
+    "order": 13,
+    "description": "Heatmap visualization for geographic data density.",
+    "demo": "map-heatmap",
+    "apiRef": "HeatmapComponent",
+    "headings": [
+      "Basic Usage",
+      "Data Points",
+      "Customization",
+      "Parameters"
+    ],
+    "searchText": "Basic Usage HeatmapComponent renders a heatmap layer on the map. Place it inside an AdvancedHereMap and provide a list of HeatmapDataPoint objects. Data Points Each HeatmapDataPoint has Lat, Lng, and a Value that controls the intensity at that location. Higher values produce a stronger heat signal. | Property | Type | Default | Description | |----------|------|---------|-------------| | Lat | double | -- | Latitude of the data point. | | Lng | double | -- | Longitude of the data point. | | Value"
+  },
+  {
+    "slug": "components/geojson-reader",
+    "title": "GeoJsonReaderComponent",
+    "category": "Components",
+    "order": 14,
+    "description": "Load and display GeoJSON data on the map.",
+    "demo": "map-data",
+    "apiRef": "GeoJsonReaderComponent",
+    "headings": [
+      "Basic Usage",
+      "Inline Data",
+      "URL Loading",
+      "Styling",
+      "Parameters"
+    ],
+    "searchText": "Basic Usage GeoJsonReaderComponent loads GeoJSON data and renders the features on the map. It requires the data module to be enabled: Place the component inside an AdvancedHereMap: Inline Data Pass a GeoJSON string directly with the GeoJsonString parameter instead of loading from a URL: When both Url and GeoJsonString are set, Url takes precedence. URL Loading Load GeoJSON from a remote endpoint or a local static file: Toggle Visible to show or hide the loaded data without re-fetching. Styling A"
+  },
+  {
+    "slug": "components/kml-reader",
+    "title": "KmlReaderComponent",
+    "category": "Components",
+    "order": 15,
+    "description": "Load and display KML data on the map.",
+    "apiRef": "KmlReaderComponent",
+    "headings": [
+      "Basic Usage",
+      "URL Loading",
+      "Parameters"
+    ],
+    "searchText": "Basic Usage KmlReaderComponent loads KML (Keyhole Markup Language) data and renders it on the map. Like GeoJsonReaderComponent, it requires the data module: Place it inside an AdvancedHereMap and provide a Url: URL Loading Load KML from a local static file or a remote URL. Use DefaultStyle to override the KML\u0027s embedded styles, and Visible to toggle the layer. Parameters | Parameter | Type | Default | Description | |-----------|------|---------|-------------| | Url | string? | null | URL of the "
+  },
+  {
+    "slug": "components/custom-tile-layer",
+    "title": "CustomTileLayerComponent",
+    "category": "Components",
+    "order": 16,
+    "description": "Custom tile layer for external tile providers.",
+    "apiRef": "CustomTileLayerComponent",
+    "headings": [
+      "Basic Usage",
+      "Tile URL Template",
+      "Parameters"
+    ],
+    "searchText": "Basic Usage CustomTileLayerComponent overlays raster tiles from an external tile provider on top of the HERE base map. Place it inside an AdvancedHereMap and provide a URL pattern. Tile URL Template The UrlPattern string must include {x}, {y}, and {z} placeholders. These are replaced at runtime with the tile column, row, and zoom level values respectively. Common tile provider examples: Configure the zoom range and tile size to match the provider\u0027s specifications: Parameters | Parameter | Type |"
+  },
+  {
+    "slug": "components/image-overlay",
+    "title": "ImageOverlayComponent",
+    "category": "Components",
+    "order": 17,
+    "description": "Overlay a static image on the map.",
+    "apiRef": "ImageOverlayComponent",
+    "headings": [
+      "Basic Usage",
+      "Bounds Configuration",
+      "Parameters"
+    ],
+    "searchText": "Basic Usage ImageOverlayComponent stretches a static image (PNG, JPEG, or SVG) over a geographic bounding box on the map. Place it inside an AdvancedHereMap. The image is projected onto the map and scales with zoom. This is useful for floor plans, historical maps, or custom overlays tied to specific geographic coordinates. Bounds Configuration The overlay bounds are defined by four parameters that form a geographic rectangle: Both HTTP URLs and data URIs are supported for ImageUrl. For example, "
+  },
+  {
+    "slug": "components/route-component",
+    "title": "RouteComponent",
+    "category": "Components",
+    "order": 18,
+    "description": "Display calculated routes on the map.",
+    "demo": "map-routing",
+    "headings": [
+      "Basic Usage",
+      "Route Visualization",
+      "Parameters",
+      "Combined with Routing Service"
+    ],
+    "searchText": "Basic Usage RouteComponent calculates a route between an origin and destination using the HERE Routing API, then renders it as a polyline on the map. It requires IRoutingService to be registered: Place it inside an AdvancedHereMap: Route Visualization Customize the route line appearance with StrokeColor and LineWidth. Add via waypoints with the Via parameter. Parameters | Parameter | Type | Default | Description | |-----------|------|---------|-------------| | Origin | LatLngLiteral | -- | Route"
+  },
+  {
+    "slug": "components/autosuggest",
+    "title": "HereAutosuggest",
+    "category": "Components",
+    "order": 19,
+    "description": "Address and place autosuggest search component.",
+    "demo": "map-autosuggest",
+    "apiRef": "HereAutosuggest",
+    "headings": [
+      "Basic Usage",
+      "Customization (AutosuggestOptions, AutosuggestDesign)",
+      "AutosuggestDesign Variants",
+      "Component Parameters",
+      "Templates",
+      "Events"
+    ],
+    "searchText": "Basic Usage HereAutosuggest is a standalone search input with autocomplete powered by the HERE Autosuggest API. It does not require an AdvancedHereMap parent -- it can be used anywhere on the page. The component initializes the HERE platform automatically if it has not been loaded yet. Customization (AutosuggestOptions, AutosuggestDesign) Configure search behavior with AutosuggestOptions and visual style with AutosuggestDesign. AutosuggestDesign Variants | Variant | Description | |---------|----"
+  },
+  {
+    "slug": "components/distance-measurement",
+    "title": "DistanceMeasurementComponent",
+    "category": "Components",
+    "order": 20,
+    "description": "Interactive distance measurement tool.",
+    "apiRef": "DistanceMeasurementComponent",
+    "headings": [
+      "Basic Usage",
+      "Parameters",
+      "Integration with AdvancedHereMap"
+    ],
+    "searchText": "Basic Usage DistanceMeasurementComponent adds an interactive distance measurement tool to the map. Users click points on the map to measure distances between them. Parameters | Parameter | Type | Default | Description | |-----------|------|---------|-------------| | Active | bool | false | Activates or deactivates the measurement tool. | | Alignment | UIAlignment | TopRight | Position of the UI control on the map. | | OnMeasured | EventCallback\u003Cdouble\u003E | -- | Fires when measurement completes, wi"
+  },
+  {
+    "slug": "components/overview-map",
+    "title": "OverviewMapComponent",
+    "category": "Components",
+    "order": 21,
+    "description": "Mini overview map showing the current viewport.",
+    "apiRef": "OverviewMapComponent",
+    "headings": [
+      "Basic Usage",
+      "Customization",
+      "Parameters",
+      "Alignment Options"
+    ],
+    "searchText": "Basic Usage OverviewMapComponent displays a small overview (mini-map) that shows the main map\u0027s current viewport at a wider zoom level. It automatically tracks the main map\u0027s center position. By default, the overview map appears in the bottom-right corner and displays the area at a zoom level 4 steps lower than the main map. Customization Control the position and zoom difference: A larger ZoomDelta shows more surrounding area in the overview. Parameters | Parameter | Type | Default | Description"
+  },
+  {
+    "slug": "components/zoom-rectangle",
+    "title": "ZoomRectangleComponent",
+    "category": "Components",
+    "order": 22,
+    "description": "Zoom-to-rectangle selection tool.",
+    "apiRef": "ZoomRectangleComponent",
+    "headings": [
+      "Basic Usage",
+      "Parameters",
+      "Alignment Options"
+    ],
+    "searchText": "Basic Usage ZoomRectangleComponent lets users draw a rectangle on the map to zoom into that area. When active, the user clicks and drags to define a bounding box, and the map zooms to fit the selected region. When Active is set to true, normal map panning is temporarily suspended and the cursor changes to a crosshair. The user draws a rectangle by clicking and dragging. After release, the map animates to fill the selected area, and the tool can be kept active for repeated use or deactivated by s"
+  },
+  {
+    "slug": "getting-started/installation",
+    "title": "Installation",
+    "category": "Getting Started",
+    "order": 1,
+    "description": "Install the BlazorHerePlatform NuGet package and add it to your Blazor Server or WebAssembly project.",
+    "headings": [
+      "NuGet Package",
+      "Supported Frameworks",
+      "Blazor Server Projects",
+      "Blazor WebAssembly Projects",
+      "Namespace Imports",
+      "What Gets Registered"
+    ],
+    "searchText": "NuGet Package Install the BlazorHerePlatform package from NuGet: Or via the .NET CLI: Supported Frameworks BlazorHerePlatform multi-targets three .NET versions: | Framework | Status | |-----------|--------| | .NET 8.0 | Supported (LTS) | | .NET 9.0 | Supported | | .NET 10.0 | Supported | Your project only needs to target one of these. The correct dependency set is selected automatically based on your \u003CTargetFramework\u003E. Blazor Server Projects Add the package reference, then register services in P"
+  },
+  {
+    "slug": "getting-started/quick-start",
+    "title": "Quick Start",
+    "category": "Getting Started",
+    "order": 2,
+    "description": "Display a HERE map in your Blazor app in under five minutes.",
+    "headings": [
+      "Prerequisites",
+      "Register Services",
+      "Add the Map Component",
+      "Run After Init",
+      "Add Child Components",
+      "Satellite View",
+      "Next Steps"
+    ],
+    "searchText": "Prerequisites You need a HERE API key. Sign up at the HERE Developer Portal to get a free key. Register Services In your Program.cs, call AddBlazorHerePlatform with your API key: Never hard-code your key in source. Use configuration or user secrets instead: Add the Map Component In any .razor page or component, add a HereMap: This renders an interactive vector map centered on Berlin at zoom level 12. The default height is 500px; the example above overrides it to 600px. Run After Init Use the OnA"
+  },
+  {
+    "slug": "getting-started/configuration",
+    "title": "Configuration",
+    "category": "Getting Started",
+    "order": 3,
+    "description": "Configure API loading options, map appearance, and API key management.",
+    "headings": [
+      "AddBlazorHerePlatform Overloads",
+      "HereApiLoadOptions",
+      "MapOptions",
+      "API Key Management",
+      "Per-Map Load Options Override"
+    ],
+    "searchText": "AddBlazorHerePlatform Overloads Three overloads are available for service registration: String API key -- simplest form, uses default load options: HereApiLoadOptions -- full control over which HERE JS modules are loaded: Custom IBlazorHerePlatformKeyService -- for dynamic key resolution or multi-tenant scenarios: HereApiLoadOptions Controls how the HERE Maps JS API is loaded on the page. | Property | Type | Default | Description | |----------|------|---------|-------------| | ApiKey | string | "
+  },
+  {
+    "slug": "getting-started/blazor-server",
+    "title": "Blazor Server Notes",
+    "category": "Getting Started",
+    "order": 4,
+    "description": "Important considerations when using BlazorHerePlatform in Blazor Server apps.",
+    "headings": [
+      "Server vs. WebAssembly",
+      "Scoped Services",
+      "Shared Key Service Instance",
+      "SignalR Message Size",
+      "Prerendering",
+      "Circuit Disconnection",
+      "Recommendations"
+    ],
+    "searchText": "Server vs. WebAssembly In Blazor WebAssembly, all code runs in the browser. In Blazor Server, C# runs on the server and DOM updates are sent over a SignalR connection. This has several implications for map components. JS interop is asynchronous over the wire. Every call to the HERE Maps JS API crosses the SignalR connection. High-frequency operations (e.g., updating marker positions in a loop) will have noticeable latency compared to WASM. Map rendering happens client-side. The HERE JS API still"
+  },
+  {
+    "slug": "guides/layer-types",
+    "title": "Layer Types",
+    "category": "Guides",
+    "order": 1,
+    "description": "Understanding HERE map layer types.",
+    "headings": [
+      "Normal",
+      "Satellite",
+      "Hybrid",
+      "Terrain",
+      "Traffic Layers",
+      "MapLayerType Enum Values"
+    ],
+    "searchText": "Normal Standard vector map layers rendered with the HARP engine. Best for general-purpose maps. Night variants are available for dark themes: Satellite Raster satellite imagery. Provides aerial/satellite photography without road labels. Hybrid Hybrid layers combine satellite imagery with vector road overlays. These are composites of multiple layers: - HybridDayRaster -- satellite imagery base (set as base layer) - HybridDayVector -- roads and labels overlay (added on top) - HybridDayTraffic -- t"
+  },
+  {
+    "slug": "guides/two-way-binding",
+    "title": "Two-Way Binding",
+    "category": "Guides",
+    "order": 2,
+    "description": "Binding map state to Blazor properties.",
+    "headings": [
+      "@bind Syntax",
+      "Supported Properties",
+      "AdvancedHereMap",
+      "MarkerComponent",
+      "CircleComponent",
+      "Example"
+    ],
+    "searchText": "@bind Syntax AdvancedHereMap and map object components support Blazor two-way binding using the @bind-PropertyName syntax. When the user interacts with the map (panning, zooming, dragging markers), the bound properties update automatically. When you change the bound property in code, the map updates to match. Supported Properties AdvancedHereMap | Property | Type | Callback | Trigger | |----------|------|----------|---------| | Center | LatLngLiteral? | CenterChanged | User finishes panning. | |"
+  },
+  {
+    "slug": "guides/events",
+    "title": "Events",
+    "category": "Guides",
+    "order": 3,
+    "description": "Handling map and object events.",
+    "headings": [
+      "Map Events (OnClick, OnDrag, OnMapViewChange, OnResize)",
+      "Marker Events",
+      "Shape Events",
+      "EventArgs Classes"
+    ],
+    "searchText": "Map Events (OnClick, OnDrag, OnMapViewChange, OnResize) AdvancedHereMap exposes map-level events as Blazor EventCallback parameters. These fire when the user interacts with the map background (not on map objects). All map-level pointer events: | Event | EventArgs | Description | |-------|-----------|-------------| | OnClick | MapPointerEventArgs | Tap/click on the map background. | | OnDoubleClick | MapPointerEventArgs | Double-tap/double-click. | | OnLongPress | MapPointerEventArgs | Long press"
+  },
+  {
+    "slug": "services/routing",
+    "title": "Routing Service",
+    "category": "Services",
+    "order": 1,
+    "description": "Calculate routes between waypoints.",
+    "demo": "map-routing",
+    "apiRef": "IRoutingService",
+    "headings": [
+      "Setup",
+      "CalculateRouteAsync",
+      "RoutingRequest Options",
+      "Route Result"
+    ],
+    "searchText": "Setup Inject IRoutingService into your component. It is registered automatically by AddBlazorHerePlatform. CalculateRouteAsync Calculate a route between an origin and destination. The service returns decoded polyline coordinates and section summaries. RoutingRequest Options RoutingRequest supports the following properties: | Property | Type | Default | Description | |----------|------|---------|-------------| | Origin | LatLngLiteral | -- | Start position (required). | | Destination | LatLngLite"
+  },
+  {
+    "slug": "services/geocoding",
+    "title": "Geocoding Service",
+    "category": "Services",
+    "order": 2,
+    "description": "Forward and reverse geocoding.",
+    "demo": "map-geocoding",
+    "apiRef": "IGeocodingService",
+    "headings": [
+      "Forward Geocoding (GeocodeAsync)",
+      "Reverse Geocoding (ReverseGeocodeAsync)",
+      "Options"
+    ],
+    "searchText": "Forward Geocoding (GeocodeAsync) Convert an address or place name into geographic coordinates. Each GeocodeItem contains: | Property | Type | Description | |----------|------|-------------| | Title | string? | Display name of the result. | | Position | LatLngLiteral? | Geographic coordinates. | | Address | string? | Formatted address string. | | ResultType | string? | Type such as \u0022houseNumber\u0022, \u0022street\u0022, \u0022locality\u0022. | Reverse Geocoding (ReverseGeocodeAsync) Convert coordinates into an address. "
+  },
+  {
+    "slug": "services/traffic",
+    "title": "Traffic Service",
+    "category": "Services",
+    "order": 3,
+    "description": "Real-time traffic flow and incidents.",
+    "demo": "map-traffic",
+    "apiRef": "ITrafficService",
+    "headings": [
+      "Traffic Flow",
+      "Traffic Incidents"
+    ],
+    "searchText": "Traffic Flow Retrieve real-time traffic flow data within a bounding box. Flow data includes current speeds, free-flow speeds, and jam factors. Each TrafficFlowItem contains: | Property | Type | Description | |----------|------|-------------| | CurrentSpeed | double | Current speed in km/h. | | FreeFlowSpeed | double | Speed without traffic in km/h. | | JamFactor | double | Congestion level: 0 = free flow, 10 = standstill. | | RoadName | string? | Name of the road. | | Position | LatLngLiteral? |"
+  },
+  {
+    "slug": "services/transit",
+    "title": "Public Transit Service",
+    "category": "Services",
+    "order": 4,
+    "description": "Public transit departures and stations.",
+    "apiRef": "IPublicTransitService",
+    "headings": [
+      "Departures",
+      "Stations"
+    ],
+    "searchText": "Departures Retrieve upcoming departures from the nearest transit station to a given position. Each TransitDeparture contains: | Property | Type | Description | |----------|------|-------------| | LineName | string? | Line name or number (e.g. \u0022U2\u0022, \u0022Bus 100\u0022). | | Direction | string? | Destination of the line. | | DepartureTime | string? | Departure time (ISO 8601). | | TransportType | string? | Transport type: \u0022bus\u0022, \u0022subway\u0022, \u0022train\u0022, \u0022tram\u0022. | | StationName | string? | Name of the departure s"
+  },
+  {
+    "slug": "services/places",
+    "title": "Places Service",
+    "category": "Services",
+    "order": 5,
+    "description": "Search for places and points of interest.",
+    "apiRef": "IPlacesService",
+    "headings": [
+      "Search",
+      "PlacesRequest",
+      "PlacesResult"
+    ],
+    "searchText": "Search IPlacesService provides three search methods corresponding to the HERE Places API: - DiscoverAsync -- free-text search for places. - BrowseAsync -- browse places by category near a position. - LookupAsync -- look up a single place by HERE Place ID. PlacesRequest | Property | Type | Default | Description | |----------|------|---------|-------------| | Query | string? | null | Free-text search query (used by DiscoverAsync). | | At | LatLngLiteral? | null | Center position for proximity sear"
+  },
+  {
+    "slug": "services/isoline",
+    "title": "Isoline Service",
+    "category": "Services",
+    "order": 6,
+    "description": "Calculate isochrone and isodistance areas.",
+    "apiRef": "IIsolineService",
+    "headings": [
+      "Isochrone",
+      "Isodistance",
+      "IsolineRequest Options"
+    ],
+    "searchText": "Isochrone Calculate the area reachable from a center point within a given time. Ranges are specified in seconds. Isodistance Calculate the area reachable within a given distance. Ranges are specified in meters. IsolineRequest Options | Property | Type | Default | Description | |----------|------|---------|-------------| | Center | LatLngLiteral | -- | Center position (required). | | Ranges | List\u003Cint\u003E? | null | Range values (seconds for time, meters for distance). | | RangeType | IsolineRangeTyp"
+  },
+  {
+    "slug": "services/matrix-routing",
+    "title": "Matrix Routing Service",
+    "category": "Services",
+    "order": 7,
+    "description": "Calculate distance/time matrices between multiple points.",
+    "apiRef": "IMatrixRoutingService",
+    "headings": [
+      "Basic Usage",
+      "MatrixRoutingRequest",
+      "Result Handling"
+    ],
+    "searchText": "Basic Usage Calculate travel times and distances between multiple origins and destinations in a single request. MatrixRoutingRequest | Property | Type | Default | Description | |----------|------|---------|-------------| | Origins | List\u003CLatLngLiteral\u003E | [] | Origin positions. | | Destinations | List\u003CLatLngLiteral\u003E | [] | Destination positions. | | TransportMode | TransportMode | Car | Car, Truck, Pedestrian, Bicycle, Scooter. | | RoutingMode | RoutingMode | Fast | Fast (time) or Short (distance"
+  },
+  {
+    "slug": "services/waypoint-sequence",
+    "title": "Waypoint Sequence Service",
+    "category": "Services",
+    "order": 8,
+    "description": "Optimize waypoint ordering.",
+    "apiRef": "IWaypointSequenceService",
+    "headings": [
+      "Basic Usage",
+      "Request",
+      "Optimized Result"
+    ],
+    "searchText": "Basic Usage Optimize the order of waypoints to minimize total travel time or distance. Useful for delivery route planning and multi-stop trip optimization. Request WaypointSequenceRequest defines the fixed start and end points and the waypoints to reorder. | Property | Type | Default | Description | |----------|------|---------|-------------| | Start | LatLngLiteral | -- | Fixed start position (required). | | End | LatLngLiteral | -- | Fixed end position (required). Use the same value as Start f"
+  },
+  {
+    "slug": "services/geofencing",
+    "title": "Geofencing Service",
+    "category": "Services",
+    "order": 9,
+    "description": "Check positions against geofence zones.",
+    "apiRef": "IGeofencingService",
+    "headings": [
+      "Basic Usage",
+      "Geofence Zones",
+      "Check Results"
+    ],
+    "searchText": "Basic Usage Check whether a geographic position falls inside one or more geofence zones. The service performs client-side point-in-polygon and point-in-circle checks. Geofence Zones Zones can be defined as circles or polygons. Circle zone: Polygon zone: | Property | Type | Default | Description | |----------|------|---------|-------------| | Id | string? | null | Unique identifier for the zone. | | Name | string? | null | Display name. | | Type | string | \u0022polygon\u0022 | Zone type: \u0022polygon\u0022 or \u0022cir"
+  },
+  {
+    "slug": "utilities/wkt-parser",
+    "title": "WKT Parser",
+    "category": "Utilities",
+    "order": 1,
+    "description": "Parse Well-Known Text geometry strings.",
+    "apiRef": "WktParser",
+    "headings": [
+      "Parsing",
+      "Supported Geometry Types"
+    ],
+    "searchText": "Parsing WktParser is a static utility class that converts Well-Known Text (WKT) geometry strings into LatLngLiteral coordinates. WKT uses longitude-first ordering; the parser handles the conversion to LatLngLiteral(lat, lng) automatically. Parse a POINT: Parse a LINESTRING: Parse a POLYGON: Parse a MULTIPOINT: Parse a MULTILINESTRING: Supported Geometry Types | Method | WKT Type | Return Type | |--------|----------|-------------| | ParsePoint | POINT | LatLngLiteral? | | ParseLineString | LINEST"
+  },
+  {
+    "slug": "utilities/geojson-exporter",
+    "title": "GeoJSON Exporter",
+    "category": "Utilities",
+    "order": 2,
+    "description": "Export map objects to GeoJSON format.",
+    "apiRef": "GeoJsonExporter",
+    "headings": [
+      "Export Features",
+      "Export FeatureCollection"
+    ],
+    "searchText": "Export Features GeoJsonExporter is a static utility class that converts coordinates into GeoJSON Feature strings. All methods return raw JSON strings. Point Feature: Point with properties: LineString Feature: Polygon Feature: Polygon with holes: Export FeatureCollection Combine multiple feature JSON strings into a GeoJSON FeatureCollection. All coordinate output follows the GeoJSON specification: [longitude, latitude]. Property values support string, bool, int, double, and null types. Other type"
+  },
+  {
+    "slug": "utilities/flexible-polyline",
+    "title": "Flexible Polyline",
+    "category": "Utilities",
+    "order": 3,
+    "description": "Encode and decode HERE flexible polyline format.",
+    "apiRef": "FlexiblePolyline",
+    "headings": [
+      "Encoding",
+      "Decoding"
+    ],
+    "searchText": "Encoding FlexiblePolyline is a static utility class that implements the HERE Flexible Polyline codec in pure C#. Use Encode to compress a list of coordinates into a compact string representation. The default precision is 5 decimal places. Specify a custom precision when higher or lower accuracy is needed: Decoding Use Decode to convert a flexible polyline string back into coordinates. This is useful for processing route polylines returned by the Routing Service. Decoding handles the header forma"
+  }
+]

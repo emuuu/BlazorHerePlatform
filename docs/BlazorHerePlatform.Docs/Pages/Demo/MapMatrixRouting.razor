@@ -1,0 +1,294 @@
+@page "/demo/map-matrix-routing"
+
+<PageTitle>Matrix Routing</PageTitle>
+
+<h3>Matrix Routing Demo</h3>
+<p>Click on the map to add origins (green) and destinations (red), then calculate a travel time/distance matrix.</p>
+
+<details class="mb-3">
+    <summary class="fw-bold" role="button">Usage</summary>
+    <pre class="bg-light border rounded p-3 mt-2 mb-0"><code>@@using HerePlatformComponents.Maps.Events
+@@using HerePlatformComponents.Maps.Services
+@@using HerePlatformComponents.Maps.Services.MatrixRouting
+@@using HerePlatformComponents.Maps.Services.Routing
+
+&lt;!-- Click map to add origins/destinations, then calculate matrix --&gt;
+&lt;AdvancedHereMap @@ref="_advMap" Options="@@_mapOptions" Height="500px"
+    OnClick="@@OnMapClick"&gt;
+
+    @@foreach (var origin in _origins)
+    {
+        &lt;MarkerComponent Lat="@@origin.Lat" Lng="@@origin.Lng"
+            IconUrl="@@_greenIcon" /&gt;
+    }
+    @@foreach (var dest in _destinations)
+    {
+        &lt;MarkerComponent Lat="@@dest.Lat" Lng="@@dest.Lng"
+            IconUrl="@@_redIcon" /&gt;
+    }
+
+&lt;/AdvancedHereMap&gt;
+
+@@code {
+    [Inject] private IMatrixRoutingService MatrixService { get; set; } = default!;
+
+    private AdvancedHereMap? _advMap;
+    private List&lt;LatLngLiteral&gt; _origins = new();
+    private List&lt;LatLngLiteral&gt; _destinations = new();
+    private MatrixRoutingResult? _result;
+    private TransportMode _transportMode = TransportMode.Car;
+
+    // Inline SVG icons for origin (green) and destination (red)
+    private string _greenIcon = "&lt;svg xmlns='http://www.w3.org/2000/svg' " +
+        "width='24' height='24'&gt;&lt;circle cx='12' cy='12' r='10' " +
+        "fill='#28a745' stroke='white' stroke-width='2'/&gt;&lt;/svg&gt;";
+    private string _redIcon = "&lt;svg xmlns='http://www.w3.org/2000/svg' " +
+        "width='24' height='24'&gt;&lt;circle cx='12' cy='12' r='10' " +
+        "fill='#dc3545' stroke='white' stroke-width='2'/&gt;&lt;/svg&gt;";
+
+    private MapOptions _mapOptions = new()
+    {
+        Center = new LatLngLiteral(51.0, 10.0),
+        Zoom = 6,
+        EnableUI = true,
+        EnableInteraction = true
+    };
+
+    // Calculate N:M travel time/distance matrix
+    private async Task CalculateMatrix()
+    {
+        var request = new MatrixRoutingRequest
+        {
+            Origins = _origins.ToList(),
+            Destinations = _destinations.ToList(),
+            TransportMode = _transportMode
+        };
+
+        _result = await MatrixService.CalculateMatrixAsync(request);
+        // _result.Matrix: list of entries with
+        //   OriginIndex, DestinationIndex, Duration, Length
+        // _result.NumOrigins, _result.NumDestinations
+    }
+
+    private void OnMapClick(MapPointerEventArgs e) { /* add to origins or destinations */ }
+}</code></pre>
+</details>
+
+<AdvancedHereMap @ref="_advMap" Options="@_mapOptions" Height="clamp(250px, 50vh, 500px)"
+    OnClick="@OnMapClick">
+
+    @foreach (var origin in _origins)
+    {
+        <MarkerComponent Lat="@origin.Lat" Lng="@origin.Lng"
+            IconUrl="@_greenIcon" />
+    }
+
+    @foreach (var dest in _destinations)
+    {
+        <MarkerComponent Lat="@dest.Lat" Lng="@dest.Lng"
+            IconUrl="@_redIcon" />
+    }
+
+</AdvancedHereMap>
+
+<div class="mt-3 d-flex gap-3 flex-wrap align-items-center">
+    <div>
+        <label>Mode:</label>
+        <div class="btn-group btn-group-sm ms-1">
+            <button class="btn @(_addMode == AddMode.Origin ? "btn-success" : "btn-outline-success")"
+                @onclick="@(() => _addMode = AddMode.Origin)">Add Origins</button>
+            <button class="btn @(_addMode == AddMode.Destination ? "btn-danger" : "btn-outline-danger")"
+                @onclick="@(() => _addMode = AddMode.Destination)">Add Destinations</button>
+        </div>
+    </div>
+
+    <div>
+        <label>Transport:</label>
+        <div class="btn-group btn-group-sm ms-1">
+            <button class="btn btn-sm @(_transportMode == TransportMode.Car ? "btn-primary" : "btn-outline-primary")"
+                @onclick="@(() => _transportMode = TransportMode.Car)">Car</button>
+            <button class="btn btn-sm @(_transportMode == TransportMode.Pedestrian ? "btn-primary" : "btn-outline-primary")"
+                @onclick="@(() => _transportMode = TransportMode.Pedestrian)">Pedestrian</button>
+            <button class="btn btn-sm @(_transportMode == TransportMode.Bicycle ? "btn-primary" : "btn-outline-primary")"
+                @onclick="@(() => _transportMode = TransportMode.Bicycle)">Bicycle</button>
+            <button class="btn btn-sm @(_transportMode == TransportMode.Truck ? "btn-primary" : "btn-outline-primary")"
+                @onclick="@(() => _transportMode = TransportMode.Truck)">Truck</button>
+        </div>
+    </div>
+
+    <button class="btn btn-sm btn-primary" @onclick="CalculateMatrix"
+        disabled="@(_origins.Count == 0 || _destinations.Count == 0 || _isCalculating)">
+        Calculate Matrix
+    </button>
+
+    <div>
+        <h6>Presets</h6>
+        <button class="btn btn-sm btn-outline-secondary" @onclick="PresetGermanCities">German Cities</button>
+    </div>
+
+    <button class="btn btn-sm btn-outline-danger" @onclick="Clear">Clear</button>
+
+    <span class="badge bg-success">Origins: @_origins.Count</span>
+    <span class="badge bg-danger">Destinations: @_destinations.Count</span>
+</div>
+
+@if (_isCalculating)
+{
+    <div class="mt-3 alert alert-info">Calculating matrix...</div>
+}
+
+@if (_result != null && _result.Matrix.Count > 0)
+{
+    <div class="mt-3">
+        <h5>Results (@_result.NumOrigins origins x @_result.NumDestinations destinations)</h5>
+        <div class="table-responsive">
+            <table class="table table-sm table-bordered">
+                <thead>
+                    <tr>
+                        <th>Origin \ Dest</th>
+                        @for (int d = 0; d < _result.NumDestinations; d++)
+                        {
+                            <th class="text-center">D@(d + 1)</th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (int o = 0; o < _result.NumOrigins; o++)
+                    {
+                        var oi = o;
+                        <tr>
+                            <td class="fw-bold">O@(oi + 1)</td>
+                            @for (int d = 0; d < _result.NumDestinations; d++)
+                            {
+                                var entry = _result.Matrix.FirstOrDefault(e => e.OriginIndex == oi && e.DestinationIndex == d);
+                                <td class="text-center">
+                                    @if (entry != null)
+                                    {
+                                        <span>@FormatDuration(entry.Duration)</span><br />
+                                        <small class="text-muted">@((entry.Length / 1000.0).ToString("F1", CultureInfo.InvariantCulture)) km</small>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">---</span>
+                                    }
+                                </td>
+                            }
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
+
+@if (!string.IsNullOrEmpty(_status))
+{
+    <div class="mt-3 alert alert-info">@_status</div>
+}
+
+@code {
+    private AdvancedHereMap? _advMap;
+    private List<LatLngLiteral> _origins = new();
+    private List<LatLngLiteral> _destinations = new();
+    private MatrixRoutingResult? _result;
+    private TransportMode _transportMode = TransportMode.Car;
+    private AddMode _addMode = AddMode.Origin;
+    private bool _isCalculating;
+    private string? _status;
+
+    private string _greenIcon = "<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24'><circle cx='12' cy='12' r='10' fill='#28a745' stroke='white' stroke-width='2'/></svg>";
+    private string _redIcon = "<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24'><circle cx='12' cy='12' r='10' fill='#dc3545' stroke='white' stroke-width='2'/></svg>";
+
+    private enum AddMode { Origin, Destination }
+
+    [Inject]
+    private IMatrixRoutingService MatrixService { get; set; } = default!;
+
+    private MapOptions _mapOptions = new()
+    {
+        Center = new LatLngLiteral(51.0, 10.0),
+        Zoom = 6,
+        EnableUI = true,
+        EnableInteraction = true
+    };
+
+    private void OnMapClick(MapPointerEventArgs e)
+    {
+        if (!e.Position.HasValue) return;
+
+        if (_addMode == AddMode.Origin)
+        {
+            _origins.Add(e.Position.Value);
+            _status = $"Added origin #{_origins.Count} at ({e.Position.Value.Lat:F4}, {e.Position.Value.Lng:F4})";
+        }
+        else
+        {
+            _destinations.Add(e.Position.Value);
+            _status = $"Added destination #{_destinations.Count} at ({e.Position.Value.Lat:F4}, {e.Position.Value.Lng:F4})";
+        }
+    }
+
+    private async Task CalculateMatrix()
+    {
+        if (_origins.Count == 0 || _destinations.Count == 0) return;
+
+        _isCalculating = true;
+        _result = null;
+        _status = null;
+        StateHasChanged();
+
+        try
+        {
+            var request = new MatrixRoutingRequest
+            {
+                Origins = _origins.ToList(),
+                Destinations = _destinations.ToList(),
+                TransportMode = _transportMode
+            };
+
+            _result = await MatrixService.CalculateMatrixAsync(request);
+            _status = $"Matrix calculated: {_result.NumOrigins}x{_result.NumDestinations} = {_result.Matrix.Count} entries";
+        }
+        catch (Exception ex)
+        {
+            _status = $"Error: {ex.Message}";
+        }
+        finally
+        {
+            _isCalculating = false;
+        }
+    }
+
+    private void PresetGermanCities()
+    {
+        _origins = new List<LatLngLiteral>
+        {
+            new(52.52, 13.405),    // Berlin
+            new(48.1351, 11.582),  // Munich
+            new(50.1109, 8.6821),  // Frankfurt
+        };
+        _destinations = new List<LatLngLiteral>
+        {
+            new(53.5511, 9.9937),  // Hamburg
+            new(51.2277, 6.7735),  // Dusseldorf
+            new(48.7758, 9.1829),  // Stuttgart
+        };
+        _result = null;
+        _status = "Preset loaded: Berlin, Munich, Frankfurt -> Hamburg, Dusseldorf, Stuttgart";
+    }
+
+    private void Clear()
+    {
+        _origins.Clear();
+        _destinations.Clear();
+        _result = null;
+        _status = "Cleared.";
+    }
+
+    private string FormatDuration(int seconds)
+    {
+        var hours = seconds / 3600;
+        var mins = (seconds % 3600) / 60;
+        return hours > 0 ? $"{hours}h {mins}m" : $"{mins}m";
+    }
+}
