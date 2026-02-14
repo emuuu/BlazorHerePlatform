@@ -11,11 +11,11 @@ namespace HerePlatformComponents;
 /// <summary>
 /// Lightweight DTO used for serializing JsObjectRef GUIDs to JavaScript.
 /// </summary>
-internal class JsObjectRef1
+internal class JsObjectRefDto
 {
     public string Guid { get; set; }
 
-    public JsObjectRef1(Guid guid)
+    public JsObjectRefDto(Guid guid)
     {
         Guid = guid.ToString();
     }
@@ -84,7 +84,13 @@ public class JsObjectRef : IJsObjectRef
 
     public virtual void Dispose()
     {
-        DisposeAsync();
+        _ = DisposeGuarded();
+
+        async Task DisposeGuarded()
+        {
+            try { await DisposeAsync(); }
+            catch { /* Best-effort: sync Dispose is fallback, prefer DisposeAsync */ }
+        }
     }
 
     public ValueTask<object> DisposeAsync()

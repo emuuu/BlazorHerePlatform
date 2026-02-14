@@ -16,7 +16,7 @@ internal class JsObjectRefConverter<T> : JsonConverter<T>
     {
         writer.WriteStartObject();
 
-        using var doc = JsonSerializer.SerializeToDocument(new JsObjectRef1(value.Guid), typeof(JsObjectRef1), options);
+        using var doc = JsonSerializer.SerializeToDocument(new JsObjectRefDto(value.Guid), typeof(JsObjectRefDto), options);
 
         foreach (var prop in doc.RootElement.EnumerateObject())
         {

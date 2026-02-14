@@ -6,7 +6,7 @@ namespace HerePlatformComponents.Maps;
 public class MapEventListener : IJsObjectRef, IDisposable, IAsyncDisposable
 {
     private readonly JsObjectRef _jsObjectRef;
-    public bool IsRemoved;
+    public bool IsRemoved { get; internal set; }
     private bool _isDisposed;
 
     internal MapEventListener(JsObjectRef jsObjectRef)

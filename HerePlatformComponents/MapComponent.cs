@@ -30,7 +30,7 @@ public class MapComponent : ComponentBase, IDisposable, IAsyncDisposable
         base.OnInitialized();
     }
 
-    public Map InteropObject { get; private set; } = default!;
+    public Map? InteropObject { get; private set; }
 
     public async Task InitAsync(ElementReference element, MapOptions? options = null)
     {
@@ -48,7 +48,7 @@ public class MapComponent : ComponentBase, IDisposable, IAsyncDisposable
 
             if (!_keyService.IsApiInitialized || !isHereReady)
             {
-                _keyService.IsApiInitialized = true;
+                _keyService.MarkApiInitialized();
             }
 
             // Always pass ApiLoadOptions so initMap can lazy-load additional modules
@@ -69,7 +69,7 @@ public class MapComponent : ComponentBase, IDisposable, IAsyncDisposable
         {
             try { await InteropObject.DisposeAsync(); }
             catch { }
-            InteropObject = null!;
+            InteropObject = null;
         }
     }
 
@@ -87,7 +87,7 @@ public class MapComponent : ComponentBase, IDisposable, IAsyncDisposable
             try
             {
                 await InteropObject.DisposeAsync();
-                InteropObject = null!;
+                InteropObject = null;
             }
             catch (Exception ex)
             {

@@ -53,11 +53,11 @@ public class BlazorHerePlatformKeyServiceTests
     }
 
     [Test]
-    public void IsApiInitialized_CanBeSet()
+    public void MarkApiInitialized_SetsFlag()
     {
         var service = new BlazorHerePlatformKeyService("key");
 
-        service.IsApiInitialized = true;
+        service.MarkApiInitialized();
 
         Assert.That(service.IsApiInitialized, Is.True);
     }
@@ -77,7 +77,7 @@ public class BlazorHerePlatformKeyServiceTests
     public async Task UpdateApiKey_ChangesApiKey()
     {
         var service = new BlazorHerePlatformKeyService("old-key");
-        service.IsApiInitialized = true;
+        service.MarkApiInitialized();
 
         service.UpdateApiKey("new-key");
 
@@ -89,7 +89,7 @@ public class BlazorHerePlatformKeyServiceTests
     public void UpdateApiKey_ResetsIsApiInitialized()
     {
         var service = new BlazorHerePlatformKeyService("key");
-        service.IsApiInitialized = true;
+        service.MarkApiInitialized();
 
         service.UpdateApiKey("new-key");
 

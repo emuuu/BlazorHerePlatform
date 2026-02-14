@@ -236,7 +236,7 @@ public partial class HereAutosuggest : IAsyncDisposable
 
         if (!keyService.IsApiInitialized || !isReady)
         {
-            keyService.IsApiInitialized = true;
+            keyService.MarkApiInitialized();
             var apiOptions = await keyService.GetApiOptions();
             await Js.InvokeVoidAsync("blazorHerePlatform.objectManager.initMap", apiOptions);
         }

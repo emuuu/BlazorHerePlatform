@@ -5,14 +5,17 @@ namespace HerePlatformComponents;
 public interface IBlazorHerePlatformKeyService
 {
     Task<Maps.HereApiLoadOptions> GetApiOptions();
-    bool IsApiInitialized { get; set; }
+    bool IsApiInitialized { get; }
+    void MarkApiInitialized();
     void UpdateApiKey(string apiKey);
 }
 
 public class BlazorHerePlatformKeyService : IBlazorHerePlatformKeyService
 {
     private Maps.HereApiLoadOptions _initOptions;
-    public bool IsApiInitialized { get; set; } = false;
+    public bool IsApiInitialized { get; private set; }
+
+    public void MarkApiInitialized() => IsApiInitialized = true;
 
     public BlazorHerePlatformKeyService(string apiKey)
     {
