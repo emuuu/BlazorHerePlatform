@@ -688,7 +688,13 @@ window.blazorHerePlatform.objectManager = function () {
                 return guid;
             }
 
-            // Generic object creation
+            // Generic object creation — whitelist allowed namespaces
+            const allowedPrefixes = ['H.map.', 'H.ui.', 'H.geo.', 'H.clustering.'];
+            if (!allowedPrefixes.some(p => constructorName.startsWith(p))) {
+                console.error(`[BlazorHerePlatform] Constructor '${constructorName}' not allowed.`);
+                return null;
+            }
+
             const parts = constructorName.split('.');
             let ctor = window;
             for (const part of parts) {
@@ -1122,6 +1128,15 @@ window.blazorHerePlatform.objectManager = function () {
                         map.removeObjects(objects);
                     }
                 } catch (e) { }
+
+                // Remove all child entries whose _blzMapId matches this map
+                for (const key in mapObjects) {
+                    if (key === mapGuid) continue;
+                    const entry = mapObjects[key];
+                    if (entry && entry['_blzMapId'] === mapGuid) {
+                        delete mapObjects[key];
+                    }
+                }
 
                 // Dispose the behavior to remove its event listeners and
                 // prevent orphaned behaviors from polluting future lookups.

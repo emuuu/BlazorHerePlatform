@@ -25,6 +25,8 @@ public partial class MarkerClusterComponent : IAsyncDisposable
 
     public Guid Guid => _guid;
 
+    internal void MarkDisposed() => _isDisposed = true;
+
     [Inject]
     private IJSRuntime Js { get; set; } = default!;
 
