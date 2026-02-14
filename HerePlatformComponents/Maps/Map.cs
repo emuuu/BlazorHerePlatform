@@ -153,9 +153,10 @@ public class Map : EventEntityBase, IJsObjectRef, IAsyncDisposable
     /// <summary>
     /// Removes all objects from this map.
     /// </summary>
-    public Task RemoveAllObjects()
+    public async Task RemoveAllObjects()
     {
-        return _jsObjectRef.InvokeAsync("removeObjects", _jsObjectRef.InvokeAsync<object>("getObjects"));
+        var objects = await _jsObjectRef.InvokeAsync<object>("getObjects");
+        await _jsObjectRef.InvokeAsync("removeObjects", objects);
     }
 
     /// <summary>
