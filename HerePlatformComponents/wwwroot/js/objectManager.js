@@ -52,6 +52,53 @@ window.blazorHerePlatform.objectManager = function () {
         delete mapObjects[guid];
     }
 
+    // O(1) dispose helpers — use _blzMapId stored on objects instead of scanning all mapObjects.
+
+    function removeObjectFromMap(id) {
+        var obj = mapObjects[id];
+        if (!obj) return;
+        var mapId = obj['_blzMapId'];
+        if (mapId) {
+            var map = mapObjects[mapId];
+            if (map instanceof H.Map) {
+                try { map.removeObject(obj); } catch (e) { }
+                return;
+            }
+        }
+        // Fallback: parent group (e.g. DomMarker in Group)
+        try {
+            var parent = obj.getParentGroup && obj.getParentGroup();
+            if (parent) parent.removeObject(obj);
+        } catch (e) { }
+    }
+
+    function removeLayerFromMap(id) {
+        var wrapper = mapObjects[id];
+        if (!wrapper || !wrapper.layer) return;
+        var mapId = wrapper._blzMapId;
+        if (mapId) {
+            var map = mapObjects[mapId];
+            if (map && typeof map.removeLayer === 'function') {
+                try { map.removeLayer(wrapper.layer); } catch (e) { }
+            }
+        }
+    }
+
+    function removeBubbleFromUI(id) {
+        var bubble = mapObjects[id];
+        if (!bubble) return;
+        var mapId = bubble['_blzMapId'];
+        if (mapId) {
+            var map = mapObjects[mapId];
+            if (map) {
+                var uiGuid = map['_blzUiGuid'];
+                if (uiGuid && mapObjects[uiGuid]) {
+                    try { mapObjects[uiGuid].removeBubble(bubble); } catch (e) { }
+                }
+            }
+        }
+    }
+
     function loadScript(url) {
         return new Promise((resolve, reject) => {
             if (document.querySelector(`script[src="${url}"]`)) {
@@ -122,6 +169,20 @@ window.blazorHerePlatform.objectManager = function () {
             document.head.appendChild(existing);
         } else {
             loadCSS(overrideCssUrl);
+        }
+    }
+
+    // Install zoom-clamping listener once per map
+    function ensureZoomClamp(map) {
+        if (!map['_blzZoomClampInstalled']) {
+            map['_blzZoomClampInstalled'] = true;
+            map.addEventListener('mapviewchangeend', function () {
+                var z = map.getZoom();
+                var mn = map['_blzMinZoom'];
+                var mx = map['_blzMaxZoom'];
+                if (mn != null && z < mn) map.setZoom(mn, false);
+                if (mx != null && z > mx) map.setZoom(mx, false);
+            });
         }
     }
 
@@ -540,8 +601,10 @@ window.blazorHerePlatform.objectManager = function () {
                 ensureUiCssOverrides();
             }
 
-            // Handle resize
-            window.addEventListener('resize', () => map.getViewPort().resize());
+            // Handle resize (store reference for cleanup in disposeMap)
+            const resizeHandler = () => map.getViewPort().resize();
+            window.addEventListener('resize', resizeHandler);
+            map['_blzResizeHandler'] = resizeHandler;
 
             return result;
         },
@@ -841,33 +904,14 @@ window.blazorHerePlatform.objectManager = function () {
             const map = mapObjects[mapGuid];
             if (!map || map._blzPlaceholder) return;
             map['_blzMinZoom'] = minZoom;
-            // Install clamping listener once
-            if (!map['_blzZoomClampInstalled']) {
-                map['_blzZoomClampInstalled'] = true;
-                map.addEventListener('mapviewchangeend', function () {
-                    var z = map.getZoom();
-                    var mn = map['_blzMinZoom'];
-                    var mx = map['_blzMaxZoom'];
-                    if (mn != null && z < mn) map.setZoom(mn, false);
-                    if (mx != null && z > mx) map.setZoom(mx, false);
-                });
-            }
+            ensureZoomClamp(map);
         },
 
         setMaxZoom: function (mapGuid, maxZoom) {
             const map = mapObjects[mapGuid];
             if (!map || map._blzPlaceholder) return;
             map['_blzMaxZoom'] = maxZoom;
-            if (!map['_blzZoomClampInstalled']) {
-                map['_blzZoomClampInstalled'] = true;
-                map.addEventListener('mapviewchangeend', function () {
-                    var z = map.getZoom();
-                    var mn = map['_blzMinZoom'];
-                    var mx = map['_blzMaxZoom'];
-                    if (mn != null && z < mn) map.setZoom(mn, false);
-                    if (mx != null && z > mx) map.setZoom(mx, false);
-                });
-            }
+            ensureZoomClamp(map);
         },
 
         getMinZoom: function (mapGuid) {
@@ -1094,6 +1138,11 @@ window.blazorHerePlatform.objectManager = function () {
                         try { uiForBubble.removeBubble(autoBubble); } catch (e) { }
                     }
                     map['_blzAutoBubble'] = null;
+                }
+
+                // Remove resize listener to prevent leak on navigation
+                if (map['_blzResizeHandler']) {
+                    window.removeEventListener('resize', map['_blzResizeHandler']);
                 }
 
                 // Do NOT call ui.dispose() — it corrupts shared HERE Maps
@@ -1346,30 +1395,13 @@ window.blazorHerePlatform.objectManager = function () {
                 }, false);
             }
 
+            marker['_blzMapId'] = mapId;
             addMapObject(id, marker);
         },
 
         disposeMarkerComponent: function (id) {
-            const marker = mapObjects[id];
-            if (!marker) return;
-
-            // Try to remove from any map it's on
-            const element = marker.getRootGroup && marker.getRootGroup();
-            if (element) {
-                try {
-                    const parent = marker.getParentGroup && marker.getParentGroup();
-                    if (parent) parent.removeObject(marker);
-                } catch (e) { }
-            }
-
-            // Try direct disposal from any map
-            for (const key of Object.keys(mapObjects)) {
-                const obj = mapObjects[key];
-                if (obj instanceof H.Map) {
-                    try { obj.removeObject(marker); } catch (e) { }
-                }
-            }
-
+            if (!mapObjects[id]) return;
+            removeObjectFromMap(id);
             blazorHerePlatform.objectManager.disposeObject(id);
         },
 
@@ -1463,20 +1495,13 @@ window.blazorHerePlatform.objectManager = function () {
                 wireDragEventsForShape(polygon, 'polygon', id, callbackRef, map);
             }
 
+            polygon['_blzMapId'] = mapId;
             addMapObject(id, polygon);
         },
 
         disposePolygonComponent: function (id) {
-            const polygon = mapObjects[id];
-            if (!polygon) return;
-
-            for (const key of Object.keys(mapObjects)) {
-                const obj = mapObjects[key];
-                if (obj instanceof H.Map) {
-                    try { obj.removeObject(polygon); } catch (e) { }
-                }
-            }
-
+            if (!mapObjects[id]) return;
+            removeObjectFromMap(id);
             blazorHerePlatform.objectManager.disposeObject(id);
         },
 
@@ -1571,20 +1596,13 @@ window.blazorHerePlatform.objectManager = function () {
                 wireDragEventsForShape(polyline, 'polyline', id, callbackRef, map);
             }
 
+            polyline['_blzMapId'] = mapId;
             addMapObject(id, polyline);
         },
 
         disposePolylineComponent: function (id) {
-            const polyline = mapObjects[id];
-            if (!polyline) return;
-
-            for (const key of Object.keys(mapObjects)) {
-                const obj = mapObjects[key];
-                if (obj instanceof H.Map) {
-                    try { obj.removeObject(polyline); } catch (e) { }
-                }
-            }
-
+            if (!mapObjects[id]) return;
+            removeObjectFromMap(id);
             blazorHerePlatform.objectManager.disposeObject(id);
         },
 
@@ -1658,20 +1676,13 @@ window.blazorHerePlatform.objectManager = function () {
                 wireDragEventsForShape(circle, 'circle', id, callbackRef, map);
             }
 
+            circle['_blzMapId'] = mapId;
             addMapObject(id, circle);
         },
 
         disposeCircleComponent: function (id) {
-            const circle = mapObjects[id];
-            if (!circle) return;
-
-            for (const key of Object.keys(mapObjects)) {
-                const obj = mapObjects[key];
-                if (obj instanceof H.Map) {
-                    try { obj.removeObject(circle); } catch (e) { }
-                }
-            }
-
+            if (!mapObjects[id]) return;
+            removeObjectFromMap(id);
             blazorHerePlatform.objectManager.disposeObject(id);
         },
 
@@ -1741,20 +1752,13 @@ window.blazorHerePlatform.objectManager = function () {
                 wireDragEventsForShape(rect, 'rect', id, callbackRef, map);
             }
 
+            rect['_blzMapId'] = mapId;
             addMapObject(id, rect);
         },
 
         disposeRectComponent: function (id) {
-            const rect = mapObjects[id];
-            if (!rect) return;
-
-            for (const key of Object.keys(mapObjects)) {
-                const obj = mapObjects[key];
-                if (obj instanceof H.Map) {
-                    try { obj.removeObject(rect); } catch (e) { }
-                }
-            }
-
+            if (!mapObjects[id]) return;
+            removeObjectFromMap(id);
             blazorHerePlatform.objectManager.disposeObject(id);
         },
 
@@ -1792,6 +1796,7 @@ window.blazorHerePlatform.objectManager = function () {
                 map.addObject(group);
             }
 
+            group['_blzMapId'] = mapId;
             addMapObject(id, group);
         },
 
@@ -1840,16 +1845,8 @@ window.blazorHerePlatform.objectManager = function () {
         },
 
         disposeGroupComponent: function (id) {
-            const group = mapObjects[id];
-            if (!group) return;
-
-            for (const key of Object.keys(mapObjects)) {
-                const obj = mapObjects[key];
-                if (obj instanceof H.Map) {
-                    try { obj.removeObject(group); } catch (e) { }
-                }
-            }
-
+            if (!mapObjects[id]) return;
+            removeObjectFromMap(id);
             blazorHerePlatform.objectManager.disposeObject(id);
         },
 
@@ -1927,27 +1924,13 @@ window.blazorHerePlatform.objectManager = function () {
                 wireObjectEvents(marker, 'dommarker', id, callbackRef, map);
             }
 
+            marker['_blzMapId'] = mapId;
             addMapObject(id, marker);
         },
 
         disposeDomMarkerComponent: function (id) {
-            const marker = mapObjects[id];
-            if (!marker) return;
-
-            // Try to remove from parent group
-            try {
-                const parent = marker.getParentGroup && marker.getParentGroup();
-                if (parent) parent.removeObject(marker);
-            } catch (e) { }
-
-            // Fallback: try all maps
-            for (const key of Object.keys(mapObjects)) {
-                const obj = mapObjects[key];
-                if (obj instanceof H.Map) {
-                    try { obj.removeObject(marker); } catch (e) { }
-                }
-            }
-
+            if (!mapObjects[id]) return;
+            removeObjectFromMap(id);
             blazorHerePlatform.objectManager.disposeObject(id);
         },
 
@@ -2003,22 +1986,13 @@ window.blazorHerePlatform.objectManager = function () {
             });
 
             ui.addBubble(bubble);
+            bubble['_blzMapId'] = mapId;
             addMapObject(id, bubble);
         },
 
         disposeInfoBubbleComponent: function (id) {
-            const bubble = mapObjects[id];
-            if (!bubble) return;
-
-            // Try to remove from UI
-            for (const key of Object.keys(mapObjects)) {
-                const obj = mapObjects[key];
-                // Check if obj is a UI instance by duck-typing
-                if (obj && typeof obj.removeBubble === 'function') {
-                    try { obj.removeBubble(bubble); } catch (e) { }
-                }
-            }
-
+            if (!mapObjects[id]) return;
+            removeBubbleFromUI(id);
             removeMapObject(id);
         },
 
@@ -2562,20 +2536,12 @@ window.blazorHerePlatform.objectManager = function () {
                 }
             });
 
-            addMapObject(id, { reader: reader, layer: layer });
+            addMapObject(id, { reader: reader, layer: layer, _blzMapId: mapId });
         },
 
         disposeGeoJsonReaderComponent: function (id) {
-            const existing = mapObjects[id];
-            if (!existing) return;
-
-            for (const key of Object.keys(mapObjects)) {
-                const obj = mapObjects[key];
-                if (obj instanceof H.Map && existing.layer) {
-                    try { obj.removeLayer(existing.layer); } catch (e) { }
-                }
-            }
-
+            if (!mapObjects[id]) return;
+            removeLayerFromMap(id);
             removeMapObject(id);
         },
 
@@ -2622,20 +2588,12 @@ window.blazorHerePlatform.objectManager = function () {
                 }
             });
 
-            addMapObject(id, { reader: reader, layer: layer });
+            addMapObject(id, { reader: reader, layer: layer, _blzMapId: mapId });
         },
 
         disposeKmlReaderComponent: function (id) {
-            const existing = mapObjects[id];
-            if (!existing) return;
-
-            for (const key of Object.keys(mapObjects)) {
-                const obj = mapObjects[key];
-                if (obj instanceof H.Map && existing.layer) {
-                    try { obj.removeLayer(existing.layer); } catch (e) { }
-                }
-            }
-
+            if (!mapObjects[id]) return;
+            removeLayerFromMap(id);
             removeMapObject(id);
         },
 
@@ -2800,20 +2758,12 @@ window.blazorHerePlatform.objectManager = function () {
             var layer = new H.map.layer.TileLayer(provider);
             map.addLayer(layer);
 
-            mapObjects[id] = { provider: provider, layer: layer };
+            mapObjects[id] = { provider: provider, layer: layer, _blzMapId: mapId };
         },
 
         disposeHeatmapComponent: function (id) {
-            var existing = mapObjects[id];
-            if (existing && existing.layer) {
-                // Find and remove from all maps
-                Object.keys(mapObjects).forEach(function (key) {
-                    var obj = mapObjects[key];
-                    if (obj && typeof obj.removeLayer === 'function') {
-                        try { obj.removeLayer(existing.layer); } catch (e) { }
-                    }
-                });
-            }
+            if (!mapObjects[id]) return;
+            removeLayerFromMap(id);
             removeMapObject(id);
         },
 
@@ -3146,19 +3096,12 @@ window.blazorHerePlatform.objectManager = function () {
             var layer = new H.map.layer.TileLayer(provider);
             map.addLayer(layer);
 
-            mapObjects[id] = { provider: provider, layer: layer };
+            mapObjects[id] = { provider: provider, layer: layer, _blzMapId: options.mapId };
         },
 
         disposeCustomTileLayer: function (id) {
-            var existing = mapObjects[id];
-            if (existing && existing.layer) {
-                Object.keys(mapObjects).forEach(function (key) {
-                    var obj = mapObjects[key];
-                    if (obj && typeof obj.removeLayer === 'function') {
-                        try { obj.removeLayer(existing.layer); } catch (e) { }
-                    }
-                });
-            }
+            if (!mapObjects[id]) return;
+            removeLayerFromMap(id);
             removeMapObject(id);
         },
 
@@ -3567,20 +3510,13 @@ window.blazorHerePlatform.objectManager = function () {
             if (options.opacity != null && options.opacity < 1) {
                 try { overlay.setOpacity(options.opacity); } catch (e) { /* unsupported */ }
             }
+            overlay['_blzMapId'] = options.mapId;
             addMapObject(id, overlay);
         },
 
         disposeImageOverlayComponent: function (id) {
-            var overlay = mapObjects[id];
-            if (!overlay) return;
-
-            // Remove from any map
-            for (var key of Object.keys(mapObjects)) {
-                var obj = mapObjects[key];
-                if (obj instanceof H.Map) {
-                    try { obj.removeObject(overlay); } catch (e) { }
-                }
-            }
+            if (!mapObjects[id]) return;
+            removeObjectFromMap(id);
             removeMapObject(id);
         },
 
