@@ -28,7 +28,7 @@ await bubble.SetContent("&lt;div&gt;New content&lt;/div&gt;");</code></pre>
 <HereMap @ref="_map"
          Options="@_mapOptions"
          OnAfterInit="@OnMapInit"
-         Height="500px" />
+         Height="clamp(250px, 50vh, 500px)" />
 
 <div class="mt-3">
     <button class="btn btn-primary" @onclick="ShowBubbleAtBrandenburgGate">

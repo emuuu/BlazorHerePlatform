@@ -33,7 +33,7 @@
 }</code></pre>
 </details>
 
-<AdvancedHereMap @ref="_advMap" Options="@_mapOptions" Height="500px">
+<AdvancedHereMap @ref="_advMap" Options="@_mapOptions" Height="clamp(250px, 50vh, 500px)">
 
     @if (_showClusters && _dataPoints.Count > 0)
     {
@@ -63,24 +63,24 @@
     <div>
         <label>Eps (radius): @_eps</label>
         <input type="range" class="form-range" min="16" max="128" step="8"
-            @bind="_eps" @bind:event="oninput" @bind:culture="@CultureInfo.InvariantCulture" style="width:150px;" />
+            @bind="_eps" @bind:event="oninput" @bind:culture="@CultureInfo.InvariantCulture" style="max-width:150px;" />
     </div>
 
     <div>
         <label>Min Weight: @_minWeight</label>
         <input type="range" class="form-range" min="1" max="10" step="1"
-            @bind="_minWeight" @bind:event="oninput" style="width:120px;" />
+            @bind="_minWeight" @bind:event="oninput" style="max-width:120px;" />
     </div>
 
     <div>
         <label>MinZoom: @(_clusterMinZoom?.ToString("F0", CultureInfo.InvariantCulture) ?? "none")</label>
-        <input type="number" class="form-control form-control-sm" style="width:80px;"
+        <input type="number" class="form-control form-control-sm" style="max-width:80px;"
             value="@_clusterMinZoom" @onchange="@(e => _clusterMinZoom = double.TryParse(e.Value?.ToString(), out var v) ? v : null)" />
     </div>
 
     <div>
         <label>MaxZoom: @(_clusterMaxZoom?.ToString("F0", CultureInfo.InvariantCulture) ?? "none")</label>
-        <input type="number" class="form-control form-control-sm" style="width:80px;"
+        <input type="number" class="form-control form-control-sm" style="max-width:80px;"
             value="@_clusterMaxZoom" @onchange="@(e => _clusterMaxZoom = double.TryParse(e.Value?.ToString(), out var v) ? v : null)" />
     </div>
 </div>

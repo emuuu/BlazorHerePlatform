@@ -42,7 +42,7 @@
                  Options="@_mapOptions"
                  @bind-Center="_viewCenter"
                  @bind-Zoom="_viewZoom"
-                 Height="500px">
+                 Height="clamp(250px, 50vh, 500px)">
 
     @* Two-way bound marker: drag updates _boundLat/_boundLng, changing values moves the pin *@
     @if (_showBoundMarker)
@@ -127,7 +127,7 @@
 <div class="mt-2 d-flex gap-3 flex-wrap align-items-center">
     <div>
         <label>Opacity: @_markerOpacity.ToString("F1", CultureInfo.InvariantCulture)</label>
-        <input type="range" min="0.1" max="1.0" step="0.1" @bind="_markerOpacity" @bind:event="oninput" @bind:culture="@System.Globalization.CultureInfo.InvariantCulture" style="width:120px;" />
+        <input type="range" min="0.1" max="1.0" step="0.1" @bind="_markerOpacity" @bind:event="oninput" @bind:culture="@System.Globalization.CultureInfo.InvariantCulture" style="max-width:120px;" />
     </div>
     <div>
         <label>
@@ -136,7 +136,7 @@
         </label>
         <input type="range" min="1" max="20" step="1"
                @bind="_markerMinZoom" @bind:event="oninput" @bind:after="ClampMinZoom"
-               @bind:culture="@CultureInfo.InvariantCulture" style="width:100px;" />
+               @bind:culture="@CultureInfo.InvariantCulture" style="max-width:100px;" />
     </div>
     <div>
         <label>
@@ -145,7 +145,7 @@
         </label>
         <input type="range" min="1" max="20" step="1"
                @bind="_markerMaxZoom" @bind:event="oninput" @bind:after="ClampMaxZoom"
-               @bind:culture="@CultureInfo.InvariantCulture" style="width:100px;" />
+               @bind:culture="@CultureInfo.InvariantCulture" style="max-width:100px;" />
     </div>
 </div>
 

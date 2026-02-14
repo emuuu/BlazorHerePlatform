@@ -31,7 +31,7 @@ var result = await RoutingService.CalculateRouteAsync(request);
 &lt;/AdvancedHereMap&gt;</code></pre>
 </details>
 
-<AdvancedHereMap @ref="_advMap" Options="@_mapOptions" Height="500px"
+<AdvancedHereMap @ref="_advMap" Options="@_mapOptions" Height="clamp(250px, 50vh, 500px)"
     OnClick="@OnMapClick">
 
     @if (_origin.HasValue)
@@ -117,15 +117,15 @@ var result = await RoutingService.CalculateRouteAsync(request);
             <div class="d-flex gap-2 flex-wrap" style="font-size:0.85em;">
                 <div>
                     <label>Height (m)</label>
-                    <input type="number" class="form-control form-control-sm" @bind="_truckHeight" step="0.1" @bind:culture="@CultureInfo.InvariantCulture" style="width:80px;" />
+                    <input type="number" class="form-control form-control-sm" @bind="_truckHeight" step="0.1" @bind:culture="@CultureInfo.InvariantCulture" style="max-width:80px;" />
                 </div>
                 <div>
                     <label>Width (m)</label>
-                    <input type="number" class="form-control form-control-sm" @bind="_truckWidth" step="0.1" @bind:culture="@CultureInfo.InvariantCulture" style="width:80px;" />
+                    <input type="number" class="form-control form-control-sm" @bind="_truckWidth" step="0.1" @bind:culture="@CultureInfo.InvariantCulture" style="max-width:80px;" />
                 </div>
                 <div>
                     <label>Weight (kg)</label>
-                    <input type="number" class="form-control form-control-sm" @bind="_truckWeight" step="1000" style="width:100px;" />
+                    <input type="number" class="form-control form-control-sm" @bind="_truckWeight" step="1000" style="max-width:100px;" />
                 </div>
             </div>
         </div>
@@ -138,19 +138,19 @@ var result = await RoutingService.CalculateRouteAsync(request);
             <div class="d-flex gap-2 flex-wrap" style="font-size:0.85em;">
                 <div>
                     <label>Initial Charge (kWh)</label>
-                    <input type="number" class="form-control form-control-sm" @bind="_evInitialCharge" step="1" @bind:culture="@CultureInfo.InvariantCulture" style="width:110px;" />
+                    <input type="number" class="form-control form-control-sm" @bind="_evInitialCharge" step="1" @bind:culture="@CultureInfo.InvariantCulture" style="max-width:110px;" />
                 </div>
                 <div>
                     <label>Max Charge (kWh)</label>
-                    <input type="number" class="form-control form-control-sm" @bind="_evMaxCharge" step="1" @bind:culture="@CultureInfo.InvariantCulture" style="width:110px;" />
+                    <input type="number" class="form-control form-control-sm" @bind="_evMaxCharge" step="1" @bind:culture="@CultureInfo.InvariantCulture" style="max-width:110px;" />
                 </div>
                 <div>
                     <label>Min at Dest (kWh)</label>
-                    <input type="number" class="form-control form-control-sm" @bind="_evMinChargeAtDest" step="1" @bind:culture="@CultureInfo.InvariantCulture" style="width:110px;" />
+                    <input type="number" class="form-control form-control-sm" @bind="_evMinChargeAtDest" step="1" @bind:culture="@CultureInfo.InvariantCulture" style="max-width:110px;" />
                 </div>
                 <div>
                     <label>Aux Power (kW)</label>
-                    <input type="number" class="form-control form-control-sm" @bind="_evAuxConsumption" step="0.1" @bind:culture="@CultureInfo.InvariantCulture" style="width:100px;" />
+                    <input type="number" class="form-control form-control-sm" @bind="_evAuxConsumption" step="0.1" @bind:culture="@CultureInfo.InvariantCulture" style="max-width:100px;" />
                 </div>
             </div>
             <div class="mt-1" style="font-size:0.85em;">

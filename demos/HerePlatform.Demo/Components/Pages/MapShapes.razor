@@ -36,7 +36,7 @@
 &lt;/AdvancedHereMap&gt;</code></pre>
 </details>
 
-<AdvancedHereMap Options="@_mapOptions" Height="500px">
+<AdvancedHereMap Options="@_mapOptions" Height="clamp(250px, 50vh, 500px)">
     <PolylineComponent
         Path="@_polylinePath"
         StrokeColor="#0066FF"
@@ -124,17 +124,17 @@
 
     <div>
         <label>Dash Offset: @_dashOffset.ToString("F0", CultureInfo.InvariantCulture)</label>
-        <input type="range" min="0" max="20" step="1" @bind="_dashOffset" @bind:event="oninput" @bind:culture="@CultureInfo.InvariantCulture" style="width:120px;" />
+        <input type="range" min="0" max="20" step="1" @bind="_dashOffset" @bind:event="oninput" @bind:culture="@CultureInfo.InvariantCulture" style="max-width:120px;" />
     </div>
 
     <div>
         <label>Polyline ZIndex: @_polylineZIndex</label>
-        <input type="range" min="0" max="10" step="1" @bind="_polylineZIndex" @bind:event="oninput" style="width:100px;" />
+        <input type="range" min="0" max="10" step="1" @bind="_polylineZIndex" @bind:event="oninput" style="max-width:100px;" />
     </div>
 
     <div>
         <label>Rect ZIndex: @_rectZIndex</label>
-        <input type="range" min="0" max="10" step="1" @bind="_rectZIndex" @bind:event="oninput" style="width:100px;" />
+        <input type="range" min="0" max="10" step="1" @bind="_rectZIndex" @bind:event="oninput" style="max-width:100px;" />
     </div>
 
     <div class="form-check form-switch">

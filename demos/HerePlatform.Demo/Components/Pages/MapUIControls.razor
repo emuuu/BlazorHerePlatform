@@ -28,7 +28,7 @@
 &lt;/AdvancedHereMap&gt;</code></pre>
 </details>
 
-<AdvancedHereMap @ref="_advMap" Options="@_mapOptions" Height="500px">
+<AdvancedHereMap @ref="_advMap" Options="@_mapOptions" Height="clamp(250px, 50vh, 500px)">
 
     @if (_showDistanceMeasurement)
     {
@@ -68,7 +68,7 @@
         <div>
             <label>Overview Zoom Delta: @_overviewZoomDelta</label>
             <input type="range" class="form-range" min="2" max="8" step="1"
-                @bind="_overviewZoomDelta" @bind:event="oninput" style="width:150px;" />
+                @bind="_overviewZoomDelta" @bind:event="oninput" style="max-width:150px;" />
         </div>
     }
 </div>

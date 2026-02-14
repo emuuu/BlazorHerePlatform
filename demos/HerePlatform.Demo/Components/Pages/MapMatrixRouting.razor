@@ -24,7 +24,7 @@ var request = new MatrixRoutingRequest
 var result = await MatrixService.CalculateMatrixAsync(request);</code></pre>
 </details>
 
-<AdvancedHereMap @ref="_advMap" Options="@_mapOptions" Height="500px"
+<AdvancedHereMap @ref="_advMap" Options="@_mapOptions" Height="clamp(250px, 50vh, 500px)"
     OnClick="@OnMapClick">
 
     @foreach (var origin in _origins)
