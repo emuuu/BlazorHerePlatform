@@ -10,7 +10,7 @@ description: Install the BlazorHerePlatform NuGet package and add it to your Bla
 Install the `BlazorHerePlatform` package from NuGet:
 
 ```xml
-<PackageReference Include="BlazorHerePlatform" Version="0.1.0" />
+<PackageReference Include="BlazorHerePlatform" Version="1.0.0" />
 ```
 
 Or via the .NET CLI:
@@ -25,9 +25,9 @@ BlazorHerePlatform multi-targets three .NET versions:
 
 | Framework | Status |
 |-----------|--------|
-| .NET 8.0  | Supported (LTS) |
+| .NET 8.0  | Supported |
 | .NET 9.0  | Supported |
-| .NET 10.0 | Supported |
+| .NET 10.0 | Supported (LTS) |
 
 Your project only needs to target one of these. The correct dependency set is selected automatically based on your `<TargetFramework>`.
 

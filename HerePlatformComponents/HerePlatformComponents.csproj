@@ -5,7 +5,7 @@
 		<IsPackable>true</IsPackable>
 		<LangVersion>latest</LangVersion>
 		<PackageId>BlazorHerePlatform</PackageId>
-		<Version>0.1.0</Version>
+		<Version>1.0.0</Version>
 		<Authors>Timm Bremekamp</Authors>
 		<Description>Blazor HERE Platform Maps components</Description>
 		<PackageTags>blazor;here;maps;components;geolocation;routing</PackageTags>
