@@ -284,7 +284,7 @@ internal static class Helper
                 if (typeof(U) == typeof(string))
                 {
                     result = json ?? "";
-                    return (T)result;
+                    return (U)result;
                 }
             }
             else
