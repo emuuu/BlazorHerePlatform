@@ -30,8 +30,15 @@ internal static partial class Helper
         if (typeof(IJsObjectRef).IsAssignableFrom(typeof(TRes)))
         {
             var guid = await jsRuntime.InvokeAsync<string?>(identifier, jsFriendlyArgs);
-
-            return guid == null ? default : (TRes)JsObjectRefInstances.GetInstance(guid);
+            if (guid == null) return default;
+            try
+            {
+                return (TRes)JsObjectRefInstances.GetInstance(guid);
+            }
+            catch (KeyNotFoundException)
+            {
+                return default;
+            }
         }
 
         if (typeof(IOneOf).IsAssignableFrom(typeof(TRes)))
@@ -47,14 +54,21 @@ internal static partial class Helper
                     var typeToken = jo.RootElement.GetProperty("dotnetTypeName").GetString();
                     if (typeToken != null)
                     {
-                        result = DeSerializeObject<TRes>(typeToken);
+                        var oneOfTypeArgs = typeof(TRes).GetGenericArguments();
+                        var resolvedType = ResolveOneOfType(typeToken, oneOfTypeArgs);
+                        if (resolvedType is not null)
+                            result = DeSerializeObject(someText, resolvedType);
                     }
                     else
                     {
                         result = someText;
                     }
                 }
-                catch
+                catch (JsonException)
+                {
+                    result = someText;
+                }
+                catch (KeyNotFoundException)
                 {
                     result = someText;
                 }

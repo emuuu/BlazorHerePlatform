@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 
 namespace HerePlatformComponents;
 
@@ -18,7 +19,8 @@ internal static class JsObjectRefInstances
 
     internal static IJsObjectRef GetInstance(string guid)
     {
-        Instances.TryGetValue(guid, out var instance);
-        return instance!;
+        if (!Instances.TryGetValue(guid, out var instance))
+            throw new KeyNotFoundException($"JsObjectRef with guid '{guid}' not found in registry.");
+        return instance;
     }
 }
