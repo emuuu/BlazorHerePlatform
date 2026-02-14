@@ -96,6 +96,12 @@ public partial class RouteComponent : IAsyncDisposable
     public EventCallback<RoutingResult> OnRouteCalculated { get; set; }
 
     /// <summary>
+    /// Fired when a route calculation fails with an exception.
+    /// </summary>
+    [Parameter, System.Text.Json.Serialization.JsonIgnore]
+    public EventCallback<Exception> OnError { get; set; }
+
+    /// <summary>
     /// The most recent routing result.
     /// </summary>
     public RoutingResult? Result => _lastResult;
@@ -213,6 +219,8 @@ public partial class RouteComponent : IAsyncDisposable
         catch (Exception ex)
         {
             System.Diagnostics.Debug.WriteLine($"[RouteComponent] Error: {ex.Message}");
+            if (OnError.HasDelegate)
+                await OnError.InvokeAsync(ex);
         }
         finally
         {
