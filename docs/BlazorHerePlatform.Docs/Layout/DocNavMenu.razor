@@ -94,4 +94,9 @@
     private bool Matches(string title) =>
         string.IsNullOrWhiteSpace(_filter) ||
         title.Contains(_filter.Trim(), StringComparison.OrdinalIgnoreCase);
+
+    protected override async Task OnInitializedAsync()
+    {
+        await ContentService.InitializeAsync();
+    }
 }
