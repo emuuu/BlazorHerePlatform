@@ -1439,6 +1439,9 @@ window.blazorHerePlatform.objectManager = function () {
 
         disposeMarkerComponent: function (id) {
             if (!mapObjects[id]) return;
+            // Clean up the hidden <template> element from the DOM
+            var tpl = document.getElementById('blz-mc-' + id);
+            if (tpl) tpl.remove();
             removeObjectFromMap(id);
             blazorHerePlatform.objectManager.disposeObject(id);
         },
@@ -1968,6 +1971,9 @@ window.blazorHerePlatform.objectManager = function () {
 
         disposeDomMarkerComponent: function (id) {
             if (!mapObjects[id]) return;
+            // Clean up the hidden <template> element from the DOM
+            var tpl = document.getElementById('blz-dm-' + id);
+            if (tpl) tpl.remove();
             removeObjectFromMap(id);
             blazorHerePlatform.objectManager.disposeObject(id);
         },
@@ -2030,6 +2036,9 @@ window.blazorHerePlatform.objectManager = function () {
 
         disposeInfoBubbleComponent: function (id) {
             if (!mapObjects[id]) return;
+            // Clean up the hidden <template> element from the DOM
+            var tpl = document.getElementById('blz-ib-' + id);
+            if (tpl) tpl.remove();
             removeBubbleFromUI(id);
             removeMapObject(id);
         },
