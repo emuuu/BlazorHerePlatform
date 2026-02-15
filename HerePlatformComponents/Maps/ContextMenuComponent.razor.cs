@@ -74,7 +74,7 @@ public partial class ContextMenuComponent : IAsyncDisposable
         if (MapRef.MapId.HasValue)
         {
             await Js.InvokeVoidAsync(
-                "blazorHerePlatform.objectManager.showContextMenu",
+                JsInteropIdentifiers.ShowContextMenu,
                 MapRef.MapId.Value,
                 jsItems.ToArray(),
                 args.ViewportX,
@@ -110,7 +110,7 @@ public partial class ContextMenuComponent : IAsyncDisposable
         {
             try
             {
-                await Js.InvokeVoidAsync("blazorHerePlatform.objectManager.hideContextMenu", MapRef.MapId.Value);
+                await Js.InvokeVoidAsync(JsInteropIdentifiers.HideContextMenu, MapRef.MapId.Value);
             }
             catch (JSDisconnectedException) { }
             catch (InvalidOperationException) { }

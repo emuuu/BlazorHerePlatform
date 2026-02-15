@@ -114,7 +114,7 @@ public partial class MarkerClusterComponent : IAsyncDisposable
     private async Task UpdateOptions()
     {
         await Js.InvokeAsync<string>(
-            "blazorHerePlatform.objectManager.updateMarkerClusterComponent",
+            JsInteropIdentifiers.UpdateMarkerClusterComponent,
             Guid,
             new MarkerClusterComponentOptions
             {
@@ -162,7 +162,7 @@ public partial class MarkerClusterComponent : IAsyncDisposable
 
         try
         {
-            await Js.InvokeVoidAsync("blazorHerePlatform.objectManager.disposeMarkerClusterComponent", Guid);
+            await Js.InvokeVoidAsync(JsInteropIdentifiers.DisposeMarkerClusterComponent, Guid);
         }
         catch (JSDisconnectedException) { }
         catch (InvalidOperationException) { }

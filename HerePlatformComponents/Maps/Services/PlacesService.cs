@@ -22,7 +22,7 @@ public class PlacesService : IPlacesService
     {
         using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(120));
         var result = await _js.InvokeAsync<PlacesResult>(
-            "blazorHerePlatform.objectManager.discoverPlaces",
+            JsInteropIdentifiers.DiscoverPlaces,
             cts.Token,
             request);
 
@@ -33,7 +33,7 @@ public class PlacesService : IPlacesService
     {
         using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(120));
         var result = await _js.InvokeAsync<PlacesResult>(
-            "blazorHerePlatform.objectManager.browsePlaces",
+            JsInteropIdentifiers.BrowsePlaces,
             cts.Token,
             request);
 
@@ -44,7 +44,7 @@ public class PlacesService : IPlacesService
     {
         using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(120));
         var result = await _js.InvokeAsync<PlacesResult>(
-            "blazorHerePlatform.objectManager.lookupPlace",
+            JsInteropIdentifiers.LookupPlace,
             cts.Token,
             request);
 

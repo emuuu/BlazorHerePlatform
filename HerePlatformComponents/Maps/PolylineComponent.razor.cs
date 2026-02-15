@@ -113,7 +113,7 @@ public partial class PolylineComponent : MapObjectComponentBase
     internal override bool HasAnyEventCallback =>
         HasBaseEventCallbacks || PathChanged.HasDelegate;
 
-    protected override string JsDisposeFunction => "blazorHerePlatform.objectManager.disposePolylineComponent";
+    protected override string JsDisposeFunction => JsInteropIdentifiers.DisposePolylineComponent;
 
     protected override Task RegisterWithMapAsync() => MapRef.AddPolyline(this);
 
@@ -127,7 +127,7 @@ public partial class PolylineComponent : MapObjectComponentBase
     protected override async Task UpdateOptions()
     {
         await Js.InvokeAsync<string>(
-            "blazorHerePlatform.objectManager.updatePolylineComponent",
+            JsInteropIdentifiers.UpdatePolylineComponent,
             [Guid,
             new PolylineComponentOptions
             {

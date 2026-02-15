@@ -230,7 +230,7 @@ public partial class HereAutosuggest : IAsyncDisposable
         bool isReady = false;
         try
         {
-            isReady = await Js.InvokeAsync<bool>("blazorHerePlatform.objectManager.canRenderMap");
+            isReady = await Js.InvokeAsync<bool>(JsInteropIdentifiers.CanRenderMap);
         }
         catch { /* JS not available yet */ }
 
@@ -238,7 +238,7 @@ public partial class HereAutosuggest : IAsyncDisposable
         {
             keyService.MarkApiInitialized();
             var apiOptions = await keyService.GetApiOptions();
-            await Js.InvokeVoidAsync("blazorHerePlatform.objectManager.initMap", apiOptions);
+            await Js.InvokeVoidAsync(JsInteropIdentifiers.InitMap, apiOptions);
         }
 
         _platformInitialized = true;
@@ -261,7 +261,7 @@ public partial class HereAutosuggest : IAsyncDisposable
         };
 
         await Js.InvokeVoidAsync(
-            "blazorHerePlatform.objectManager.autosuggest",
+            JsInteropIdentifiers.Autosuggest,
             _guid,
             query,
             jsOptions,
@@ -343,7 +343,7 @@ public partial class HereAutosuggest : IAsyncDisposable
 
         try
         {
-            await Js.InvokeVoidAsync("blazorHerePlatform.objectManager.disposeAutosuggest", _guid);
+            await Js.InvokeVoidAsync(JsInteropIdentifiers.DisposeAutosuggest, _guid);
         }
         catch (JSDisconnectedException) { }
         catch (InvalidOperationException) { }

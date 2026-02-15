@@ -122,7 +122,7 @@ public partial class MarkerComponent : MapObjectComponentBase
         await UpdateOptions();
     }
 
-    protected override string JsDisposeFunction => "blazorHerePlatform.objectManager.disposeMarkerComponent";
+    protected override string JsDisposeFunction => JsInteropIdentifiers.DisposeMarkerComponent;
 
     protected override Task RegisterWithMapAsync() => MapRef.AddMarker(this);
 
@@ -137,7 +137,7 @@ public partial class MarkerComponent : MapObjectComponentBase
     {
         var hasInfoBubbleContent = ChildContent is not null;
         await Js.InvokeAsync<string>(
-            "blazorHerePlatform.objectManager.updateMarkerComponent",
+            JsInteropIdentifiers.UpdateMarkerComponent,
             [Guid,
             new MarkerComponentOptions
             {

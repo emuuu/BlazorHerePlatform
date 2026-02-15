@@ -49,7 +49,7 @@ public class JsObjectRef : IJsObjectRef
             .Concat(args).ToArray();
 
         await jsRuntime.MyInvokeAsync<object>(
-            "blazorHerePlatform.objectManager.createObject",
+            JsInteropIdentifiers.CreateObject,
             jsFriendlyArgs);
 
         return new JsObjectRef(jsRuntime, guid);
@@ -63,7 +63,7 @@ public class JsObjectRef : IJsObjectRef
         var jsObjectRefs = dictArgs.ToDictionary(e => e.Key, e => new JsObjectRef(jsRuntime, e.Key));
 
         await jsRuntime.MyInvokeAsync<object>(
-            "blazorHerePlatform.objectManager.createMultipleObject",
+            JsInteropIdentifiers.CreateMultipleObject,
             new object[] { dictArgs.Select(e => e.Key.ToString()).ToList(), functionName }
                 .Concat(dictArgs.Values).ToArray()
         );
@@ -77,7 +77,7 @@ public class JsObjectRef : IJsObjectRef
     {
         var guidDict = dictArgs.ToDictionary(e => Guid.NewGuid(), e => e.Value);
         return _jsRuntime.MyInvokeAsync<object>(
-            "blazorHerePlatform.objectManager.createMultipleObject",
+            JsInteropIdentifiers.CreateMultipleObject,
             new object[] { guidDict.Select(e => e.Key.ToString()).ToList(), functionName }
                 .Concat(guidDict.Values).ToArray()
         );
@@ -104,7 +104,7 @@ public class JsObjectRef : IJsObjectRef
         }
 
         return _jsRuntime.InvokeAsync<object>(
-            "blazorHerePlatform.objectManager.disposeObject",
+            JsInteropIdentifiers.DisposeObject,
             _guid.ToString()
         );
     }
@@ -112,7 +112,7 @@ public class JsObjectRef : IJsObjectRef
     public ValueTask<object> DisposeMultipleAsync(List<Guid> guids)
     {
         return _jsRuntime.InvokeAsync<object>(
-            "blazorHerePlatform.objectManager.disposeMultipleObjects",
+            JsInteropIdentifiers.DisposeMultipleObjects,
             guids.Select(e => e.ToString()).ToList()
         );
     }
@@ -121,7 +121,7 @@ public class JsObjectRef : IJsObjectRef
     {
         _trackedDisposables ??= new List<IDisposable>();
         await _jsRuntime.MyInvokeAsync(
-            "blazorHerePlatform.objectManager.invoke",
+            JsInteropIdentifiers.Invoke,
             _trackedDisposables,
             new object?[] { _guid.ToString(), functionName }
                 .Concat(args).ToArray()
@@ -131,7 +131,7 @@ public class JsObjectRef : IJsObjectRef
     public Task InvokeMultipleAsync(string functionName, Dictionary<Guid, object> dictArgs)
     {
         return _jsRuntime.MyInvokeAsync(
-            "blazorHerePlatform.objectManager.invokeMultiple",
+            JsInteropIdentifiers.InvokeMultiple,
             new object[] { dictArgs.Select(e => e.Key.ToString()).ToList(), functionName }
                 .Concat(dictArgs.Values).ToArray()
         );
@@ -141,7 +141,7 @@ public class JsObjectRef : IJsObjectRef
     {
         _trackedDisposables ??= new List<IDisposable>();
         return _jsRuntime.MyAddListenerAsync(
-            "blazorHerePlatform.objectManager.addMultipleListeners",
+            JsInteropIdentifiers.AddMultipleListeners,
             _trackedDisposables,
             new object[] { dictArgs.Select(e => e.Key.ToString()).ToList(), eventName }
                 .Concat(dictArgs.Values).ToArray()
@@ -152,7 +152,7 @@ public class JsObjectRef : IJsObjectRef
     {
         _trackedDisposables ??= new List<IDisposable>();
         return _jsRuntime.MyInvokeAsync<T>(
-            "blazorHerePlatform.objectManager.invoke",
+            JsInteropIdentifiers.Invoke,
             _trackedDisposables,
             new object?[] { _guid.ToString(), functionName }
                 .Concat(args).ToArray()
@@ -162,7 +162,7 @@ public class JsObjectRef : IJsObjectRef
     public Task<OneOf<T, U>> InvokeAsync<T, U>(string functionName, params object[] args)
     {
         return _jsRuntime.MyInvokeAsync<T, U>(
-            "blazorHerePlatform.objectManager.invoke",
+            JsInteropIdentifiers.Invoke,
             new object[] { _guid.ToString(), functionName }
                 .Concat(args).ToArray()
         );
@@ -171,7 +171,7 @@ public class JsObjectRef : IJsObjectRef
     public Task<OneOf<T, U, V>> InvokeAsync<T, U, V>(string functionName, params object[] args)
     {
         return _jsRuntime.MyInvokeAsync<T, U, V>(
-            "blazorHerePlatform.objectManager.invoke",
+            JsInteropIdentifiers.Invoke,
             new object[] { _guid.ToString(), functionName }
                 .Concat(args).ToArray()
         );
@@ -180,7 +180,7 @@ public class JsObjectRef : IJsObjectRef
     public Task<Dictionary<string, T>> InvokeMultipleAsync<T>(string functionName, Dictionary<Guid, object> dictArgs)
     {
         return _jsRuntime.MyInvokeAsync<Dictionary<string, T>>(
-            "blazorHerePlatform.objectManager.invokeMultiple",
+            JsInteropIdentifiers.InvokeMultiple,
             new object[] { dictArgs.Select(e => e.Key.ToString()).ToList(), functionName }
                 .Concat(dictArgs.Values).ToArray()
         )!;
@@ -189,7 +189,7 @@ public class JsObjectRef : IJsObjectRef
     public async Task<JsObjectRef> InvokeWithReturnedObjectRefAsync(string functionName, params object[] args)
     {
         var guid = await _jsRuntime.MyInvokeAsync<string>(
-            "blazorHerePlatform.objectManager.invokeWithReturnedObjectRef",
+            JsInteropIdentifiers.InvokeWithReturnedObjectRef,
             new object[] { _guid.ToString(), functionName }
                 .Concat(args).ToArray()
         );
@@ -202,7 +202,7 @@ public class JsObjectRef : IJsObjectRef
     public Task<T> GetValue<T>(string propertyName)
     {
         return _jsRuntime.MyInvokeAsync<T>(
-            "blazorHerePlatform.objectManager.readObjectPropertyValue",
+            JsInteropIdentifiers.ReadObjectPropertyValue,
             _guid.ToString(),
             propertyName)!;
     }
@@ -210,7 +210,7 @@ public class JsObjectRef : IJsObjectRef
     public async Task<JsObjectRef> GetObjectReference(string propertyName)
     {
         var guid = await _jsRuntime.MyInvokeAsync<string>(
-            "blazorHerePlatform.objectManager.readObjectPropertyValueWithReturnedObjectRef",
+            JsInteropIdentifiers.ReadObjectPropertyValueWithReturnedObjectRef,
             _guid.ToString(),
             propertyName);
 

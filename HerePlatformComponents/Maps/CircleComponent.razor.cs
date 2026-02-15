@@ -139,7 +139,7 @@ public partial class CircleComponent : MapObjectComponentBase
     internal override bool HasAnyEventCallback =>
         HasBaseEventCallbacks || CenterLatChanged.HasDelegate || CenterLngChanged.HasDelegate;
 
-    protected override string JsDisposeFunction => "blazorHerePlatform.objectManager.disposeCircleComponent";
+    protected override string JsDisposeFunction => JsInteropIdentifiers.DisposeCircleComponent;
 
     protected override Task RegisterWithMapAsync() => MapRef.AddCircle(this);
 
@@ -153,7 +153,7 @@ public partial class CircleComponent : MapObjectComponentBase
     protected override async Task UpdateOptions()
     {
         await Js.InvokeAsync<string>(
-            "blazorHerePlatform.objectManager.updateCircleComponent",
+            JsInteropIdentifiers.UpdateCircleComponent,
             [Guid,
             new CircleComponentOptions
             {

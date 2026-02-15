@@ -62,7 +62,7 @@ public partial class DistanceMeasurementComponent : IAsyncDisposable
     private async Task UpdateOptions()
     {
         await Js.InvokeAsync<string>(
-            "blazorHerePlatform.objectManager.updateDistanceMeasurement",
+            JsInteropIdentifiers.UpdateDistanceMeasurement,
             Guid,
             new
             {
@@ -100,7 +100,7 @@ public partial class DistanceMeasurementComponent : IAsyncDisposable
 
         try
         {
-            await Js.InvokeVoidAsync("blazorHerePlatform.objectManager.disposeDistanceMeasurement", Guid);
+            await Js.InvokeVoidAsync(JsInteropIdentifiers.DisposeDistanceMeasurement, Guid);
         }
         catch (JSDisconnectedException) { }
         catch (InvalidOperationException) { }

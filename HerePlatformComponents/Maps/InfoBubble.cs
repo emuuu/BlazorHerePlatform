@@ -35,7 +35,7 @@ public class InfoBubble : EventEntityBase, IJsObjectRef
             throw new InvalidOperationException("Map was created without UI support. Set EnableUI = true in MapOptions.");
 
         return _jsObjectRef.JSRuntime.InvokeVoidAsync(
-            "blazorHerePlatform.objectManager.addInfoBubble",
+            JsInteropIdentifiers.AddInfoBubble,
             map.UIGuid.Value.ToString(), _jsObjectRef.Guid.ToString()).AsTask();
     }
 
@@ -47,7 +47,7 @@ public class InfoBubble : EventEntityBase, IJsObjectRef
         if (map.UIGuid == null) return Task.CompletedTask;
 
         return _jsObjectRef.JSRuntime.InvokeVoidAsync(
-            "blazorHerePlatform.objectManager.removeInfoBubble",
+            JsInteropIdentifiers.RemoveInfoBubble,
             map.UIGuid.Value.ToString(), _jsObjectRef.Guid.ToString()).AsTask();
     }
 

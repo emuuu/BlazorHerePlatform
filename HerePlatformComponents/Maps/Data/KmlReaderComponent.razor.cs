@@ -77,7 +77,7 @@ public partial class KmlReaderComponent : IAsyncDisposable
     private async Task UpdateOptions()
     {
         await Js.InvokeAsync<string>(
-            "blazorHerePlatform.objectManager.updateKmlReaderComponent",
+            JsInteropIdentifiers.UpdateKmlReaderComponent,
             Guid,
             new KmlReaderComponentOptions
             {
@@ -118,7 +118,7 @@ public partial class KmlReaderComponent : IAsyncDisposable
 
         try
         {
-            await Js.InvokeVoidAsync("blazorHerePlatform.objectManager.disposeKmlReaderComponent", Guid);
+            await Js.InvokeVoidAsync(JsInteropIdentifiers.DisposeKmlReaderComponent, Guid);
         }
         catch (JSDisconnectedException) { }
         catch (InvalidOperationException) { }

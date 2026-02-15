@@ -56,7 +56,7 @@ public partial class OverviewMapComponent : IAsyncDisposable
     private async Task UpdateOptions()
     {
         await Js.InvokeAsync<string>(
-            "blazorHerePlatform.objectManager.updateOverviewMap",
+            JsInteropIdentifiers.UpdateOverviewMap,
             Guid,
             new
             {
@@ -94,7 +94,7 @@ public partial class OverviewMapComponent : IAsyncDisposable
 
         try
         {
-            await Js.InvokeVoidAsync("blazorHerePlatform.objectManager.disposeOverviewMap", Guid);
+            await Js.InvokeVoidAsync(JsInteropIdentifiers.DisposeOverviewMap, Guid);
         }
         catch (JSDisconnectedException) { }
         catch (InvalidOperationException) { }

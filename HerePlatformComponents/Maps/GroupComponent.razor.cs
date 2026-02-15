@@ -65,7 +65,7 @@ public partial class GroupComponent : IAsyncDisposable
     private async Task UpdateOptions()
     {
         await Js.InvokeAsync<string>(
-            "blazorHerePlatform.objectManager.updateGroupComponent",
+            JsInteropIdentifiers.UpdateGroupComponent,
             Guid,
             new GroupComponentOptions
             {
@@ -102,7 +102,7 @@ public partial class GroupComponent : IAsyncDisposable
     public async Task AddObjectAsync(Guid objectGuid)
     {
         if (!_hasRendered) return;
-        await Js.InvokeVoidAsync("blazorHerePlatform.objectManager.groupAddObjects", Guid, new[] { objectGuid });
+        await Js.InvokeVoidAsync(JsInteropIdentifiers.GroupAddObjects, Guid, new[] { objectGuid });
     }
 
     /// <summary>
@@ -111,7 +111,7 @@ public partial class GroupComponent : IAsyncDisposable
     public async Task RemoveObjectAsync(Guid objectGuid)
     {
         if (!_hasRendered) return;
-        await Js.InvokeVoidAsync("blazorHerePlatform.objectManager.groupRemoveObjects", Guid, new[] { objectGuid });
+        await Js.InvokeVoidAsync(JsInteropIdentifiers.GroupRemoveObjects, Guid, new[] { objectGuid });
     }
 
     /// <summary>
@@ -120,7 +120,7 @@ public partial class GroupComponent : IAsyncDisposable
     public async Task<GeoRect?> GetBoundsAsync()
     {
         if (!_hasRendered) return null;
-        return await Js.InvokeAsync<GeoRect?>("blazorHerePlatform.objectManager.groupGetBounds", Guid);
+        return await Js.InvokeAsync<GeoRect?>(JsInteropIdentifiers.GroupGetBounds, Guid);
     }
 
     public async ValueTask DisposeAsync()
@@ -130,7 +130,7 @@ public partial class GroupComponent : IAsyncDisposable
 
         try
         {
-            await Js.InvokeVoidAsync("blazorHerePlatform.objectManager.disposeGroupComponent", Guid);
+            await Js.InvokeVoidAsync(JsInteropIdentifiers.DisposeGroupComponent, Guid);
         }
         catch (JSDisconnectedException) { }
         catch (InvalidOperationException) { }

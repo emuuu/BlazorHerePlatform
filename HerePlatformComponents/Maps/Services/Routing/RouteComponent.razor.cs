@@ -197,7 +197,7 @@ public partial class RouteComponent : IAsyncDisposable
             if (path.Count > 0)
             {
                 await Js.InvokeAsync<string>(
-                    "blazorHerePlatform.objectManager.updatePolylineComponent",
+                    JsInteropIdentifiers.UpdatePolylineComponent,
                     _guid,
                     new
                     {
@@ -247,7 +247,7 @@ public partial class RouteComponent : IAsyncDisposable
         if (path.Count > 0)
         {
             await Js.InvokeAsync<string>(
-                "blazorHerePlatform.objectManager.updatePolylineComponent",
+                JsInteropIdentifiers.UpdatePolylineComponent,
                 _guid,
                 new
                 {
@@ -269,7 +269,7 @@ public partial class RouteComponent : IAsyncDisposable
 
         try
         {
-            await Js.InvokeVoidAsync("blazorHerePlatform.objectManager.disposePolylineComponent", _guid);
+            await Js.InvokeVoidAsync(JsInteropIdentifiers.DisposePolylineComponent, _guid);
         }
         catch (JSDisconnectedException) { }
         catch (InvalidOperationException) { }

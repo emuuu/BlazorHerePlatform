@@ -80,7 +80,7 @@ public partial class CustomTileLayerComponent : IAsyncDisposable
     private async Task UpdateOptions()
     {
         await Js.InvokeAsync<string>(
-            "blazorHerePlatform.objectManager.updateCustomTileLayer",
+            JsInteropIdentifiers.UpdateCustomTileLayer,
             Guid,
             new
             {
@@ -126,7 +126,7 @@ public partial class CustomTileLayerComponent : IAsyncDisposable
 
         try
         {
-            await Js.InvokeVoidAsync("blazorHerePlatform.objectManager.disposeCustomTileLayer", Guid);
+            await Js.InvokeVoidAsync(JsInteropIdentifiers.DisposeCustomTileLayer, Guid);
         }
         catch (JSDisconnectedException) { }
         catch (InvalidOperationException) { }

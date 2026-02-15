@@ -113,7 +113,7 @@ public partial class DomMarkerComponent : MapObjectComponentBase
     internal override bool HasAnyEventCallback =>
         HasBaseEventCallbacks || LatChanged.HasDelegate || LngChanged.HasDelegate;
 
-    protected override string JsDisposeFunction => "blazorHerePlatform.objectManager.disposeDomMarkerComponent";
+    protected override string JsDisposeFunction => JsInteropIdentifiers.DisposeDomMarkerComponent;
 
     protected override Task RegisterWithMapAsync() => MapRef.AddDomMarker(this);
 
@@ -127,7 +127,7 @@ public partial class DomMarkerComponent : MapObjectComponentBase
     protected override async Task UpdateOptions()
     {
         await Js.InvokeAsync<string>(
-            "blazorHerePlatform.objectManager.updateDomMarkerComponent",
+            JsInteropIdentifiers.UpdateDomMarkerComponent,
             [Guid,
             new DomMarkerComponentOptions
             {

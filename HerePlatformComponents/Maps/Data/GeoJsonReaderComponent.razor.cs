@@ -83,7 +83,7 @@ public partial class GeoJsonReaderComponent : IAsyncDisposable
     private async Task UpdateOptions()
     {
         await Js.InvokeAsync<string>(
-            "blazorHerePlatform.objectManager.updateGeoJsonReaderComponent",
+            JsInteropIdentifiers.UpdateGeoJsonReaderComponent,
             Guid,
             new GeoJsonReaderComponentOptions
             {
@@ -126,7 +126,7 @@ public partial class GeoJsonReaderComponent : IAsyncDisposable
 
         try
         {
-            await Js.InvokeVoidAsync("blazorHerePlatform.objectManager.disposeGeoJsonReaderComponent", Guid);
+            await Js.InvokeVoidAsync(JsInteropIdentifiers.DisposeGeoJsonReaderComponent, Guid);
         }
         catch (JSDisconnectedException) { }
         catch (InvalidOperationException) { }

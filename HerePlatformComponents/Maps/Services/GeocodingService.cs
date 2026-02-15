@@ -19,7 +19,7 @@ public class GeocodingService : IGeocodingService
     public async Task<GeocodeResult> GeocodeAsync(string query, GeocodeOptions? options = null)
     {
         var result = await _js.InvokeAsync<GeocodeResult>(
-            "blazorHerePlatform.objectManager.geocode",
+            JsInteropIdentifiers.Geocode,
             query, options ?? new GeocodeOptions());
 
         return result ?? new GeocodeResult();
@@ -28,7 +28,7 @@ public class GeocodingService : IGeocodingService
     public async Task<GeocodeResult> ReverseGeocodeAsync(LatLngLiteral position, GeocodeOptions? options = null)
     {
         var result = await _js.InvokeAsync<GeocodeResult>(
-            "blazorHerePlatform.objectManager.reverseGeocode",
+            JsInteropIdentifiers.ReverseGeocode,
             position, options ?? new GeocodeOptions());
 
         return result ?? new GeocodeResult();

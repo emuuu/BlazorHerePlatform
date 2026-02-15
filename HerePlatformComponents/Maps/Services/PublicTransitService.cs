@@ -19,7 +19,7 @@ public class PublicTransitService : IPublicTransitService
     public async Task<TransitDeparturesResult> GetDeparturesAsync(LatLngLiteral position)
     {
         var result = await _js.InvokeAsync<TransitDeparturesResult>(
-            "blazorHerePlatform.objectManager.getTransitDepartures",
+            JsInteropIdentifiers.GetTransitDepartures,
             position);
 
         return result ?? new TransitDeparturesResult();
@@ -28,7 +28,7 @@ public class PublicTransitService : IPublicTransitService
     public async Task<TransitStationsResult> SearchStationsAsync(LatLngLiteral position, double radiusMeters = 500)
     {
         var result = await _js.InvokeAsync<TransitStationsResult>(
-            "blazorHerePlatform.objectManager.searchTransitStations",
+            JsInteropIdentifiers.SearchTransitStations,
             position, radiusMeters);
 
         return result ?? new TransitStationsResult();

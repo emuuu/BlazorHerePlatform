@@ -19,7 +19,7 @@ public class TrafficService : ITrafficService
     public async Task<TrafficIncidentsResult> GetTrafficIncidentsAsync(double north, double south, double east, double west)
     {
         var result = await _js.InvokeAsync<TrafficIncidentsResult>(
-            "blazorHerePlatform.objectManager.getTrafficIncidents",
+            JsInteropIdentifiers.GetTrafficIncidents,
             north, south, east, west);
 
         return result ?? new TrafficIncidentsResult();
@@ -28,7 +28,7 @@ public class TrafficService : ITrafficService
     public async Task<TrafficFlowResult> GetTrafficFlowAsync(double north, double south, double east, double west)
     {
         var result = await _js.InvokeAsync<TrafficFlowResult>(
-            "blazorHerePlatform.objectManager.getTrafficFlow",
+            JsInteropIdentifiers.GetTrafficFlow,
             north, south, east, west);
 
         return result ?? new TrafficFlowResult();

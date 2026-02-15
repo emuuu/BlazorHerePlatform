@@ -22,7 +22,7 @@ public class MatrixRoutingService : IMatrixRoutingService
     {
         using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(120));
         var result = await _js.InvokeAsync<MatrixRoutingResult>(
-            "blazorHerePlatform.objectManager.calculateMatrix",
+            JsInteropIdentifiers.CalculateMatrix,
             cts.Token,
             request);
 

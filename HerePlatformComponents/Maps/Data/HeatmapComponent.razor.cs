@@ -75,7 +75,7 @@ public partial class HeatmapComponent : IAsyncDisposable
     private async Task UpdateOptions()
     {
         await Js.InvokeAsync<string>(
-            "blazorHerePlatform.objectManager.updateHeatmapComponent",
+            JsInteropIdentifiers.UpdateHeatmapComponent,
             Guid,
             new
             {
@@ -119,7 +119,7 @@ public partial class HeatmapComponent : IAsyncDisposable
 
         try
         {
-            await Js.InvokeVoidAsync("blazorHerePlatform.objectManager.disposeHeatmapComponent", Guid);
+            await Js.InvokeVoidAsync(JsInteropIdentifiers.DisposeHeatmapComponent, Guid);
         }
         catch (JSDisconnectedException) { }
         catch (InvalidOperationException) { }

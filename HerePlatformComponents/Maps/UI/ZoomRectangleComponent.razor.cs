@@ -56,7 +56,7 @@ public partial class ZoomRectangleComponent : IAsyncDisposable
     private async Task UpdateOptions()
     {
         await Js.InvokeAsync<string>(
-            "blazorHerePlatform.objectManager.updateZoomRectangle",
+            JsInteropIdentifiers.UpdateZoomRectangle,
             Guid,
             new
             {
@@ -94,7 +94,7 @@ public partial class ZoomRectangleComponent : IAsyncDisposable
 
         try
         {
-            await Js.InvokeVoidAsync("blazorHerePlatform.objectManager.disposeZoomRectangle", Guid);
+            await Js.InvokeVoidAsync(JsInteropIdentifiers.DisposeZoomRectangle, Guid);
         }
         catch (JSDisconnectedException) { }
         catch (InvalidOperationException) { }

@@ -149,7 +149,7 @@ public partial class RectComponent : MapObjectComponentBase
         HasBaseEventCallbacks ||
         TopChanged.HasDelegate || LeftChanged.HasDelegate || BottomChanged.HasDelegate || RightChanged.HasDelegate;
 
-    protected override string JsDisposeFunction => "blazorHerePlatform.objectManager.disposeRectComponent";
+    protected override string JsDisposeFunction => JsInteropIdentifiers.DisposeRectComponent;
 
     protected override Task RegisterWithMapAsync() => MapRef.AddRect(this);
 
@@ -163,7 +163,7 @@ public partial class RectComponent : MapObjectComponentBase
     protected override async Task UpdateOptions()
     {
         await Js.InvokeAsync<string>(
-            "blazorHerePlatform.objectManager.updateRectComponent",
+            JsInteropIdentifiers.UpdateRectComponent,
             [Guid,
             new RectComponentOptions
             {

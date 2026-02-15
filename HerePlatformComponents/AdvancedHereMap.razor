@@ -352,7 +352,7 @@
         // Wire up map-level events now that the map is ready
         if (MapId.HasValue)
         {
-            await Js.InvokeVoidAsync("blazorHerePlatform.objectManager.setupMapEvents", MapId.Value, CallbackRef);
+            await Js.InvokeVoidAsync(JsInteropIdentifiers.SetupMapEvents, MapId.Value, CallbackRef);
         }
 
         // Apply initial DisabledBehaviors

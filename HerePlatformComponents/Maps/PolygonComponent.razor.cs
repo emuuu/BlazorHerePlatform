@@ -119,7 +119,7 @@ public partial class PolygonComponent : MapObjectComponentBase
     internal override bool HasAnyEventCallback =>
         HasBaseEventCallbacks || PathChanged.HasDelegate;
 
-    protected override string JsDisposeFunction => "blazorHerePlatform.objectManager.disposePolygonComponent";
+    protected override string JsDisposeFunction => JsInteropIdentifiers.DisposePolygonComponent;
 
     protected override Task RegisterWithMapAsync() => MapRef.AddPolygon(this);
 
@@ -133,7 +133,7 @@ public partial class PolygonComponent : MapObjectComponentBase
     protected override async Task UpdateOptions()
     {
         await Js.InvokeAsync<string>(
-            "blazorHerePlatform.objectManager.updatePolygonComponent",
+            JsInteropIdentifiers.UpdatePolygonComponent,
             [Guid,
             new PolygonComponentOptions
             {

@@ -43,7 +43,7 @@ public class MapComponent : ComponentBase, IAsyncDisposable
             bool isHereReady = false;
             try
             {
-                isHereReady = await JsRuntime.InvokeAsync<bool>("blazorHerePlatform.objectManager.canRenderMap");
+                isHereReady = await JsRuntime.InvokeAsync<bool>(JsInteropIdentifiers.CanRenderMap);
             }
             catch (Exception ex)
             {

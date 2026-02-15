@@ -23,7 +23,7 @@ public class IsolineService : IIsolineService
     {
         using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(120));
         var result = await _js.InvokeAsync<IsolineResult>(
-            "blazorHerePlatform.objectManager.calculateIsoline",
+            JsInteropIdentifiers.CalculateIsoline,
             cts.Token,
             request);
 

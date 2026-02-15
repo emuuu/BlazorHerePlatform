@@ -88,7 +88,7 @@ public partial class InfoBubbleComponent : IAsyncDisposable
     private async Task UpdateOptions()
     {
         await Js.InvokeAsync<string>(
-            "blazorHerePlatform.objectManager.updateInfoBubbleComponent",
+            JsInteropIdentifiers.UpdateInfoBubbleComponent,
             Guid,
             new InfoBubbleComponentOptions
             {
@@ -144,7 +144,7 @@ public partial class InfoBubbleComponent : IAsyncDisposable
 
         try
         {
-            await Js.InvokeVoidAsync("blazorHerePlatform.objectManager.disposeInfoBubbleComponent", Guid);
+            await Js.InvokeVoidAsync(JsInteropIdentifiers.DisposeInfoBubbleComponent, Guid);
         }
         catch (JSDisconnectedException) { }
         catch (InvalidOperationException) { }

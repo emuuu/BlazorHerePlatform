@@ -25,7 +25,7 @@ public class ListableEntityBase<TEntityOptions> : EventEntityBase, IJsObjectRef
     public virtual Task AddToMap(Map map)
     {
         return _jsObjectRef.JSRuntime.InvokeVoidAsync(
-            "blazorHerePlatform.objectManager.addObjectToMap",
+            JsInteropIdentifiers.AddObjectToMap,
             map.Guid.ToString(), _jsObjectRef.Guid.ToString()).AsTask();
     }
 
@@ -35,7 +35,7 @@ public class ListableEntityBase<TEntityOptions> : EventEntityBase, IJsObjectRef
     public virtual Task RemoveFromMap(Map map)
     {
         return _jsObjectRef.JSRuntime.InvokeVoidAsync(
-            "blazorHerePlatform.objectManager.removeObjectFromMap",
+            JsInteropIdentifiers.RemoveObjectFromMap,
             map.Guid.ToString(), _jsObjectRef.Guid.ToString()).AsTask();
     }
 

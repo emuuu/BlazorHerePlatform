@@ -19,7 +19,7 @@ public class WaypointSequenceService : IWaypointSequenceService
     public async Task<WaypointSequenceResult> OptimizeSequenceAsync(WaypointSequenceRequest request)
     {
         var result = await _js.InvokeAsync<WaypointSequenceResult>(
-            "blazorHerePlatform.objectManager.optimizeWaypointSequence",
+            JsInteropIdentifiers.OptimizeWaypointSequence,
             request);
 
         return result ?? new WaypointSequenceResult();

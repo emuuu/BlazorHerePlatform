@@ -60,7 +60,7 @@ public class Marker : ListableEntityBase<MarkerOptions>
     public Task SetDraggable(bool draggable)
     {
         return _jsObjectRef.JSRuntime.InvokeVoidAsync(
-            "blazorHerePlatform.objectManager.writeObjectPropertyValue",
+            JsInteropIdentifiers.WriteObjectPropertyValue,
             _jsObjectRef.Guid.ToString(), "draggable", draggable).AsTask();
     }
 }

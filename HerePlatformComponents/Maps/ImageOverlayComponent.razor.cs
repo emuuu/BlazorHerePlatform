@@ -86,7 +86,7 @@ public partial class ImageOverlayComponent : IAsyncDisposable
     private async Task UpdateOptions()
     {
         await Js.InvokeAsync<string>(
-            "blazorHerePlatform.objectManager.updateImageOverlayComponent",
+            JsInteropIdentifiers.UpdateImageOverlayComponent,
             Guid,
             new
             {
@@ -134,7 +134,7 @@ public partial class ImageOverlayComponent : IAsyncDisposable
 
         try
         {
-            await Js.InvokeVoidAsync("blazorHerePlatform.objectManager.disposeImageOverlayComponent", Guid);
+            await Js.InvokeVoidAsync(JsInteropIdentifiers.DisposeImageOverlayComponent, Guid);
         }
         catch (JSDisconnectedException) { }
         catch (InvalidOperationException) { }

@@ -23,7 +23,7 @@ public class RoutingService : IRoutingService
     {
         using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(120));
         var result = await _js.InvokeAsync<RoutingResult>(
-            "blazorHerePlatform.objectManager.calculateRoute",
+            JsInteropIdentifiers.CalculateRoute,
             cts.Token,
             request);
 

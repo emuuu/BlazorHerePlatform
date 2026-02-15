@@ -33,11 +33,11 @@ public class Map : EventEntityBase, IJsObjectRef, IAsyncDisposable
         if (opts?.ApiLoadOptions != null)
         {
             HereApiLoadOptions apiOpts = opts.ApiLoadOptions;
-            await jsRuntime.InvokeVoidAsync("blazorHerePlatform.objectManager.initMap", apiOpts);
+            await jsRuntime.InvokeVoidAsync(JsInteropIdentifiers.InitMap, apiOpts);
         }
 
         var result = await jsRuntime.InvokeAsync<MapInitResult>(
-            "blazorHerePlatform.objectManager.createHereMap",
+            JsInteropIdentifiers.CreateHereMap,
             mapDiv, opts);
 
         var mapGuid = new Guid(result.MapGuid);
@@ -91,13 +91,13 @@ public class Map : EventEntityBase, IJsObjectRef, IAsyncDisposable
     public Task<GeoRect> GetViewBounds()
     {
         return _jsObjectRef.JSRuntime.InvokeAsync<GeoRect>(
-            "blazorHerePlatform.objectManager.getViewBounds", Guid.ToString()).AsTask();
+            JsInteropIdentifiers.GetViewBounds, Guid.ToString()).AsTask();
     }
 
     public Task SetViewBounds(GeoRect bounds)
     {
         return _jsObjectRef.JSRuntime.InvokeVoidAsync(
-            "blazorHerePlatform.objectManager.setViewBounds",
+            JsInteropIdentifiers.SetViewBounds,
             Guid.ToString(), bounds).AsTask();
     }
 
@@ -107,7 +107,7 @@ public class Map : EventEntityBase, IJsObjectRef, IAsyncDisposable
     public Task AddObject(IJsObjectRef mapObject)
     {
         return _jsObjectRef.JSRuntime.InvokeVoidAsync(
-            "blazorHerePlatform.objectManager.addObjectToMap",
+            JsInteropIdentifiers.AddObjectToMap,
             _jsObjectRef.Guid.ToString(), mapObject.Guid.ToString()).AsTask();
     }
 
@@ -117,7 +117,7 @@ public class Map : EventEntityBase, IJsObjectRef, IAsyncDisposable
     public Task RemoveObject(IJsObjectRef mapObject)
     {
         return _jsObjectRef.JSRuntime.InvokeVoidAsync(
-            "blazorHerePlatform.objectManager.removeObjectFromMap",
+            JsInteropIdentifiers.RemoveObjectFromMap,
             _jsObjectRef.Guid.ToString(), mapObject.Guid.ToString()).AsTask();
     }
 
@@ -131,7 +131,7 @@ public class Map : EventEntityBase, IJsObjectRef, IAsyncDisposable
             guids.Add(obj.Guid.ToString());
 
         return _jsObjectRef.JSRuntime.InvokeVoidAsync(
-            "blazorHerePlatform.objectManager.addObjectsToMap",
+            JsInteropIdentifiers.AddObjectsToMap,
             _jsObjectRef.Guid.ToString(), guids.ToArray()).AsTask();
     }
 
@@ -145,7 +145,7 @@ public class Map : EventEntityBase, IJsObjectRef, IAsyncDisposable
             guids.Add(obj.Guid.ToString());
 
         return _jsObjectRef.JSRuntime.InvokeVoidAsync(
-            "blazorHerePlatform.objectManager.removeObjectsFromMap",
+            JsInteropIdentifiers.RemoveObjectsFromMap,
             _jsObjectRef.Guid.ToString(), guids.ToArray()).AsTask();
     }
 
@@ -165,21 +165,21 @@ public class Map : EventEntityBase, IJsObjectRef, IAsyncDisposable
     {
         var layerPath = Helper.GetEnumMemberValue(layerType);
         return _jsObjectRef.JSRuntime.InvokeVoidAsync(
-            "blazorHerePlatform.objectManager.setBaseLayer",
+            JsInteropIdentifiers.SetBaseLayer,
             Guid.ToString(), layerPath).AsTask();
     }
 
     public Task SetTilt(double tilt)
     {
         return _jsObjectRef.JSRuntime.InvokeVoidAsync(
-            "blazorHerePlatform.objectManager.setMapLookAt",
+            JsInteropIdentifiers.SetMapLookAt,
             Guid.ToString(), new { tilt }).AsTask();
     }
 
     public async Task<double> GetTilt()
     {
         var data = await _jsObjectRef.JSRuntime.InvokeAsync<LookAtData>(
-            "blazorHerePlatform.objectManager.getMapLookAt",
+            JsInteropIdentifiers.GetMapLookAt,
             Guid.ToString());
         return data.Tilt;
     }
@@ -187,14 +187,14 @@ public class Map : EventEntityBase, IJsObjectRef, IAsyncDisposable
     public Task SetHeading(double heading)
     {
         return _jsObjectRef.JSRuntime.InvokeVoidAsync(
-            "blazorHerePlatform.objectManager.setMapLookAt",
+            JsInteropIdentifiers.SetMapLookAt,
             Guid.ToString(), new { heading }).AsTask();
     }
 
     public async Task<double> GetHeading()
     {
         var data = await _jsObjectRef.JSRuntime.InvokeAsync<LookAtData>(
-            "blazorHerePlatform.objectManager.getMapLookAt",
+            JsInteropIdentifiers.GetMapLookAt,
             Guid.ToString());
         return data.Heading;
     }
@@ -234,7 +234,7 @@ public class Map : EventEntityBase, IJsObjectRef, IAsyncDisposable
     public Task Resize()
     {
         return _jsObjectRef.JSRuntime.InvokeVoidAsync(
-            "blazorHerePlatform.objectManager.resizeMap", Guid.ToString()).AsTask();
+            JsInteropIdentifiers.ResizeMap, Guid.ToString()).AsTask();
     }
 
     /// <summary>
@@ -243,7 +243,7 @@ public class Map : EventEntityBase, IJsObjectRef, IAsyncDisposable
     public Task EnableBehavior(BehaviorFeature features)
     {
         return _jsObjectRef.JSRuntime.InvokeVoidAsync(
-            "blazorHerePlatform.objectManager.setBehaviorFeatures",
+            JsInteropIdentifiers.SetBehaviorFeatures,
             Guid.ToString(), (int)features, true).AsTask();
     }
 
@@ -253,7 +253,7 @@ public class Map : EventEntityBase, IJsObjectRef, IAsyncDisposable
     public Task DisableBehavior(BehaviorFeature features)
     {
         return _jsObjectRef.JSRuntime.InvokeVoidAsync(
-            "blazorHerePlatform.objectManager.setBehaviorFeatures",
+            JsInteropIdentifiers.SetBehaviorFeatures,
             Guid.ToString(), (int)features, false).AsTask();
     }
 
@@ -263,7 +263,7 @@ public class Map : EventEntityBase, IJsObjectRef, IAsyncDisposable
     public Task<string> CaptureAsync()
     {
         return _jsObjectRef.JSRuntime.InvokeAsync<string>(
-            "blazorHerePlatform.objectManager.captureMap",
+            JsInteropIdentifiers.CaptureMap,
             Guid.ToString()).AsTask();
     }
 
@@ -273,7 +273,7 @@ public class Map : EventEntityBase, IJsObjectRef, IAsyncDisposable
     public Task SetViewportPadding(int top, int right, int bottom, int left)
     {
         return _jsObjectRef.JSRuntime.InvokeVoidAsync(
-            "blazorHerePlatform.objectManager.setViewportPadding",
+            JsInteropIdentifiers.SetViewportPadding,
             Guid.ToString(), top, right, bottom, left).AsTask();
     }
 
@@ -285,7 +285,7 @@ public class Map : EventEntityBase, IJsObjectRef, IAsyncDisposable
     public Task ZoomToBoundsAsync(List<LatLngLiteral> points, bool animate = true)
     {
         return _jsObjectRef.JSRuntime.InvokeVoidAsync(
-            "blazorHerePlatform.objectManager.zoomToBounds",
+            JsInteropIdentifiers.ZoomToBounds,
             Guid.ToString(), points, animate, null).AsTask();
     }
 
@@ -295,7 +295,7 @@ public class Map : EventEntityBase, IJsObjectRef, IAsyncDisposable
     public Task<string> ToGeoJsonAsync()
     {
         return _jsObjectRef.JSRuntime.InvokeAsync<string>(
-            "blazorHerePlatform.objectManager.exportMapGeoJson",
+            JsInteropIdentifiers.ExportMapGeoJson,
             Guid.ToString()).AsTask();
     }
 
@@ -305,7 +305,7 @@ public class Map : EventEntityBase, IJsObjectRef, IAsyncDisposable
     public Task SetMinZoom(double minZoom)
     {
         return _jsObjectRef.JSRuntime.InvokeVoidAsync(
-            "blazorHerePlatform.objectManager.setMinZoom",
+            JsInteropIdentifiers.SetMinZoom,
             Guid.ToString(), minZoom).AsTask();
     }
 
@@ -315,7 +315,7 @@ public class Map : EventEntityBase, IJsObjectRef, IAsyncDisposable
     public Task SetMaxZoom(double maxZoom)
     {
         return _jsObjectRef.JSRuntime.InvokeVoidAsync(
-            "blazorHerePlatform.objectManager.setMaxZoom",
+            JsInteropIdentifiers.SetMaxZoom,
             Guid.ToString(), maxZoom).AsTask();
     }
 
@@ -325,7 +325,7 @@ public class Map : EventEntityBase, IJsObjectRef, IAsyncDisposable
     public Task<double> GetMinZoom()
     {
         return _jsObjectRef.JSRuntime.InvokeAsync<double>(
-            "blazorHerePlatform.objectManager.getMinZoom",
+            JsInteropIdentifiers.GetMinZoom,
             Guid.ToString()).AsTask();
     }
 
@@ -335,7 +335,7 @@ public class Map : EventEntityBase, IJsObjectRef, IAsyncDisposable
     public Task<double> GetMaxZoom()
     {
         return _jsObjectRef.JSRuntime.InvokeAsync<double>(
-            "blazorHerePlatform.objectManager.getMaxZoom",
+            JsInteropIdentifiers.GetMaxZoom,
             Guid.ToString()).AsTask();
     }
 
@@ -345,7 +345,7 @@ public class Map : EventEntityBase, IJsObjectRef, IAsyncDisposable
     public Task AddLayerAsync(string layerPath)
     {
         return _jsObjectRef.JSRuntime.InvokeVoidAsync(
-            "blazorHerePlatform.objectManager.addOverlayLayer",
+            JsInteropIdentifiers.AddOverlayLayer,
             Guid.ToString(), layerPath).AsTask();
     }
 
@@ -355,7 +355,7 @@ public class Map : EventEntityBase, IJsObjectRef, IAsyncDisposable
     public Task RemoveLayerAsync(string layerPath)
     {
         return _jsObjectRef.JSRuntime.InvokeVoidAsync(
-            "blazorHerePlatform.objectManager.removeOverlayLayer",
+            JsInteropIdentifiers.RemoveOverlayLayer,
             Guid.ToString(), layerPath).AsTask();
     }
 
@@ -366,7 +366,7 @@ public class Map : EventEntityBase, IJsObjectRef, IAsyncDisposable
         try
         {
             await _jsObjectRef.JSRuntime.InvokeAsync<object>(
-                "blazorHerePlatform.objectManager.disposeMap", Guid.ToString());
+                JsInteropIdentifiers.DisposeMap, Guid.ToString());
         }
         catch (JSDisconnectedException) { /* Expected during circuit disconnect */ }
         catch (InvalidOperationException) { /* Expected: JS runtime may be unavailable */ }

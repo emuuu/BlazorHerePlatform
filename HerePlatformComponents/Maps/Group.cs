@@ -41,7 +41,7 @@ public class Group : ListableEntityBase<GroupOptions>
     {
         var guids = mapObjects.Select(o => o.Guid.ToString()).ToArray();
         return _jsObjectRef.JSRuntime.InvokeVoidAsync(
-            "blazorHerePlatform.objectManager.groupAddObjects",
+            JsInteropIdentifiers.GroupAddObjects,
             _jsObjectRef.Guid.ToString(), guids).AsTask();
     }
 
@@ -52,7 +52,7 @@ public class Group : ListableEntityBase<GroupOptions>
     {
         var guids = mapObjects.Select(o => o.Guid.ToString()).ToArray();
         return _jsObjectRef.JSRuntime.InvokeVoidAsync(
-            "blazorHerePlatform.objectManager.groupRemoveObjects",
+            JsInteropIdentifiers.GroupRemoveObjects,
             _jsObjectRef.Guid.ToString(), guids).AsTask();
     }
 
