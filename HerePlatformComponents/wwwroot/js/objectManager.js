@@ -1396,46 +1396,40 @@ window.blazorHerePlatform.objectManager = function () {
             if (draggable && map && !map['_blzDragWired_' + id]) {
                 map['_blzDragWired_' + id] = true;
                 map.addEventListener('dragstart', function (evt) {
-                    const target = evt.target;
+                    if (evt.target !== marker) return;
                     const pointer = evt.currentPointer;
-                    if (target instanceof H.map.Marker) {
-                        const behavior = map['_blzBehavior'];
-                        if (behavior) {
-                            behavior.disable(H.mapevents.Behavior.Feature.PANNING);
-                        }
-                        var targetPosition = map.geoToScreen(target.getGeometry());
-                        target['offset'] = new H.math.Point(
-                            pointer.viewportX - targetPosition.x,
-                            pointer.viewportY - targetPosition.y
-                        );
-                        const data = extractDragEventData(evt, map);
-                        callbackRef.invokeMethodAsync('OnObjectDragEvent', 'marker', id, 'dragstart', data);
+                    const behavior = map['_blzBehavior'];
+                    if (behavior) {
+                        behavior.disable(H.mapevents.Behavior.Feature.PANNING);
                     }
+                    var targetPosition = map.geoToScreen(marker.getGeometry());
+                    marker['offset'] = new H.math.Point(
+                        pointer.viewportX - targetPosition.x,
+                        pointer.viewportY - targetPosition.y
+                    );
+                    const data = extractDragEventData(evt, map);
+                    callbackRef.invokeMethodAsync('OnObjectDragEvent', 'marker', id, 'dragstart', data);
                 }, false);
 
                 map.addEventListener('drag', function (evt) {
-                    const target = evt.target;
+                    if (evt.target !== marker) return;
                     const pointer = evt.currentPointer;
-                    if (target instanceof H.map.Marker) {
-                        target.setGeometry(map.screenToGeo(
-                            pointer.viewportX - target['offset'].x,
-                            pointer.viewportY - target['offset'].y
-                        ));
-                        const data = extractDragEventData(evt, map);
-                        callbackRef.invokeMethodAsync('OnObjectDragEvent', 'marker', id, 'drag', data);
-                    }
+                    marker.setGeometry(map.screenToGeo(
+                        pointer.viewportX - marker['offset'].x,
+                        pointer.viewportY - marker['offset'].y
+                    ));
+                    const data = extractDragEventData(evt, map);
+                    callbackRef.invokeMethodAsync('OnObjectDragEvent', 'marker', id, 'drag', data);
                 }, false);
 
                 map.addEventListener('dragend', function (evt) {
-                    const target = evt.target;
-                    if (target instanceof H.map.Marker) {
-                        const behavior = map['_blzBehavior'];
-                        if (behavior) {
-                            behavior.enable(H.mapevents.Behavior.Feature.PANNING);
-                        }
-                        const data = extractDragEventData(evt, map);
-                        callbackRef.invokeMethodAsync('OnObjectDragEvent', 'marker', id, 'dragend', data);
+                    if (evt.target !== marker) return;
+                    const behavior = map['_blzBehavior'];
+                    if (behavior) {
+                        behavior.enable(H.mapevents.Behavior.Feature.PANNING);
                     }
+                    const data = extractDragEventData(evt, map);
+                    callbackRef.invokeMethodAsync('OnObjectDragEvent', 'marker', id, 'dragend', data);
                 }, false);
             }
 
@@ -2818,10 +2812,9 @@ window.blazorHerePlatform.objectManager = function () {
             try {
                 var url = 'https://data.traffic.hereapi.com/v7/incidents' +
                     '?in=bbox:' + west + ',' + south + ',' + east + ',' + north +
-                    '&locationReferencing=shape' +
-                    '&apiKey=' + encodeURIComponent(hereApiKey);
+                    '&locationReferencing=shape';
 
-                var resp = await fetch(url);
+                var resp = await fetch(url, { headers: { 'apiKey': hereApiKey } });
                 if (!resp.ok) {
                     console.warn('[BlazorHerePlatform] Traffic API v7 incidents error:', resp.status);
                     return { incidents: [] };
@@ -2866,10 +2859,9 @@ window.blazorHerePlatform.objectManager = function () {
             try {
                 var url = 'https://data.traffic.hereapi.com/v7/flow' +
                     '?in=bbox:' + west + ',' + south + ',' + east + ',' + north +
-                    '&locationReferencing=shape' +
-                    '&apiKey=' + encodeURIComponent(hereApiKey);
+                    '&locationReferencing=shape';
 
-                var resp = await fetch(url);
+                var resp = await fetch(url, { headers: { 'apiKey': hereApiKey } });
                 if (!resp.ok) return { items: [] };
                 var data = await resp.json();
                 return { items: data.results || [] };
