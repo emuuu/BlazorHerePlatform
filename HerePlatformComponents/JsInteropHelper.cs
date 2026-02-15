@@ -20,12 +20,40 @@ internal static partial class Helper
         await jsRuntime.InvokeVoidAsync(identifier, jsFriendlyArgs);
     }
 
-    internal static async Task<TRes?> MyInvokeAsync<TRes>(
+    internal static async Task MyInvokeAsync(
+        this IJSRuntime jsRuntime,
+        string identifier,
+        IList<IDisposable>? disposables,
+        params object?[] args)
+    {
+        var jsFriendlyArgs = MakeArgJsFriendly(jsRuntime, args, disposables);
+        await jsRuntime.InvokeVoidAsync(identifier, jsFriendlyArgs);
+    }
+
+    internal static Task<TRes?> MyInvokeAsync<TRes>(
+        this IJSRuntime jsRuntime,
+        string identifier,
+        IList<IDisposable>? disposables,
+        params object?[] args)
+    {
+        return jsRuntime.MyInvokeAsyncCore<TRes>(identifier, args, disposables);
+    }
+
+    internal static Task<TRes?> MyInvokeAsync<TRes>(
         this IJSRuntime jsRuntime,
         string identifier,
         params object?[] args)
     {
-        var jsFriendlyArgs = MakeArgJsFriendly(jsRuntime, args);
+        return jsRuntime.MyInvokeAsyncCore<TRes>(identifier, args, null);
+    }
+
+    private static async Task<TRes?> MyInvokeAsyncCore<TRes>(
+        this IJSRuntime jsRuntime,
+        string identifier,
+        object?[] args,
+        IList<IDisposable>? disposables)
+    {
+        var jsFriendlyArgs = MakeArgJsFriendly(jsRuntime, args, disposables);
 
         if (typeof(IJsObjectRef).IsAssignableFrom(typeof(TRes)))
         {
@@ -88,6 +116,17 @@ internal static partial class Helper
         params object[] args)
     {
         var jsFriendlyArgs = MakeArgJsFriendly(jsRuntime, args);
+
+        return await jsRuntime.InvokeAsync<object>(identifier, jsFriendlyArgs);
+    }
+
+    internal static async Task<object> MyAddListenerAsync(
+        this IJSRuntime jsRuntime,
+        string identifier,
+        IList<IDisposable>? disposables,
+        params object[] args)
+    {
+        var jsFriendlyArgs = MakeArgJsFriendly(jsRuntime, args, disposables);
 
         return await jsRuntime.InvokeAsync<object>(identifier, jsFriendlyArgs);
     }
@@ -182,12 +221,12 @@ internal static partial class Helper
         }
     }
 
-    // Note: DotNetObjectReference instances created here for Action/Func parameters
-    // are not tracked for disposal. Their lifetime is tied to the JS event listener
-    // or callback they wrap. For v0.1 this is acceptable — the leak is proportional
-    // to the number of imperative AddListener calls. A future version should track
-    // these references on the parent JsObjectRef for cleanup in DisposeAsync.
     private static IEnumerable<object?> MakeArgJsFriendly(IJSRuntime jsRuntime, IEnumerable<object?> args)
+    {
+        return MakeArgJsFriendly(jsRuntime, args, null);
+    }
+
+    private static IEnumerable<object?> MakeArgJsFriendly(IJSRuntime jsRuntime, IEnumerable<object?> args, IList<IDisposable>? disposables)
     {
         var jsFriendlyArgs = args
             .Select(arg =>
@@ -218,7 +257,11 @@ internal static partial class Helper
                     case bool _:
                         return arg;
                     case Action action:
-                        return DotNetObjectReference.Create(new JsCallableAction(jsRuntime, action));
+                        {
+                            var dotNetRef = DotNetObjectReference.Create(new JsCallableAction(jsRuntime, action));
+                            disposables?.Add(dotNetRef);
+                            return dotNetRef;
+                        }
                     default:
                         {
                             if (argType.IsGenericType)
@@ -227,13 +270,17 @@ internal static partial class Helper
                                 if (typeDefinition == typeof(Action<>))
                                 {
                                     var genericArguments = argType.GetGenericArguments();
-                                    return DotNetObjectReference.Create(new JsCallableAction(jsRuntime, (Delegate)arg, genericArguments));
+                                    var dotNetRef = DotNetObjectReference.Create(new JsCallableAction(jsRuntime, (Delegate)arg, genericArguments));
+                                    disposables?.Add(dotNetRef);
+                                    return dotNetRef;
                                 }
 
                                 if (typeDefinition == typeof(Func<,>))
                                 {
                                     var genericArguments = argType.GetGenericArguments();
-                                    return DotNetObjectReference.Create(new JsCallableFunc((Delegate)arg, genericArguments));
+                                    var dotNetRef = DotNetObjectReference.Create(new JsCallableFunc((Delegate)arg, genericArguments));
+                                    disposables?.Add(dotNetRef);
+                                    return dotNetRef;
                                 }
                             }
 
@@ -241,7 +288,11 @@ internal static partial class Helper
                             {
                                 case JsCallableAction _:
                                 case JsCallableFunc _:
-                                    return DotNetObjectReference.Create(arg);
+                                    {
+                                        var dotNetRef = DotNetObjectReference.Create(arg);
+                                        disposables?.Add(dotNetRef);
+                                        return dotNetRef;
+                                    }
                                 case IJsObjectRef jsObjectRef:
                                     {
                                         var guid = jsObjectRef.Guid;

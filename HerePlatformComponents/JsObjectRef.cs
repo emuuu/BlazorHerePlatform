@@ -25,6 +25,7 @@ public class JsObjectRef : IJsObjectRef
 {
     private readonly Guid _guid;
     private readonly IJSRuntime _jsRuntime;
+    internal List<IDisposable>? _trackedDisposables;
 
     public IJSRuntime JSRuntime => _jsRuntime;
     public Guid Guid => _guid;
@@ -95,6 +96,13 @@ public class JsObjectRef : IJsObjectRef
 
     public ValueTask<object> DisposeAsync()
     {
+        if (_trackedDisposables != null)
+        {
+            foreach (var d in _trackedDisposables)
+                d.Dispose();
+            _trackedDisposables = null;
+        }
+
         return _jsRuntime.InvokeAsync<object>(
             "blazorHerePlatform.objectManager.disposeObject",
             _guid.ToString()
@@ -111,8 +119,10 @@ public class JsObjectRef : IJsObjectRef
 
     public async Task InvokeAsync(string functionName, params object?[] args)
     {
+        _trackedDisposables ??= new List<IDisposable>();
         await _jsRuntime.MyInvokeAsync(
             "blazorHerePlatform.objectManager.invoke",
+            _trackedDisposables,
             new object?[] { _guid.ToString(), functionName }
                 .Concat(args).ToArray()
         );
@@ -129,8 +139,10 @@ public class JsObjectRef : IJsObjectRef
 
     public Task AddMultipleListenersAsync(string eventName, Dictionary<Guid, object> dictArgs)
     {
+        _trackedDisposables ??= new List<IDisposable>();
         return _jsRuntime.MyAddListenerAsync(
             "blazorHerePlatform.objectManager.addMultipleListeners",
+            _trackedDisposables,
             new object[] { dictArgs.Select(e => e.Key.ToString()).ToList(), eventName }
                 .Concat(dictArgs.Values).ToArray()
         );
@@ -138,8 +150,10 @@ public class JsObjectRef : IJsObjectRef
 
     public Task<T> InvokeAsync<T>(string functionName, params object?[] args)
     {
+        _trackedDisposables ??= new List<IDisposable>();
         return _jsRuntime.MyInvokeAsync<T>(
             "blazorHerePlatform.objectManager.invoke",
+            _trackedDisposables,
             new object?[] { _guid.ToString(), functionName }
                 .Concat(args).ToArray()
         )!;
