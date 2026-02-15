@@ -10,6 +10,7 @@ A comprehensive Blazor component library for the [HERE Maps JS API](https://deve
 [![NuGet Downloads](https://img.shields.io/nuget/dt/BlazorHerePlatform.svg)](https://www.nuget.org/packages/BlazorHerePlatform)
 [![CI](https://github.com/emuuu/BlazorHerePlatform/actions/workflows/ci.yml/badge.svg)](https://github.com/emuuu/BlazorHerePlatform/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Docs](https://img.shields.io/badge/Docs-GitHub%20Pages-blue)](https://emuuu.github.io/BlazorHerePlatform/)
 
 **Feature highlights:**
 
