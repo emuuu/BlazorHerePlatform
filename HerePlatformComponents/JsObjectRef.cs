@@ -194,7 +194,9 @@ public class JsObjectRef : IJsObjectRef
                 .Concat(args).ToArray()
         );
 
-        return new JsObjectRef(_jsRuntime, new Guid(guid!));
+        if (!Guid.TryParse(guid, out var parsed))
+            throw new InvalidOperationException($"JS returned invalid GUID: '{guid}'");
+        return new JsObjectRef(_jsRuntime, parsed);
     }
 
     public Task<T> GetValue<T>(string propertyName)
@@ -212,7 +214,9 @@ public class JsObjectRef : IJsObjectRef
             _guid.ToString(),
             propertyName);
 
-        return new JsObjectRef(_jsRuntime, new Guid(guid!));
+        if (!Guid.TryParse(guid, out var parsed))
+            throw new InvalidOperationException($"JS returned invalid GUID: '{guid}'");
+        return new JsObjectRef(_jsRuntime, parsed);
     }
 
     public override bool Equals(object? obj)
