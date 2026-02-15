@@ -121,4 +121,53 @@ public class OneOfConverterRoundtripTests
         Assert.That(doc.RootElement.TryGetProperty("dotnetTypeName", out var prop), Is.True);
         Assert.That(prop.GetString(), Is.EqualTo(typeof(Alpha).FullName));
     }
+
+    // --- Edge cases ---
+
+    [Test]
+    public void OneOf2_Read_WithUnknownDotnetTypeName_Throws()
+    {
+        var json = """{"name":"test","dotnetTypeName":"NonExistent.Type"}""";
+
+        Assert.Throws<JsonException>(() =>
+            JsonSerializer.Deserialize<OneOf<Alpha, Beta>>(json, Options));
+    }
+
+    [Test]
+    public void OneOf2_Read_WithInvalidIndex_Throws()
+    {
+        var json = """{"$index":5,"name":"bad"}""";
+
+        Assert.Throws<JsonException>(() =>
+            JsonSerializer.Deserialize<OneOf<Alpha, Beta>>(json, Options));
+    }
+
+    [Test]
+    public void OneOf2_Read_WithNegativeIndex_Throws()
+    {
+        var json = """{"$index":-1,"name":"bad"}""";
+
+        Assert.Throws<JsonException>(() =>
+            JsonSerializer.Deserialize<OneOf<Alpha, Beta>>(json, Options));
+    }
+
+    [Test]
+    public void OneOf3_Read_WithoutIndexOrTypeName_Throws()
+    {
+        var json = """{"flag":true}""";
+
+        Assert.Throws<JsonException>(() =>
+            JsonSerializer.Deserialize<OneOf<Alpha, Beta, Gamma>>(json, Options));
+    }
+
+    [Test]
+    public void OneOf3_Read_WithIndex_Deserializes()
+    {
+        var json = """{"$index":2,"flag":true}""";
+
+        var result = JsonSerializer.Deserialize<OneOf<Alpha, Beta, Gamma>>(json, Options);
+
+        Assert.That(result.IsT2, Is.True);
+        Assert.That(result.AsT2.Flag, Is.True);
+    }
 }

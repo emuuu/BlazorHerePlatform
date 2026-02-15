@@ -86,6 +86,9 @@ internal static partial class Helper
                         var resolvedType = ResolveOneOfType(typeToken, oneOfTypeArgs);
                         if (resolvedType is not null)
                             result = DeSerializeObject(someText, resolvedType);
+                        else
+                            throw new InvalidOperationException(
+                                $"OneOf type '{typeToken}' could not be resolved to any of [{string.Join(", ", oneOfTypeArgs.Select(t => t.FullName))}].");
                     }
                     else
                     {
@@ -94,10 +97,12 @@ internal static partial class Helper
                 }
                 catch (JsonException)
                 {
+                    // Not valid JSON — treat the raw string as the result value.
                     result = someText;
                 }
                 catch (KeyNotFoundException)
                 {
+                    // No dotnetTypeName property — treat the raw string as the result value.
                     result = someText;
                 }
             }
