@@ -3422,7 +3422,7 @@
         "description": ""
       },
       {
-        "name": "SetIcon(object icon)",
+        "name": "SetIcon(OneOf\u003CIcon, string\u003E icon)",
         "kind": "Method",
         "type": "Task",
         "description": ""
