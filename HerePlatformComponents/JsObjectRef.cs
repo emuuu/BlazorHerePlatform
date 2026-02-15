@@ -161,8 +161,10 @@ public class JsObjectRef : IJsObjectRef
 
     public Task<OneOf<T, U>> InvokeAsync<T, U>(string functionName, params object[] args)
     {
+        _trackedDisposables ??= new List<IDisposable>();
         return _jsRuntime.MyInvokeAsync<T, U>(
             JsInteropIdentifiers.Invoke,
+            _trackedDisposables,
             new object[] { _guid.ToString(), functionName }
                 .Concat(args).ToArray()
         );
@@ -170,8 +172,10 @@ public class JsObjectRef : IJsObjectRef
 
     public Task<OneOf<T, U, V>> InvokeAsync<T, U, V>(string functionName, params object[] args)
     {
+        _trackedDisposables ??= new List<IDisposable>();
         return _jsRuntime.MyInvokeAsync<T, U, V>(
             JsInteropIdentifiers.Invoke,
+            _trackedDisposables,
             new object[] { _guid.ToString(), functionName }
                 .Concat(args).ToArray()
         );

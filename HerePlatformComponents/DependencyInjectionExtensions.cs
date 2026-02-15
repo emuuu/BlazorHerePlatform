@@ -27,9 +27,12 @@ public static class DependencyInjectionExtensions
 
     /// <summary>
     /// Registers BlazorHerePlatform services with a custom key service instance.
-    /// Note: The provided instance is shared across all scopes (circuits).
-    /// State like <see cref="IBlazorHerePlatformKeyService.IsApiInitialized"/>
-    /// will be shared across users in Blazor Server.
+    /// <para>
+    /// <strong>Warning (Blazor Server):</strong> The provided instance is shared across
+    /// all scopes (circuits). Mutable state like <see cref="IBlazorHerePlatformKeyService.IsApiInitialized"/>
+    /// will leak between users. Prefer the <c>AddBlazorHerePlatform(string apiKey)</c> or
+    /// <c>AddBlazorHerePlatform(HereApiLoadOptions)</c> overloads for per-circuit isolation.
+    /// </para>
     /// </summary>
     public static IServiceCollection AddBlazorHerePlatform(this IServiceCollection services, IBlazorHerePlatformKeyService keyService)
     {

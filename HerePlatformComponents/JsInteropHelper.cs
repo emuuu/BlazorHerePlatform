@@ -131,12 +131,30 @@ internal static partial class Helper
         return await jsRuntime.InvokeAsync<object>(identifier, jsFriendlyArgs);
     }
 
-    internal static async Task<OneOf<T, U>> MyInvokeAsync<T, U>(
+    internal static Task<OneOf<T, U>> MyInvokeAsync<T, U>(
+        this IJSRuntime jsRuntime,
+        string identifier,
+        IList<IDisposable>? disposables,
+        params object[] args)
+    {
+        return jsRuntime.MyInvokeAsyncOneOf<T, U>(identifier, disposables, args);
+    }
+
+    internal static Task<OneOf<T, U>> MyInvokeAsync<T, U>(
         this IJSRuntime jsRuntime,
         string identifier,
         params object[] args)
     {
-        var resultObject = await jsRuntime.MyInvokeAsync<object>(identifier, args);
+        return jsRuntime.MyInvokeAsyncOneOf<T, U>(identifier, null, args);
+    }
+
+    private static async Task<OneOf<T, U>> MyInvokeAsyncOneOf<T, U>(
+        this IJSRuntime jsRuntime,
+        string identifier,
+        IList<IDisposable>? disposables,
+        object[] args)
+    {
+        var resultObject = await jsRuntime.MyInvokeAsync<object>(identifier, disposables, args);
         object? result = null;
 
         if (resultObject is JsonElement jsonElement)
@@ -187,12 +205,30 @@ internal static partial class Helper
         }
     }
 
-    internal static async Task<OneOf<T, U, V>> MyInvokeAsync<T, U, V>(
+    internal static Task<OneOf<T, U, V>> MyInvokeAsync<T, U, V>(
+        this IJSRuntime jsRuntime,
+        string identifier,
+        IList<IDisposable>? disposables,
+        params object[] args)
+    {
+        return jsRuntime.MyInvokeAsyncOneOf<T, U, V>(identifier, disposables, args);
+    }
+
+    internal static Task<OneOf<T, U, V>> MyInvokeAsync<T, U, V>(
         this IJSRuntime jsRuntime,
         string identifier,
         params object[] args)
     {
-        var resultObject = await jsRuntime.MyInvokeAsync<object>(identifier, args);
+        return jsRuntime.MyInvokeAsyncOneOf<T, U, V>(identifier, null, args);
+    }
+
+    private static async Task<OneOf<T, U, V>> MyInvokeAsyncOneOf<T, U, V>(
+        this IJSRuntime jsRuntime,
+        string identifier,
+        IList<IDisposable>? disposables,
+        object[] args)
+    {
+        var resultObject = await jsRuntime.MyInvokeAsync<object>(identifier, disposables, args);
         object? result = null;
 
         if (resultObject is JsonElement jsonElement)
