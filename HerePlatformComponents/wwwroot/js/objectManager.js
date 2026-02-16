@@ -2172,11 +2172,12 @@ window.blazorHerePlatform.objectManager = function () {
                 }
             }
 
-            // Tile auth probe: HEAD request against tile endpoint to detect invalid API key.
-            // HERE SDK does not expose tile-load errors, so this is the only way to detect them.
+            // API key auth probe: lightweight geocode request to detect invalid API key.
+            // Uses the REST geocode endpoint because it returns proper CORS headers
+            // even on 401/403 (the vector tile endpoint does not).
             if (hereApiKey) {
-                fetch('https://vector.hereapi.com/v2/vectortiles/base/mc/1/0/0/omv?apiKey='
-                      + encodeURIComponent(hereApiKey), { method: 'HEAD' })
+                fetch('https://geocode.search.hereapi.com/v1/geocode?q=test&limit=1&apiKey='
+                      + encodeURIComponent(hereApiKey))
                     .then(function (resp) {
                         if (resp.status === 401 || resp.status === 403) {
                             console.error('[BlazorHerePlatform] HERE API auth failed. Tiles will not load. HTTP ' + resp.status);
