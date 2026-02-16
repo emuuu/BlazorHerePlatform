@@ -20,18 +20,36 @@ public class PublicTransitService : IPublicTransitService
 
     public async Task<TransitDeparturesResult> GetDeparturesAsync(LatLngLiteral position)
     {
-        var result = await _js.InvokeAsync<TransitDeparturesResult>(
-            JsInteropIdentifiers.GetTransitDepartures,
-            position);
+        TransitDeparturesResult? result;
+        try
+        {
+            result = await _js.InvokeAsync<TransitDeparturesResult>(
+                JsInteropIdentifiers.GetTransitDepartures,
+                position);
+        }
+        catch (JSException ex)
+        {
+            JsAuthErrorHelper.ThrowIfAuthError(ex, "transit-departures");
+            throw;
+        }
 
         return result ?? new TransitDeparturesResult();
     }
 
     public async Task<TransitStationsResult> SearchStationsAsync(LatLngLiteral position, double radiusMeters = 500)
     {
-        var result = await _js.InvokeAsync<TransitStationsResult>(
-            JsInteropIdentifiers.SearchTransitStations,
-            position, radiusMeters);
+        TransitStationsResult? result;
+        try
+        {
+            result = await _js.InvokeAsync<TransitStationsResult>(
+                JsInteropIdentifiers.SearchTransitStations,
+                position, radiusMeters);
+        }
+        catch (JSException ex)
+        {
+            JsAuthErrorHelper.ThrowIfAuthError(ex, "transit-stations");
+            throw;
+        }
 
         return result ?? new TransitStationsResult();
     }

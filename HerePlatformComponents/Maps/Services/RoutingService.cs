@@ -22,11 +22,20 @@ public class RoutingService : IRoutingService
 
     public async Task<RoutingResult> CalculateRouteAsync(RoutingRequest request)
     {
-        using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(120));
-        var result = await _js.InvokeAsync<RoutingResult>(
-            JsInteropIdentifiers.CalculateRoute,
-            cts.Token,
-            request);
+        RoutingResult? result;
+        try
+        {
+            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(120));
+            result = await _js.InvokeAsync<RoutingResult>(
+                JsInteropIdentifiers.CalculateRoute,
+                cts.Token,
+                request);
+        }
+        catch (JSException ex)
+        {
+            JsAuthErrorHelper.ThrowIfAuthError(ex, "routing");
+            throw;
+        }
 
         // Decode polylines
         if (result?.Routes != null)

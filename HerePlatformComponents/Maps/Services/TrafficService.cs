@@ -19,18 +19,36 @@ public class TrafficService : ITrafficService
 
     public async Task<TrafficIncidentsResult> GetTrafficIncidentsAsync(double north, double south, double east, double west)
     {
-        var result = await _js.InvokeAsync<TrafficIncidentsResult>(
-            JsInteropIdentifiers.GetTrafficIncidents,
-            north, south, east, west);
+        TrafficIncidentsResult? result;
+        try
+        {
+            result = await _js.InvokeAsync<TrafficIncidentsResult>(
+                JsInteropIdentifiers.GetTrafficIncidents,
+                north, south, east, west);
+        }
+        catch (JSException ex)
+        {
+            JsAuthErrorHelper.ThrowIfAuthError(ex, "traffic-incidents");
+            throw;
+        }
 
         return result ?? new TrafficIncidentsResult();
     }
 
     public async Task<TrafficFlowResult> GetTrafficFlowAsync(double north, double south, double east, double west)
     {
-        var result = await _js.InvokeAsync<TrafficFlowResult>(
-            JsInteropIdentifiers.GetTrafficFlow,
-            north, south, east, west);
+        TrafficFlowResult? result;
+        try
+        {
+            result = await _js.InvokeAsync<TrafficFlowResult>(
+                JsInteropIdentifiers.GetTrafficFlow,
+                north, south, east, west);
+        }
+        catch (JSException ex)
+        {
+            JsAuthErrorHelper.ThrowIfAuthError(ex, "traffic-flow");
+            throw;
+        }
 
         return result ?? new TrafficFlowResult();
     }

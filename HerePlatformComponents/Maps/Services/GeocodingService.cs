@@ -20,18 +20,36 @@ public class GeocodingService : IGeocodingService
 
     public async Task<GeocodeResult> GeocodeAsync(string query, GeocodeOptions? options = null)
     {
-        var result = await _js.InvokeAsync<GeocodeResult>(
-            JsInteropIdentifiers.Geocode,
-            query, options ?? new GeocodeOptions());
+        GeocodeResult? result;
+        try
+        {
+            result = await _js.InvokeAsync<GeocodeResult>(
+                JsInteropIdentifiers.Geocode,
+                query, options ?? new GeocodeOptions());
+        }
+        catch (JSException ex)
+        {
+            JsAuthErrorHelper.ThrowIfAuthError(ex, "geocoding");
+            throw;
+        }
 
         return result ?? new GeocodeResult();
     }
 
     public async Task<GeocodeResult> ReverseGeocodeAsync(LatLngLiteral position, GeocodeOptions? options = null)
     {
-        var result = await _js.InvokeAsync<GeocodeResult>(
-            JsInteropIdentifiers.ReverseGeocode,
-            position, options ?? new GeocodeOptions());
+        GeocodeResult? result;
+        try
+        {
+            result = await _js.InvokeAsync<GeocodeResult>(
+                JsInteropIdentifiers.ReverseGeocode,
+                position, options ?? new GeocodeOptions());
+        }
+        catch (JSException ex)
+        {
+            JsAuthErrorHelper.ThrowIfAuthError(ex, "reverse-geocoding");
+            throw;
+        }
 
         return result ?? new GeocodeResult();
     }

@@ -1,8 +1,10 @@
 using HerePlatform.Core.Coordinates;
+using HerePlatform.Core.Exceptions;
 using HerePlatform.Core.Services;
 using HerePlatform.Core.Transit;
 using HerePlatformComponents.Maps;
 using HerePlatformComponents.Maps.Services;
+using Microsoft.JSInterop;
 
 namespace HerePlatformComponents.Tests.Services.Transit;
 
@@ -89,5 +91,33 @@ public class PublicTransitServiceTests : ServiceTestBase
         Assert.That(result.Stations[0].TransportTypes, Contains.Item("subway"));
         Assert.That(result.Stations[1].Name, Is.EqualTo("Invalidenpark"));
         Assert.That(result.Stations[1].TransportTypes, Has.Count.EqualTo(2));
+    }
+
+    [Test]
+    public void GetDeparturesAsync_AuthError_ThrowsHereApiAuthenticationException()
+    {
+        MockJsException<TransitDeparturesResult>(
+            "blazorHerePlatform.objectManager.getTransitDepartures",
+            new JSException("Error: HERE_AUTH_ERROR:transit-departures:HTTP 401"));
+        var service = new PublicTransitService(JsRuntime);
+
+        var ex = Assert.ThrowsAsync<HereApiAuthenticationException>(async () =>
+            await service.GetDeparturesAsync(new LatLngLiteral(52.5251, 13.3694)));
+
+        Assert.That(ex!.Service, Is.EqualTo("transit-departures"));
+    }
+
+    [Test]
+    public void SearchStationsAsync_AuthError_ThrowsHereApiAuthenticationException()
+    {
+        MockJsException<TransitStationsResult>(
+            "blazorHerePlatform.objectManager.searchTransitStations",
+            new JSException("Error: HERE_AUTH_ERROR:transit-stations:HTTP 401"));
+        var service = new PublicTransitService(JsRuntime);
+
+        var ex = Assert.ThrowsAsync<HereApiAuthenticationException>(async () =>
+            await service.SearchStationsAsync(new LatLngLiteral(52.5260, 13.3700)));
+
+        Assert.That(ex!.Service, Is.EqualTo("transit-stations"));
     }
 }

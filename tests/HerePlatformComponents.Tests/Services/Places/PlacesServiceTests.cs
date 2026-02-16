@@ -1,8 +1,10 @@
 using HerePlatform.Core.Coordinates;
+using HerePlatform.Core.Exceptions;
 using HerePlatform.Core.Places;
 using HerePlatform.Core.Services;
 using HerePlatformComponents.Maps;
 using HerePlatformComponents.Maps.Services;
+using Microsoft.JSInterop;
 
 namespace HerePlatformComponents.Tests.Services.Places;
 
@@ -132,5 +134,23 @@ public class PlacesServiceTests : ServiceTestBase
         Assert.That(place.Contacts, Has.Count.EqualTo(2));
         Assert.That(place.Contacts![0].Type, Is.EqualTo("phone"));
         Assert.That(place.Contacts[1].Type, Is.EqualTo("website"));
+    }
+
+    [Test]
+    public void DiscoverAsync_AuthError_ThrowsHereApiAuthenticationException()
+    {
+        MockJsException<PlacesResult>(
+            "blazorHerePlatform.objectManager.discoverPlaces",
+            new JSException("Error: HERE_AUTH_ERROR:discover-places:HTTP 401"));
+        var service = new PlacesService(JsRuntime);
+
+        var ex = Assert.ThrowsAsync<HereApiAuthenticationException>(async () =>
+            await service.DiscoverAsync(new PlacesRequest
+            {
+                Query = "restaurants",
+                At = new LatLngLiteral(52.52, 13.405)
+            }));
+
+        Assert.That(ex!.Service, Is.EqualTo("discover-places"));
     }
 }

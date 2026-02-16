@@ -1,9 +1,11 @@
 using HerePlatform.Core.Coordinates;
+using HerePlatform.Core.Exceptions;
 using HerePlatform.Core.Routing;
 using HerePlatform.Core.Services;
 using HerePlatformComponents.Maps;
 using HerePlatformComponents.Maps.Services;
 using HerePlatform.Core.Utilities;
+using Microsoft.JSInterop;
 
 namespace HerePlatformComponents.Tests.Services.Routing;
 
@@ -123,5 +125,23 @@ public class RoutingServiceTests : ServiceTestBase
 
         Assert.That(result, Is.Not.Null);
         Assert.That(result.Routes, Is.Null);
+    }
+
+    [Test]
+    public void CalculateRouteAsync_AuthError_ThrowsHereApiAuthenticationException()
+    {
+        MockJsException<RoutingResult>(
+            "blazorHerePlatform.objectManager.calculateRoute",
+            new JSException("Error: HERE_AUTH_ERROR:routing:HTTP 401"));
+        var service = new RoutingService(JsRuntime);
+
+        var ex = Assert.ThrowsAsync<HereApiAuthenticationException>(async () =>
+            await service.CalculateRouteAsync(new RoutingRequest
+            {
+                Origin = new LatLngLiteral(52.5200, 13.4050),
+                Destination = new LatLngLiteral(52.5220, 13.4070)
+            }));
+
+        Assert.That(ex!.Service, Is.EqualTo("routing"));
     }
 }

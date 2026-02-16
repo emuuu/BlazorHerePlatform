@@ -22,11 +22,20 @@ public class IsolineService : IIsolineService
 
     public async Task<IsolineResult> CalculateIsolineAsync(IsolineRequest request)
     {
-        using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(120));
-        var result = await _js.InvokeAsync<IsolineResult>(
-            JsInteropIdentifiers.CalculateIsoline,
-            cts.Token,
-            request);
+        IsolineResult? result;
+        try
+        {
+            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(120));
+            result = await _js.InvokeAsync<IsolineResult>(
+                JsInteropIdentifiers.CalculateIsoline,
+                cts.Token,
+                request);
+        }
+        catch (JSException ex)
+        {
+            JsAuthErrorHelper.ThrowIfAuthError(ex, "isoline");
+            throw;
+        }
 
         // Fallback: decode polylines in C# if JS decoding failed
         if (result?.Isolines != null)

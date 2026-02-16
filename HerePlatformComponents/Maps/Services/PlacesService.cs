@@ -21,33 +21,60 @@ public class PlacesService : IPlacesService
 
     public async Task<PlacesResult> DiscoverAsync(PlacesRequest request)
     {
-        using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(120));
-        var result = await _js.InvokeAsync<PlacesResult>(
-            JsInteropIdentifiers.DiscoverPlaces,
-            cts.Token,
-            request);
+        PlacesResult? result;
+        try
+        {
+            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(120));
+            result = await _js.InvokeAsync<PlacesResult>(
+                JsInteropIdentifiers.DiscoverPlaces,
+                cts.Token,
+                request);
+        }
+        catch (JSException ex)
+        {
+            JsAuthErrorHelper.ThrowIfAuthError(ex, "discover-places");
+            throw;
+        }
 
         return result ?? new PlacesResult();
     }
 
     public async Task<PlacesResult> BrowseAsync(PlacesRequest request)
     {
-        using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(120));
-        var result = await _js.InvokeAsync<PlacesResult>(
-            JsInteropIdentifiers.BrowsePlaces,
-            cts.Token,
-            request);
+        PlacesResult? result;
+        try
+        {
+            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(120));
+            result = await _js.InvokeAsync<PlacesResult>(
+                JsInteropIdentifiers.BrowsePlaces,
+                cts.Token,
+                request);
+        }
+        catch (JSException ex)
+        {
+            JsAuthErrorHelper.ThrowIfAuthError(ex, "browse-places");
+            throw;
+        }
 
         return result ?? new PlacesResult();
     }
 
     public async Task<PlacesResult> LookupAsync(PlacesRequest request)
     {
-        using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(120));
-        var result = await _js.InvokeAsync<PlacesResult>(
-            JsInteropIdentifiers.LookupPlace,
-            cts.Token,
-            request);
+        PlacesResult? result;
+        try
+        {
+            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(120));
+            result = await _js.InvokeAsync<PlacesResult>(
+                JsInteropIdentifiers.LookupPlace,
+                cts.Token,
+                request);
+        }
+        catch (JSException ex)
+        {
+            JsAuthErrorHelper.ThrowIfAuthError(ex, "lookup-place");
+            throw;
+        }
 
         return result ?? new PlacesResult();
     }

@@ -21,11 +21,20 @@ public class MatrixRoutingService : IMatrixRoutingService
 
     public async Task<MatrixRoutingResult> CalculateMatrixAsync(MatrixRoutingRequest request)
     {
-        using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(120));
-        var result = await _js.InvokeAsync<MatrixRoutingResult>(
-            JsInteropIdentifiers.CalculateMatrix,
-            cts.Token,
-            request);
+        MatrixRoutingResult? result;
+        try
+        {
+            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(120));
+            result = await _js.InvokeAsync<MatrixRoutingResult>(
+                JsInteropIdentifiers.CalculateMatrix,
+                cts.Token,
+                request);
+        }
+        catch (JSException ex)
+        {
+            JsAuthErrorHelper.ThrowIfAuthError(ex, "matrix-routing");
+            throw;
+        }
 
         return result ?? new MatrixRoutingResult();
     }

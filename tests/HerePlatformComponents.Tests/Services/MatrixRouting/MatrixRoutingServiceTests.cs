@@ -1,8 +1,10 @@
 using HerePlatform.Core.Coordinates;
+using HerePlatform.Core.Exceptions;
 using HerePlatform.Core.MatrixRouting;
 using HerePlatform.Core.Services;
 using HerePlatformComponents.Maps;
 using HerePlatformComponents.Maps.Services;
+using Microsoft.JSInterop;
 
 namespace HerePlatformComponents.Tests.Services.MatrixRouting;
 
@@ -65,5 +67,23 @@ public class MatrixRoutingServiceTests : ServiceTestBase
 
         Assert.That(result, Is.Not.Null);
         Assert.That(result.Matrix, Is.Empty);
+    }
+
+    [Test]
+    public void CalculateMatrixAsync_AuthError_ThrowsHereApiAuthenticationException()
+    {
+        MockJsException<MatrixRoutingResult>(
+            "blazorHerePlatform.objectManager.calculateMatrix",
+            new JSException("Error: HERE_AUTH_ERROR:matrix-routing:HTTP 401"));
+        var service = new MatrixRoutingService(JsRuntime);
+
+        var ex = Assert.ThrowsAsync<HereApiAuthenticationException>(async () =>
+            await service.CalculateMatrixAsync(new MatrixRoutingRequest
+            {
+                Origins = new List<LatLngLiteral> { new(52.5200, 13.4050) },
+                Destinations = new List<LatLngLiteral> { new(52.5310, 13.3847) }
+            }));
+
+        Assert.That(ex!.Service, Is.EqualTo("matrix-routing"));
     }
 }

@@ -1,9 +1,11 @@
 using HerePlatform.Core.Coordinates;
+using HerePlatform.Core.Exceptions;
 using HerePlatform.Core.Isoline;
 using HerePlatform.Core.Services;
 using HerePlatform.Core.Utilities;
 using HerePlatformComponents.Maps;
 using HerePlatformComponents.Maps.Services;
+using Microsoft.JSInterop;
 
 namespace HerePlatformComponents.Tests.Services.Isoline;
 
@@ -98,5 +100,23 @@ public class IsolineServiceTests : ServiceTestBase
         Assert.That(result.Isolines[0].Polygon, Has.Count.EqualTo(4));
         Assert.That(result.Isolines[0].Polygon![0].Lat, Is.EqualTo(52.530).Within(0.00001));
         Assert.That(result.Isolines[0].Polygon[0].Lng, Is.EqualTo(13.390).Within(0.00001));
+    }
+
+    [Test]
+    public void CalculateIsolineAsync_AuthError_ThrowsHereApiAuthenticationException()
+    {
+        MockJsException<IsolineResult>(
+            "blazorHerePlatform.objectManager.calculateIsoline",
+            new JSException("Error: HERE_AUTH_ERROR:isoline:HTTP 401"));
+        var service = new IsolineService(JsRuntime);
+
+        var ex = Assert.ThrowsAsync<HereApiAuthenticationException>(async () =>
+            await service.CalculateIsolineAsync(new IsolineRequest
+            {
+                Center = new LatLngLiteral(52.52, 13.405),
+                Ranges = new List<int> { 300 }
+            }));
+
+        Assert.That(ex!.Service, Is.EqualTo("isoline"));
     }
 }

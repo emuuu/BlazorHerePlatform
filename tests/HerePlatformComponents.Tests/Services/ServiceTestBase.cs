@@ -12,4 +12,9 @@ public abstract class ServiceTestBase : BunitTestBase
     {
         Context.JSInterop.Setup<T>(identifier, _ => true).SetResult(result);
     }
+
+    protected void MockJsException<T>(string identifier, Exception exception)
+    {
+        Context.JSInterop.Setup<T>(identifier, _ => true).SetException(exception);
+    }
 }

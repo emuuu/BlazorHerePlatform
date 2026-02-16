@@ -19,9 +19,18 @@ public class WaypointSequenceService : IWaypointSequenceService
 
     public async Task<WaypointSequenceResult> OptimizeSequenceAsync(WaypointSequenceRequest request)
     {
-        var result = await _js.InvokeAsync<WaypointSequenceResult>(
-            JsInteropIdentifiers.OptimizeWaypointSequence,
-            request);
+        WaypointSequenceResult? result;
+        try
+        {
+            result = await _js.InvokeAsync<WaypointSequenceResult>(
+                JsInteropIdentifiers.OptimizeWaypointSequence,
+                request);
+        }
+        catch (JSException ex)
+        {
+            JsAuthErrorHelper.ThrowIfAuthError(ex, "waypoint-sequence");
+            throw;
+        }
 
         return result ?? new WaypointSequenceResult();
     }
