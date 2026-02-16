@@ -1,0 +1,111 @@
+using System.Net.Http.Headers;
+using System.Security.Cryptography;
+using System.Text;
+using System.Text.Json;
+
+namespace HerePlatform.RestClient.Auth;
+
+internal sealed class HereOAuthTokenManager
+{
+    private const string TokenEndpoint = "https://account.api.here.com/oauth2/token";
+    private static readonly TimeSpan RefreshMargin = TimeSpan.FromSeconds(60);
+
+    private readonly string _accessKeyId;
+    private readonly string _accessKeySecret;
+    private readonly HttpClient _httpClient;
+
+    private string? _cachedToken;
+    private DateTimeOffset _tokenExpiry = DateTimeOffset.MinValue;
+    private readonly SemaphoreSlim _semaphore = new(1, 1);
+
+    public HereOAuthTokenManager(string accessKeyId, string accessKeySecret, HttpClient httpClient)
+    {
+        _accessKeyId = accessKeyId;
+        _accessKeySecret = accessKeySecret;
+        _httpClient = httpClient;
+    }
+
+    public async Task<string> GetTokenAsync(CancellationToken cancellationToken)
+    {
+        if (_cachedToken is not null && DateTimeOffset.UtcNow < _tokenExpiry - RefreshMargin)
+            return _cachedToken;
+
+        await _semaphore.WaitAsync(cancellationToken);
+        try
+        {
+            // Double-check after acquiring lock
+            if (_cachedToken is not null && DateTimeOffset.UtcNow < _tokenExpiry - RefreshMargin)
+                return _cachedToken;
+
+            return await RequestTokenAsync(cancellationToken);
+        }
+        finally
+        {
+            _semaphore.Release();
+        }
+    }
+
+    private async Task<string> RequestTokenAsync(CancellationToken cancellationToken)
+    {
+        var timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString();
+        var nonce = Guid.NewGuid().ToString("N");
+
+        var oauthParams = new SortedDictionary<string, string>
+        {
+            ["grant_type"] = "client_credentials",
+            ["oauth_consumer_key"] = _accessKeyId,
+            ["oauth_nonce"] = nonce,
+            ["oauth_signature_method"] = "HMAC-SHA256",
+            ["oauth_timestamp"] = timestamp,
+            ["oauth_version"] = "1.0"
+        };
+
+        // Build signature base string: POST&url_encoded_endpoint&sorted_params
+        var paramString = string.Join("&",
+            oauthParams.Select(kv => $"{Uri.EscapeDataString(kv.Key)}={Uri.EscapeDataString(kv.Value)}"));
+        var signatureBase = $"POST&{Uri.EscapeDataString(TokenEndpoint)}&{Uri.EscapeDataString(paramString)}";
+
+        // Signing key: url_encoded_secret& (no token secret for HERE)
+        var signingKey = $"{Uri.EscapeDataString(_accessKeySecret)}&";
+        var signature = ComputeHmacSha256(signingKey, signatureBase);
+
+        // Build Authorization header
+        var authHeader = $"OAuth " +
+            $"oauth_consumer_key=\"{Uri.EscapeDataString(_accessKeyId)}\","+
+            $"oauth_nonce=\"{Uri.EscapeDataString(nonce)}\","+
+            $"oauth_signature=\"{Uri.EscapeDataString(signature)}\","+
+            $"oauth_signature_method=\"HMAC-SHA256\","+
+            $"oauth_timestamp=\"{timestamp}\","+
+            $"oauth_version=\"1.0\"";
+
+        var request = new HttpRequestMessage(HttpMethod.Post, TokenEndpoint)
+        {
+            Content = new FormUrlEncodedContent(new Dictionary<string, string>
+            {
+                ["grant_type"] = "client_credentials"
+            })
+        };
+        request.Headers.TryAddWithoutValidation("Authorization", authHeader);
+
+        var response = await _httpClient.SendAsync(request, cancellationToken);
+        response.EnsureSuccessStatusCode();
+
+        var json = await response.Content.ReadAsStringAsync(cancellationToken);
+        using var doc = JsonDocument.Parse(json);
+        var root = doc.RootElement;
+
+        _cachedToken = root.GetProperty("access_token").GetString()
+            ?? throw new InvalidOperationException("OAuth response missing access_token.");
+        var expiresIn = root.GetProperty("expires_in").GetInt32();
+        _tokenExpiry = DateTimeOffset.UtcNow.AddSeconds(expiresIn);
+
+        return _cachedToken;
+    }
+
+    internal static string ComputeHmacSha256(string key, string data)
+    {
+        using var hmac = new HMACSHA256(Encoding.UTF8.GetBytes(key));
+        var hash = hmac.ComputeHash(Encoding.UTF8.GetBytes(data));
+        return Convert.ToBase64String(hash);
+    }
+}
