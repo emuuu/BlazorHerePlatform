@@ -1,10 +1,18 @@
+using System.Runtime.Serialization;
+using System.Text;
+using System.Text.Json;
+using HerePlatform.Core.Coordinates;
 using HerePlatform.Core.MatrixRouting;
+using HerePlatform.Core.Routing;
 using HerePlatform.Core.Services;
+using HerePlatform.RestClient.Internal;
 
 namespace HerePlatform.RestClient.Services;
 
 internal sealed class RestMatrixRoutingService : IMatrixRoutingService
 {
+    private const string BaseUrl = "https://matrix.router.hereapi.com/v8/matrix";
+
     private readonly IHttpClientFactory _httpClientFactory;
 
     public RestMatrixRoutingService(IHttpClientFactory httpClientFactory)
@@ -12,6 +20,66 @@ internal sealed class RestMatrixRoutingService : IMatrixRoutingService
         _httpClientFactory = httpClientFactory;
     }
 
-    public Task<MatrixRoutingResult> CalculateMatrixAsync(MatrixRoutingRequest request)
-        => throw new NotImplementedException();
+    public async Task<MatrixRoutingResult> CalculateMatrixAsync(MatrixRoutingRequest request)
+    {
+        var body = new
+        {
+            origins = request.Origins.Select(o => new { lat = o.Lat, lng = o.Lng }).ToArray(),
+            destinations = request.Destinations.Select(d => new { lat = d.Lat, lng = d.Lng }).ToArray(),
+            regionDefinition = new
+            {
+                type = "world"
+            },
+            profile = GetEnumMemberValue(request.TransportMode)
+        };
+
+        var jsonBody = JsonSerializer.Serialize(body, HereJsonDefaults.Options);
+        var content = new StringContent(jsonBody, Encoding.UTF8, "application/json");
+
+        var client = _httpClientFactory.CreateClient("HereApi");
+        var response = await client.PostAsync(BaseUrl, content);
+
+        HereApiHelper.EnsureAuthSuccess(response, "matrix");
+        response.EnsureSuccessStatusCode();
+
+        var json = await response.Content.ReadAsStringAsync();
+        var hereResponse = JsonSerializer.Deserialize<HereMatrixResponse>(json, HereJsonDefaults.Options);
+
+        return MapToResult(hereResponse, request.Origins.Count, request.Destinations.Count);
+    }
+
+    private static MatrixRoutingResult MapToResult(HereMatrixResponse? hereResponse, int numOrigins, int numDestinations)
+    {
+        if (hereResponse?.Matrix is null)
+            return new MatrixRoutingResult
+            {
+                NumOrigins = numOrigins,
+                NumDestinations = numDestinations,
+                Matrix = []
+            };
+
+        var matrix = hereResponse.Matrix;
+
+        return new MatrixRoutingResult
+        {
+            NumOrigins = matrix.NumOrigins,
+            NumDestinations = matrix.NumDestinations,
+            Matrix = matrix.Entries?.Select(e => new MatrixEntry
+            {
+                OriginIndex = e.OriginIndex,
+                DestinationIndex = e.DestinationIndex,
+                Duration = e.TravelTime ?? 0,
+                Length = e.Distance ?? 0
+            }).ToList() ?? []
+        };
+    }
+
+    private static string GetEnumMemberValue<T>(T value) where T : struct, Enum
+    {
+        var member = typeof(T).GetMember(value.ToString()!)[0];
+        var attr = member.GetCustomAttributes(typeof(EnumMemberAttribute), false)
+            .Cast<EnumMemberAttribute>()
+            .FirstOrDefault();
+        return attr?.Value ?? value.ToString()!.ToLowerInvariant();
+    }
 }
