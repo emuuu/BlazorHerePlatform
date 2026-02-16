@@ -3609,6 +3609,13 @@ window.blazorHerePlatform.objectManager = function () {
                 if (p.lng > maxLng) maxLng = p.lng;
             });
 
+            // Single point or very tight cluster: center + fixed zoom
+            if (minLat === maxLat && minLng === maxLng) {
+                map.setCenter({ lat: minLat, lng: minLng });
+                map.setZoom(15);
+                return;
+            }
+
             var rect = new H.geo.Rect(maxLat, minLng, minLat, maxLng);
             var lookAtData = { bounds: rect };
 
@@ -3619,6 +3626,11 @@ window.blazorHerePlatform.objectManager = function () {
             }
 
             map.getViewModel().setLookAtData(lookAtData, animate !== false);
+
+            // Cap zoom to prevent excessive zoom on tight clusters
+            setTimeout(function () {
+                if (map.getZoom() > 16) map.setZoom(16);
+            }, 100);
         },
 
         // ──────────────────────────────────────────
