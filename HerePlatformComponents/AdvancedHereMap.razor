@@ -832,11 +832,14 @@
         foreach (var c in _mapGeoJsonComponents.Values) c.MarkDisposed();
         foreach (var c in _mapKmlComponents.Values) c.MarkDisposed();
 
+        // disposeMap (JS) marks the safeCallbackRef wrapper as disposed,
+        // so any in-flight JS events are silently ignored.
         if (MapRef != null)
         {
             await MapRef.DisposeAsync();
         }
 
         CallbackRef?.Dispose();
+        CallbackRef = null;
     }
 }

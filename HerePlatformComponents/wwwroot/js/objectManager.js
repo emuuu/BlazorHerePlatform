@@ -22,6 +22,23 @@ window.blazorHerePlatform.objectManager = function () {
         return '';
     })();
 
+    // Wraps a DotNetObjectReference so that invokeMethodAsync calls are silently
+    // ignored after the reference has been disposed (.NET side).  This prevents
+    // "no tracked object with id" errors when JS events fire during or after
+    // Blazor component teardown.
+    function safeCallbackRef(ref) {
+        const wrapper = {
+            _disposed: false,
+            invokeMethodAsync: function () {
+                if (wrapper._disposed) return;
+                try { return ref.invokeMethodAsync.apply(ref, arguments); }
+                catch (e) { console.debug('[BlazorHerePlatform] callback ignored:', e.message || e); }
+            },
+            dispose: function () { wrapper._disposed = true; }
+        };
+        return wrapper;
+    }
+
     // Blazor IJSRuntime serializes C# enums as integers. Map them to API strings.
     var transportModes = { 0: 'car', 1: 'truck', 2: 'pedestrian', 3: 'bicycle', 4: 'scooter' };
     var routingModes = { 0: 'fast', 1: 'short' };
@@ -330,6 +347,7 @@ window.blazorHerePlatform.objectManager = function () {
     // Mirrors the marker drag pattern from the HERE developer guide.
     function wireDragEventsForShape(obj, objectType, id, callbackRef, map) {
         if (!map) return;
+        callbackRef = map._blzCallbackWrapper || callbackRef;
         map.addEventListener('dragstart', function (evt) {
             if (evt.target !== obj) return;
             const behavior = map['_blzBehavior'];
@@ -360,6 +378,7 @@ window.blazorHerePlatform.objectManager = function () {
     // Wire all pointer/interaction events on a map object (marker, polygon)
     // and forward them to C# via the unified OnObject* JSInvokable methods.
     function wireObjectEvents(obj, objectType, id, callbackRef, map) {
+        callbackRef = map._blzCallbackWrapper || callbackRef;
         const pointerEvents = [
             'tap', 'dbltap', 'longpress', 'contextmenu',
             'pointerdown', 'pointerup', 'pointermove',
@@ -1141,6 +1160,12 @@ window.blazorHerePlatform.objectManager = function () {
                 return;
             }
             if (map) {
+                // Mark the callback wrapper as disposed so that any in-flight
+                // JS events are silently ignored instead of throwing.
+                if (map._blzCallbackWrapper) {
+                    map._blzCallbackWrapper.dispose();
+                }
+
                 // Remove hybrid overlay layers
                 const overlays = map['_blzOverlays'];
                 if (overlays) {
@@ -2048,6 +2073,8 @@ window.blazorHerePlatform.objectManager = function () {
         setupMapEvents: function (mapGuid, callbackRef) {
             const map = mapObjects[mapGuid];
             if (!map || !callbackRef || map._blzPlaceholder) return;
+            callbackRef = safeCallbackRef(callbackRef);
+            map._blzCallbackWrapper = callbackRef;
 
             // Pointer events on the map
             const pointerEvents = [
