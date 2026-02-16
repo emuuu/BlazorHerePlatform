@@ -25,6 +25,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\HerePlatform.Core\HerePlatform.Core.csproj" />
     <ProjectReference Include="..\..\HerePlatformComponents\HerePlatformComponents.csproj" />
   </ItemGroup>
 
