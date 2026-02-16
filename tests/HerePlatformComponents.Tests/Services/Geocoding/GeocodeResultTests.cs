@@ -1,6 +1,6 @@
 using HerePlatform.Core.Coordinates;
 using HerePlatformComponents.Maps;
-using HerePlatformComponents.Maps.Services.Geocoding;
+using HerePlatform.Core.Geocoding;
 
 namespace HerePlatformComponents.Tests.Services.Geocoding;
 

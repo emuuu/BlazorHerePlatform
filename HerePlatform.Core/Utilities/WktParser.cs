@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 
-namespace HerePlatformComponents.Maps.Utilities;
+namespace HerePlatform.Core.Utilities;
 
 /// <summary>
 /// Parser for Well-Known Text (WKT) geometry strings.

@@ -11,7 +11,7 @@ apiRef: WktParser
 `WktParser` is a static utility class that converts Well-Known Text (WKT) geometry strings into `LatLngLiteral` coordinates. WKT uses longitude-first ordering; the parser handles the conversion to `LatLngLiteral(lat, lng)` automatically.
 
 ```csharp
-using HerePlatformComponents.Maps.Utilities;
+using HerePlatform.Core.Utilities;
 ```
 
 **Parse a POINT:**

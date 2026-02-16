@@ -1,5 +1,5 @@
 using HerePlatform.Core.Coordinates;
-using HerePlatformComponents.Maps.Services.Transit;
+using HerePlatform.Core.Transit;
 using System.Threading.Tasks;
 
 namespace HerePlatformComponents.Maps.Services;

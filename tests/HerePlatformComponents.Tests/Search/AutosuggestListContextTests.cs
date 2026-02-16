@@ -1,5 +1,6 @@
 using HerePlatform.Core.Coordinates;
 using HerePlatformComponents.Maps;
+using HerePlatform.Core.Search;
 using HerePlatformComponents.Maps.Search;
 
 namespace HerePlatformComponents.Tests.Search;

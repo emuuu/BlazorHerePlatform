@@ -1,4 +1,4 @@
-namespace HerePlatformComponents.Maps.Services.Geocoding;
+namespace HerePlatform.Core.Geocoding;
 
 /// <summary>
 /// Options for geocoding requests.

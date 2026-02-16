@@ -1,4 +1,4 @@
-using HerePlatformComponents.Maps.Services.WaypointSequence;
+using HerePlatform.Core.WaypointSequence;
 using Microsoft.JSInterop;
 using System.Threading.Tasks;
 

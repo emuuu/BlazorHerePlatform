@@ -1,4 +1,4 @@
-using HerePlatformComponents.Maps.Services.Traffic;
+using HerePlatform.Core.Traffic;
 using System.Threading.Tasks;
 
 namespace HerePlatformComponents.Maps.Services;

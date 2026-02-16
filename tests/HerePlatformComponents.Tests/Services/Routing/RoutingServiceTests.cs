@@ -2,7 +2,7 @@ using HerePlatform.Core.Coordinates;
 using HerePlatform.Core.Routing;
 using HerePlatformComponents.Maps;
 using HerePlatformComponents.Maps.Services;
-using HerePlatformComponents.Maps.Utilities;
+using HerePlatform.Core.Utilities;
 
 namespace HerePlatformComponents.Tests.Services.Routing;
 

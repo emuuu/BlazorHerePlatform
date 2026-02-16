@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
 
-namespace HerePlatformComponents.Maps.Utilities;
+namespace HerePlatform.Core.Utilities;
 
 /// <summary>
 /// Export geographic data as GeoJSON strings.

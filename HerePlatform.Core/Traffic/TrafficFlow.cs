@@ -1,7 +1,7 @@
 using HerePlatform.Core.Coordinates;
 using System.Collections.Generic;
 
-namespace HerePlatformComponents.Maps.Services.Traffic;
+namespace HerePlatform.Core.Traffic;
 
 /// <summary>
 /// A traffic flow data item.

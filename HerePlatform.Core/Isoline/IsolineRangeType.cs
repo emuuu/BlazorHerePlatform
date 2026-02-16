@@ -1,9 +1,8 @@
-using HerePlatform.Core.Coordinates;
 using HerePlatform.Core.Serialization;
 using System.Runtime.Serialization;
 using System.Text.Json.Serialization;
 
-namespace HerePlatformComponents.Maps.Services.Isoline;
+namespace HerePlatform.Core.Isoline;
 
 /// <summary>
 /// Range type for isoline calculation.

@@ -3,7 +3,7 @@ using HerePlatform.Core.Routing;
 using System;
 using System.Collections.Generic;
 
-namespace HerePlatformComponents.Maps.Services.MatrixRouting;
+namespace HerePlatform.Core.MatrixRouting;
 
 /// <summary>
 /// Request parameters for matrix routing calculation.

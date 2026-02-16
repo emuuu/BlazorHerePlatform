@@ -11,7 +11,7 @@ apiRef: FlexiblePolyline
 `FlexiblePolyline` is a static utility class that implements the HERE Flexible Polyline codec in pure C#. Use `Encode` to compress a list of coordinates into a compact string representation.
 
 ```csharp
-using HerePlatformComponents.Maps.Utilities;
+using HerePlatform.Core.Utilities;
 ```
 
 ```csharp

@@ -1,5 +1,5 @@
 using HerePlatform.Core.Coordinates;
-using HerePlatformComponents.Maps.Services.Geocoding;
+using HerePlatform.Core.Geocoding;
 using System.Threading.Tasks;
 
 namespace HerePlatformComponents.Maps.Services;

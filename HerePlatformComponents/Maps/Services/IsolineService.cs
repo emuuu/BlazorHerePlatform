@@ -1,5 +1,5 @@
-using HerePlatformComponents.Maps.Services.Isoline;
-using HerePlatformComponents.Maps.Utilities;
+using HerePlatform.Core.Isoline;
+using HerePlatform.Core.Utilities;
 using Microsoft.JSInterop;
 using System;
 using System.Threading;

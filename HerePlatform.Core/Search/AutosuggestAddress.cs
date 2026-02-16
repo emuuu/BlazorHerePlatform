@@ -1,4 +1,4 @@
-namespace HerePlatformComponents.Maps.Search;
+namespace HerePlatform.Core.Search;
 
 /// <summary>
 /// Structured address details from a HERE Autosuggest result.

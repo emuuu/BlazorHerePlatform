@@ -11,7 +11,7 @@ apiRef: GeoJsonExporter
 `GeoJsonExporter` is a static utility class that converts coordinates into GeoJSON Feature strings. All methods return raw JSON strings.
 
 ```csharp
-using HerePlatformComponents.Maps.Utilities;
+using HerePlatform.Core.Utilities;
 ```
 
 **Point Feature:**

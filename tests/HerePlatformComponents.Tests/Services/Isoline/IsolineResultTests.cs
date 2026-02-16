@@ -1,6 +1,6 @@
 using HerePlatform.Core.Coordinates;
 using HerePlatformComponents.Maps;
-using HerePlatformComponents.Maps.Services.Isoline;
+using HerePlatform.Core.Isoline;
 
 namespace HerePlatformComponents.Tests.Services.Isoline;
 

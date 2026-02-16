@@ -1,4 +1,4 @@
-using HerePlatformComponents.Maps.Services.Geocoding;
+using HerePlatform.Core.Geocoding;
 
 namespace HerePlatformComponents.Tests.Services.Geocoding;
 

@@ -1,7 +1,7 @@
 using HerePlatform.Core.Coordinates;
 using System.Collections.Generic;
 
-namespace HerePlatformComponents.Maps.Services.Isoline;
+namespace HerePlatform.Core.Isoline;
 
 /// <summary>
 /// Result of an isoline calculation.

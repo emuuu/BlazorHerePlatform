@@ -1,7 +1,7 @@
 using HerePlatform.Core.Coordinates;
 using HerePlatform.Core.Routing;
 using HerePlatformComponents.Maps;
-using HerePlatformComponents.Maps.Services.WaypointSequence;
+using HerePlatform.Core.WaypointSequence;
 
 namespace HerePlatformComponents.Tests.Services.WaypointSequence;
 

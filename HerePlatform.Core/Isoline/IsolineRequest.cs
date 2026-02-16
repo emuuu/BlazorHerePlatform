@@ -2,7 +2,7 @@ using HerePlatform.Core.Coordinates;
 using HerePlatform.Core.Routing;
 using System.Collections.Generic;
 
-namespace HerePlatformComponents.Maps.Services.Isoline;
+namespace HerePlatform.Core.Isoline;
 
 /// <summary>
 /// Request parameters for isoline (isochrone/isodistance) calculation.

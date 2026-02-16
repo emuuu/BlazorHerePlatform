@@ -1,7 +1,7 @@
 using HerePlatform.Core.Coordinates;
 using System.Collections.Generic;
 
-namespace HerePlatformComponents.Maps.Services.Geofencing;
+namespace HerePlatform.Core.Geofencing;
 
 /// <summary>
 /// A geofence zone defined by a polygon or circle.

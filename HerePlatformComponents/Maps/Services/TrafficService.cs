@@ -1,4 +1,4 @@
-using HerePlatformComponents.Maps.Services.Traffic;
+using HerePlatform.Core.Traffic;
 using Microsoft.JSInterop;
 using System.Threading.Tasks;
 

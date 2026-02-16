@@ -1,6 +1,6 @@
 using HerePlatform.Core.Coordinates;
 
-namespace HerePlatformComponents.Maps.Search;
+namespace HerePlatform.Core.Search;
 
 /// <summary>
 /// A single result item from the HERE Autosuggest API.

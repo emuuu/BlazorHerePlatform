@@ -1,5 +1,6 @@
 using AngleSharp.Dom;
 using Bunit;
+using HerePlatform.Core.Search;
 using HerePlatformComponents.Maps.Search;
 using Microsoft.AspNetCore.Components.Web;
 using NUnit.Framework;

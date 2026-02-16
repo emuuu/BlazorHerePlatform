@@ -13,6 +13,7 @@ demo: map-autosuggest
 
 ```csharp
 @using HerePlatformComponents.Maps.Search
+@using HerePlatform.Core.Search
 
 <HereAutosuggest Placeholder="Search for an address..."
                  OnItemSelected="HandleSelection" />

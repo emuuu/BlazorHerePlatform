@@ -1,5 +1,5 @@
 using HerePlatformComponents.Maps;
-using HerePlatformComponents.Maps.Utilities;
+using HerePlatform.Core.Utilities;
 
 namespace HerePlatformComponents.Tests.Utilities;
 

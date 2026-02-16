@@ -2,7 +2,7 @@ using HerePlatform.Core.Coordinates;
 using HerePlatform.Core.Routing;
 using System.Collections.Generic;
 
-namespace HerePlatformComponents.Maps.Services.WaypointSequence;
+namespace HerePlatform.Core.WaypointSequence;
 
 /// <summary>
 /// Request for optimizing waypoint sequence.

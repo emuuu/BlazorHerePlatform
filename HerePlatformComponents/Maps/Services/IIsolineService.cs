@@ -1,4 +1,4 @@
-using HerePlatformComponents.Maps.Services.Isoline;
+using HerePlatform.Core.Isoline;
 using System.Threading.Tasks;
 
 namespace HerePlatformComponents.Maps.Services;

@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace HerePlatformComponents.Maps.Services.MatrixRouting;
+namespace HerePlatform.Core.MatrixRouting;
 
 /// <summary>
 /// Result of a matrix routing calculation.

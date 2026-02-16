@@ -1,4 +1,4 @@
-using HerePlatformComponents.Maps.Services.Places;
+using HerePlatform.Core.Places;
 using System.Threading.Tasks;
 
 namespace HerePlatformComponents.Maps.Services;

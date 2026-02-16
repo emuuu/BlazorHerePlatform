@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace HerePlatformComponents.Maps.Utilities;
+namespace HerePlatform.Core.Utilities;
 
 /// <summary>
 /// Pure C# codec for HERE Flexible Polyline encoding.

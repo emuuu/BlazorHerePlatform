@@ -1,4 +1,4 @@
-using HerePlatformComponents.Maps.Services.MatrixRouting;
+using HerePlatform.Core.MatrixRouting;
 using System.Threading.Tasks;
 
 namespace HerePlatformComponents.Maps.Services;

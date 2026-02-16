@@ -1,4 +1,4 @@
-using HerePlatformComponents.Maps.Services.Places;
+using HerePlatform.Core.Places;
 using Microsoft.JSInterop;
 using System;
 using System.Threading;

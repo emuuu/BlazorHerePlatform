@@ -1,6 +1,6 @@
 using HerePlatform.Core.Coordinates;
 using HerePlatformComponents.Maps;
-using HerePlatformComponents.Maps.Services.Places;
+using HerePlatform.Core.Places;
 
 namespace HerePlatformComponents.Tests.Services.Places;
 

@@ -1,4 +1,4 @@
-using HerePlatformComponents.Maps.Services.MatrixRouting;
+using HerePlatform.Core.MatrixRouting;
 using Microsoft.JSInterop;
 using System;
 using System.Threading;

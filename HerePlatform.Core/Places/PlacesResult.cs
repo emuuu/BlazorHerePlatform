@@ -1,7 +1,7 @@
 using HerePlatform.Core.Coordinates;
 using System.Collections.Generic;
 
-namespace HerePlatformComponents.Maps.Services.Places;
+namespace HerePlatform.Core.Places;
 
 /// <summary>
 /// Result of a Places API request.

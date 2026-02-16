@@ -1,7 +1,7 @@
 using HerePlatform.Core.Coordinates;
 using HerePlatformComponents.Maps;
 using HerePlatformComponents.Maps.Services;
-using HerePlatformComponents.Maps.Services.Geofencing;
+using HerePlatform.Core.Geofencing;
 
 namespace HerePlatformComponents.Tests.Services.Geofencing;
 

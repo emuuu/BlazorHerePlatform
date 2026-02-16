@@ -1,7 +1,7 @@
 using HerePlatform.Core.Coordinates;
 using System.Collections.Generic;
 
-namespace HerePlatformComponents.Maps.Services.Geocoding;
+namespace HerePlatform.Core.Geocoding;
 
 /// <summary>
 /// Result of a geocoding request.
