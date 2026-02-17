@@ -30,14 +30,14 @@ internal sealed class HereOAuthTokenManager
         if (_cachedToken is not null && DateTimeOffset.UtcNow < _tokenExpiry - RefreshMargin)
             return _cachedToken;
 
-        await _semaphore.WaitAsync(cancellationToken);
+        await _semaphore.WaitAsync(cancellationToken).ConfigureAwait(false);
         try
         {
             // Double-check after acquiring lock
             if (_cachedToken is not null && DateTimeOffset.UtcNow < _tokenExpiry - RefreshMargin)
                 return _cachedToken;
 
-            return await RequestTokenAsync(cancellationToken);
+            return await RequestTokenAsync(cancellationToken).ConfigureAwait(false);
         }
         finally
         {
@@ -78,7 +78,7 @@ internal sealed class HereOAuthTokenManager
             $"oauth_timestamp=\"{timestamp}\","+
             $"oauth_version=\"1.0\"";
 
-        var request = new HttpRequestMessage(HttpMethod.Post, TokenEndpoint)
+        using var request = new HttpRequestMessage(HttpMethod.Post, TokenEndpoint)
         {
             Content = new FormUrlEncodedContent(new Dictionary<string, string>
             {
@@ -87,10 +87,10 @@ internal sealed class HereOAuthTokenManager
         };
         request.Headers.TryAddWithoutValidation("Authorization", authHeader);
 
-        var response = await _httpClient.SendAsync(request, cancellationToken);
+        using var response = await _httpClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
         response.EnsureSuccessStatusCode();
 
-        var json = await response.Content.ReadAsStringAsync(cancellationToken);
+        var json = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
         using var doc = JsonDocument.Parse(json);
         var root = doc.RootElement;
 

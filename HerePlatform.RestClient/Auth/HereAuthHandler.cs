@@ -33,16 +33,16 @@ internal sealed class HereAuthHandler : DelegatingHandler
         else if (_oauthManager is not null)
         {
             // OAuth 2.0: get cached/fresh token, set Bearer header
-            var token = await _oauthManager.GetTokenAsync(cancellationToken);
+            var token = await _oauthManager.GetTokenAsync(cancellationToken).ConfigureAwait(false);
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
         }
         else if (_options.TokenProvider is not null)
         {
             // Identity Provider: call external callback, set Bearer header
-            var token = await _options.TokenProvider(cancellationToken);
+            var token = await _options.TokenProvider(cancellationToken).ConfigureAwait(false);
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
         }
 
-        return await base.SendAsync(request, cancellationToken);
+        return await base.SendAsync(request, cancellationToken).ConfigureAwait(false);
     }
 }
