@@ -66,9 +66,14 @@
 
     private Task<IsolineResult> ExecuteIsoline()
     {
-        var ranges = _rangesText.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-            .Select(s => int.Parse(s, CultureInfo.InvariantCulture))
-            .ToList();
+        var parts = _rangesText.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        var ranges = new List<int>(parts.Length);
+        foreach (var s in parts)
+        {
+            if (!int.TryParse(s, CultureInfo.InvariantCulture, out var value))
+                throw new ArgumentException($"Invalid range value: '{s}'. Enter comma-separated integers (e.g. 300,600,900).");
+            ranges.Add(value);
+        }
 
         return IsolineService.CalculateIsolineAsync(new IsolineRequest
         {
