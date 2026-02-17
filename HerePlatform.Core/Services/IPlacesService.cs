@@ -4,8 +4,9 @@ using System.Threading.Tasks;
 namespace HerePlatform.Core.Services;
 
 /// <summary>
-/// Discover, browse, and look up places via the HERE Places API v1.
+/// Discover, browse, and look up places via the HERE Geocoding &amp; Search API v7.
 /// </summary>
+[HereApi("Geocoding & Search API", "v7")]
 public interface IPlacesService
 {
     /// <summary>

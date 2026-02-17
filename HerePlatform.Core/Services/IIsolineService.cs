@@ -6,6 +6,7 @@ namespace HerePlatform.Core.Services;
 /// <summary>
 /// Calculate reachable areas (isochrones and isodistances) via the HERE Isoline Routing API v8.
 /// </summary>
+[HereApi("Isoline Routing API", "v8")]
 public interface IIsolineService
 {
     /// <summary>

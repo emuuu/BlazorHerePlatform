@@ -6,6 +6,10 @@
 
 <div class="doc-content">
     <h1>ITrafficService</h1>
+    @if (_apiName is not null)
+    {
+        <span class="badge bg-info text-dark mb-2">@_apiName @_apiVersion</span>
+    }
     <p class="lead">@_serviceDescription</p>
     <ApiKeyWarning />
 
@@ -86,18 +90,22 @@
     private string _serviceDescription = "";
     private string _incidentsMethodDescription = "";
     private string _flowMethodDescription = "";
+    private string? _apiName;
+    private string? _apiVersion;
     private List<ParamDoc> _incidentsParams = [];
     private List<ParamDoc> _flowParams = [];
 
     protected override async Task OnInitializedAsync()
     {
         await DocService.InitializeAsync();
-        var svc = DocService.GetService("ITrafficService");
+        var svc = DocService.GetService(nameof(ITrafficService));
         _serviceDescription = svc?.Description ?? "";
-        _incidentsMethodDescription = DocService.GetMethod("ITrafficService", "GetTrafficIncidentsAsync")?.Description ?? "";
-        _flowMethodDescription = DocService.GetMethod("ITrafficService", "GetTrafficFlowAsync")?.Description ?? "";
-        _incidentsParams = DocService.GetMethodParams("ITrafficService", "GetTrafficIncidentsAsync");
-        _flowParams = DocService.GetMethodParams("ITrafficService", "GetTrafficFlowAsync");
+        _apiName = svc?.ApiName;
+        _apiVersion = svc?.ApiVersion;
+        _incidentsMethodDescription = DocService.GetMethod(nameof(ITrafficService), nameof(ITrafficService.GetTrafficIncidentsAsync))?.Description ?? "";
+        _flowMethodDescription = DocService.GetMethod(nameof(ITrafficService), nameof(ITrafficService.GetTrafficFlowAsync))?.Description ?? "";
+        _incidentsParams = DocService.GetMethodParams(nameof(ITrafficService), nameof(ITrafficService.GetTrafficIncidentsAsync));
+        _flowParams = DocService.GetMethodParams(nameof(ITrafficService), nameof(ITrafficService.GetTrafficFlowAsync));
     }
 
     private const string _incidentsSuccessExample = @"{

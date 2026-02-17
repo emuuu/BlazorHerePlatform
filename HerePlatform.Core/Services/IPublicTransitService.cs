@@ -7,6 +7,7 @@ namespace HerePlatform.Core.Services;
 /// <summary>
 /// Transit departures and station search via the HERE Public Transit API v8.
 /// </summary>
+[HereApi("Public Transit API", "v8")]
 public interface IPublicTransitService
 {
     /// <summary>

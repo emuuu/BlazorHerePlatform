@@ -91,10 +91,10 @@
     protected override async Task OnInitializedAsync()
     {
         await DocService.InitializeAsync();
-        var svc = DocService.GetService("IGeofencingService");
+        var svc = DocService.GetService(nameof(IGeofencingService));
         _serviceDescription = svc?.Description ?? "";
-        _methodDescription = DocService.GetMethod("IGeofencingService", "CheckPositionAsync")?.Description ?? "";
-        _params = DocService.GetMethodParams("IGeofencingService", "CheckPositionAsync");
+        _methodDescription = DocService.GetMethod(nameof(IGeofencingService), nameof(IGeofencingService.CheckPositionAsync))?.Description ?? "";
+        _params = DocService.GetMethodParams(nameof(IGeofencingService), nameof(IGeofencingService.CheckPositionAsync));
     }
 
     private const string _successExample = @"{

@@ -6,6 +6,7 @@ namespace HerePlatform.Core.Services;
 /// <summary>
 /// Compute travel time and distance matrices via the HERE Matrix Routing API v8.
 /// </summary>
+[HereApi("Matrix Routing API", "v8")]
 public interface IMatrixRoutingService
 {
     /// <summary>

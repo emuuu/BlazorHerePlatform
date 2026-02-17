@@ -6,6 +6,7 @@ namespace HerePlatform.Core.Services;
 /// <summary>
 /// Real-time traffic incidents and flow data via the HERE Traffic API v7.
 /// </summary>
+[HereApi("Traffic API", "v7")]
 public interface ITrafficService
 {
     /// <summary>

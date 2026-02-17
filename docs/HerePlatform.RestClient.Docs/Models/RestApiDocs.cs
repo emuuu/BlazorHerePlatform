@@ -11,6 +11,8 @@ public class ServiceDoc
 {
     public string InterfaceName { get; set; } = "";
     public string Description { get; set; } = "";
+    public string? ApiName { get; set; }
+    public string? ApiVersion { get; set; }
     public List<MethodDoc> Methods { get; set; } = [];
 }
 

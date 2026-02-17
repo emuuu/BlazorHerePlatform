@@ -7,6 +7,7 @@ namespace HerePlatform.Core.Services;
 /// Route calculation via the HERE Routing API v8.
 /// Supports car, truck, pedestrian, bicycle, scooter, and EV routing.
 /// </summary>
+[HereApi("Routing API", "v8")]
 public interface IRoutingService
 {
     /// <summary>

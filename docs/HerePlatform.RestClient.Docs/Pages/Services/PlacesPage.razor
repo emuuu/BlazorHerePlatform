@@ -6,6 +6,10 @@
 
 <div class="doc-content">
     <h1>IPlacesService</h1>
+    @if (_apiName is not null)
+    {
+        <span class="badge bg-info text-dark mb-2">@_apiName @_apiVersion</span>
+    }
     <p class="lead">@_serviceDescription</p>
     <ApiKeyWarning />
 
@@ -144,6 +148,8 @@
     private string _discoverMethodDescription = "";
     private string _browseMethodDescription = "";
     private string _lookupMethodDescription = "";
+    private string? _apiName;
+    private string? _apiVersion;
     private List<ParamDoc> _discoverParams = [];
     private List<ParamDoc> _browseParams = [];
     private List<ParamDoc> _lookupParams = [];
@@ -151,14 +157,16 @@
     protected override async Task OnInitializedAsync()
     {
         await DocService.InitializeAsync();
-        var svc = DocService.GetService("IPlacesService");
+        var svc = DocService.GetService(nameof(IPlacesService));
         _serviceDescription = svc?.Description ?? "";
-        _discoverMethodDescription = DocService.GetMethod("IPlacesService", "DiscoverAsync")?.Description ?? "";
-        _browseMethodDescription = DocService.GetMethod("IPlacesService", "BrowseAsync")?.Description ?? "";
-        _lookupMethodDescription = DocService.GetMethod("IPlacesService", "LookupAsync")?.Description ?? "";
-        _discoverParams = DocService.GetMethodParams("IPlacesService", "DiscoverAsync");
-        _browseParams = DocService.GetMethodParams("IPlacesService", "BrowseAsync");
-        _lookupParams = DocService.GetMethodParams("IPlacesService", "LookupAsync");
+        _apiName = svc?.ApiName;
+        _apiVersion = svc?.ApiVersion;
+        _discoverMethodDescription = DocService.GetMethod(nameof(IPlacesService), nameof(IPlacesService.DiscoverAsync))?.Description ?? "";
+        _browseMethodDescription = DocService.GetMethod(nameof(IPlacesService), nameof(IPlacesService.BrowseAsync))?.Description ?? "";
+        _lookupMethodDescription = DocService.GetMethod(nameof(IPlacesService), nameof(IPlacesService.LookupAsync))?.Description ?? "";
+        _discoverParams = DocService.GetMethodParams(nameof(IPlacesService), nameof(IPlacesService.DiscoverAsync));
+        _browseParams = DocService.GetMethodParams(nameof(IPlacesService), nameof(IPlacesService.BrowseAsync));
+        _lookupParams = DocService.GetMethodParams(nameof(IPlacesService), nameof(IPlacesService.LookupAsync));
     }
 
     private const string _discoverSuccessExample = @"{

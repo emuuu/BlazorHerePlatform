@@ -2,7 +2,9 @@
   "services": [
     {
       "interfaceName": "IGeocodingService",
-      "description": "Forward and reverse geocoding via the HERE Geocoding \u0026 Search API v1.",
+      "description": "Forward and reverse geocoding via the HERE Geocoding \u0026 Search API v7.",
+      "apiName": "Geocoding \u0026 Search API",
+      "apiVersion": "v7",
       "methods": [
         {
           "name": "GeocodeAsync",
@@ -120,6 +122,8 @@
     {
       "interfaceName": "IIsolineService",
       "description": "Calculate reachable areas (isochrones and isodistances) via the HERE Isoline Routing API v8.",
+      "apiName": "Isoline Routing API",
+      "apiVersion": "v8",
       "methods": [
         {
           "name": "CalculateIsolineAsync",
@@ -190,6 +194,8 @@
     {
       "interfaceName": "IMatrixRoutingService",
       "description": "Compute travel time and distance matrices via the HERE Matrix Routing API v8.",
+      "apiName": "Matrix Routing API",
+      "apiVersion": "v8",
       "methods": [
         {
           "name": "CalculateMatrixAsync",
@@ -243,7 +249,9 @@
     },
     {
       "interfaceName": "IPlacesService",
-      "description": "Discover, browse, and look up places via the HERE Places API v1.",
+      "description": "Discover, browse, and look up places via the HERE Geocoding \u0026 Search API v7.",
+      "apiName": "Geocoding \u0026 Search API",
+      "apiVersion": "v7",
       "methods": [
         {
           "name": "DiscoverAsync",
@@ -445,6 +453,8 @@
     {
       "interfaceName": "IPublicTransitService",
       "description": "Transit departures and station search via the HERE Public Transit API v8.",
+      "apiName": "Public Transit API",
+      "apiVersion": "v8",
       "methods": [
         {
           "name": "GetDeparturesAsync",
@@ -486,6 +496,8 @@
     {
       "interfaceName": "IRoutingService",
       "description": "Route calculation via the HERE Routing API v8. Supports car, truck, pedestrian, bicycle, scooter, and EV routing.",
+      "apiName": "Routing API",
+      "apiVersion": "v8",
       "methods": [
         {
           "name": "CalculateRouteAsync",
@@ -707,6 +719,8 @@
     {
       "interfaceName": "ITrafficService",
       "description": "Real-time traffic incidents and flow data via the HERE Traffic API v7.",
+      "apiName": "Traffic API",
+      "apiVersion": "v7",
       "methods": [
         {
           "name": "GetTrafficIncidentsAsync",
@@ -775,6 +789,8 @@
     {
       "interfaceName": "IWaypointSequenceService",
       "description": "Optimize waypoint order for minimum travel time or distance via the HERE Waypoint Sequence API v8.",
+      "apiName": "Waypoint Sequence API",
+      "apiVersion": "v8",
       "methods": [
         {
           "name": "OptimizeSequenceAsync",

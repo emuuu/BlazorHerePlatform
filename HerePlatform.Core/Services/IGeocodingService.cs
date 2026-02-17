@@ -5,8 +5,9 @@ using System.Threading.Tasks;
 namespace HerePlatform.Core.Services;
 
 /// <summary>
-/// Forward and reverse geocoding via the HERE Geocoding &amp; Search API v1.
+/// Forward and reverse geocoding via the HERE Geocoding &amp; Search API v7.
 /// </summary>
+[HereApi("Geocoding & Search API", "v7")]
 public interface IGeocodingService
 {
     /// <summary>

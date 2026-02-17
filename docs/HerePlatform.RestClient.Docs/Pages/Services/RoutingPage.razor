@@ -6,6 +6,10 @@
 
 <div class="doc-content">
     <h1>IRoutingService</h1>
+    @if (_apiName is not null)
+    {
+        <span class="badge bg-info text-dark mb-2">@_apiName @_apiVersion</span>
+    }
     <p class="lead">@_serviceDescription</p>
     <ApiKeyWarning />
 
@@ -160,15 +164,19 @@
 
     private string _serviceDescription = "";
     private string _methodDescription = "";
+    private string? _apiName;
+    private string? _apiVersion;
     private List<ParamDoc> _params = [];
 
     protected override async Task OnInitializedAsync()
     {
         await DocService.InitializeAsync();
-        var svc = DocService.GetService("IRoutingService");
+        var svc = DocService.GetService(nameof(IRoutingService));
         _serviceDescription = svc?.Description ?? "";
-        _methodDescription = DocService.GetMethod("IRoutingService", "CalculateRouteAsync")?.Description ?? "";
-        _params = DocService.GetMethodParams("IRoutingService", "CalculateRouteAsync");
+        _apiName = svc?.ApiName;
+        _apiVersion = svc?.ApiVersion;
+        _methodDescription = DocService.GetMethod(nameof(IRoutingService), nameof(IRoutingService.CalculateRouteAsync))?.Description ?? "";
+        _params = DocService.GetMethodParams(nameof(IRoutingService), nameof(IRoutingService.CalculateRouteAsync));
     }
 
     private const string _successExample = @"{

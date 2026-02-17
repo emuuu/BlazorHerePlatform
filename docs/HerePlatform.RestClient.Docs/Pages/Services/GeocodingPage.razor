@@ -6,6 +6,10 @@
 
 <div class="doc-content">
     <h1>IGeocodingService</h1>
+    @if (_apiName is not null)
+    {
+        <span class="badge bg-info text-dark mb-2">@_apiName @_apiVersion</span>
+    }
     <p class="lead">@_serviceDescription</p>
     <ApiKeyWarning />
 
@@ -102,18 +106,22 @@
     private string _serviceDescription = "";
     private string _geocodeMethodDescription = "";
     private string _reverseGeocodeMethodDescription = "";
+    private string? _apiName;
+    private string? _apiVersion;
     private List<ParamDoc> _geocodeParams = [];
     private List<ParamDoc> _reverseGeocodeParams = [];
 
     protected override async Task OnInitializedAsync()
     {
         await DocService.InitializeAsync();
-        var svc = DocService.GetService("IGeocodingService");
+        var svc = DocService.GetService(nameof(IGeocodingService));
         _serviceDescription = svc?.Description ?? "";
-        _geocodeMethodDescription = DocService.GetMethod("IGeocodingService", "GeocodeAsync")?.Description ?? "";
-        _reverseGeocodeMethodDescription = DocService.GetMethod("IGeocodingService", "ReverseGeocodeAsync")?.Description ?? "";
-        _geocodeParams = DocService.GetMethodParams("IGeocodingService", "GeocodeAsync");
-        _reverseGeocodeParams = DocService.GetMethodParams("IGeocodingService", "ReverseGeocodeAsync");
+        _apiName = svc?.ApiName;
+        _apiVersion = svc?.ApiVersion;
+        _geocodeMethodDescription = DocService.GetMethod(nameof(IGeocodingService), nameof(IGeocodingService.GeocodeAsync))?.Description ?? "";
+        _reverseGeocodeMethodDescription = DocService.GetMethod(nameof(IGeocodingService), nameof(IGeocodingService.ReverseGeocodeAsync))?.Description ?? "";
+        _geocodeParams = DocService.GetMethodParams(nameof(IGeocodingService), nameof(IGeocodingService.GeocodeAsync));
+        _reverseGeocodeParams = DocService.GetMethodParams(nameof(IGeocodingService), nameof(IGeocodingService.ReverseGeocodeAsync));
     }
 
     // ── Static examples ──
