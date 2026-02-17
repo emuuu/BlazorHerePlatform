@@ -4,22 +4,22 @@
         <table class="table table-sm table-bordered">
             <thead class="table-light">
                 <tr>
-                    <th>Parameter</th>
-                    <th>Type</th>
-                    <th>Required</th>
-                    <th>Description</th>
-                    <th>Example</th>
+                    <th scope="col">Parameter</th>
+                    <th scope="col">Type</th>
+                    <th scope="col">Required</th>
+                    <th scope="col">Description</th>
+                    <th scope="col">Default</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach (var p in Parameters)
                 {
                     <tr>
-                        <td><code>@p.Name</code></td>
+                        <th scope="row"><code>@p.Name</code></th>
                         <td><code>@p.Type</code></td>
                         <td>@(p.Required ? "Yes" : "No")</td>
                         <td>@p.Description</td>
-                        <td>@(p.Example ?? "—")</td>
+                        <td>@(p.Default ?? "—")</td>
                     </tr>
                 }
             </tbody>
