@@ -95,6 +95,9 @@ using HerePlatform.Core.WaypointSequence;
 // Exceptions
 [assembly: TypeForwardedTo(typeof(HereApiAuthenticationException))]
 
+// Service attributes
+[assembly: TypeForwardedTo(typeof(HereApiAttribute))]
+
 // Service interfaces
 [assembly: TypeForwardedTo(typeof(IRoutingService))]
 [assembly: TypeForwardedTo(typeof(IGeocodingService))]
