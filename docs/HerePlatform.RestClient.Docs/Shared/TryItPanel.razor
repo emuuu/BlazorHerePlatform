@@ -1,5 +1,6 @@
 @typeparam TResult
 @inject DocsApiKeyService ApiKeyService
+@implements IDisposable
 
 <div class="try-it-panel">
     <div class="panel-header d-flex align-items-center justify-content-between">
@@ -52,6 +53,10 @@
 @code {
     [Parameter] public RenderFragment? FormContent { get; set; }
     [Parameter, EditorRequired] public Func<Task<TResult>> OnExecute { get; set; } = default!;
+
+    protected override void OnInitialized() => ApiKeyService.ApiKeyChanged += OnApiKeyChanged;
+    private void OnApiKeyChanged() => InvokeAsync(StateHasChanged);
+    public void Dispose() => ApiKeyService.ApiKeyChanged -= OnApiKeyChanged;
 
     private bool _loading;
     private TResult? _result;

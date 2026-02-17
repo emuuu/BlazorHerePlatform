@@ -1,4 +1,5 @@
 @inject DocsApiKeyService ApiKeyService
+@implements IDisposable
 
 @if (!ApiKeyService.HasKey)
 {
@@ -6,4 +7,10 @@
         <strong class="me-2">No API Key configured.</strong>
         <span>Enter your HERE API Key in the header to enable the Try It panels.</span>
     </div>
+}
+
+@code {
+    protected override void OnInitialized() => ApiKeyService.ApiKeyChanged += OnApiKeyChanged;
+    private void OnApiKeyChanged() => InvokeAsync(StateHasChanged);
+    public void Dispose() => ApiKeyService.ApiKeyChanged -= OnApiKeyChanged;
 }
