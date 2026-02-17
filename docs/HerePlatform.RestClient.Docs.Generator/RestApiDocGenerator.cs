@@ -42,10 +42,13 @@ public class RestApiDocGenerator
 
         foreach (var iface in serviceInterfaces)
         {
+            var hereApiAttr = iface.GetCustomAttribute<HereApiAttribute>();
             var svc = new ServiceDoc
             {
                 InterfaceName = iface.Name,
                 Description = GetXmlSummary(iface),
+                ApiName = hereApiAttr?.ApiName,
+                ApiVersion = hereApiAttr?.Version,
                 Methods = []
             };
 
@@ -144,62 +147,49 @@ public class RestApiDocGenerator
     {
         if (depth > 3) return [];
 
-        var result = new List<ParamDocEntry>();
-
+        object? instance = null;
         try
         {
-            var instance = type.IsValueType ? Activator.CreateInstance(type)
+            instance = type.IsValueType ? Activator.CreateInstance(type)
                 : type.GetConstructor(Type.EmptyTypes) is not null ? Activator.CreateInstance(type)
                 : null;
-
-            var properties = type.GetProperties(BindingFlags.Public | BindingFlags.Instance)
-                .Where(p => p.GetMethod?.IsPublic == true);
-
-            foreach (var prop in properties)
-            {
-                var propType = prop.PropertyType;
-                var isNullable = IsNullableProperty(prop);
-                var defaultValue = GetPropertyDefault(instance, prop);
-
-                CollectEnumsFromType(propType);
-
-                var entry = new ParamDocEntry
-                {
-                    Name = prop.Name,
-                    Type = FormatPropertyTypeName(prop),
-                    Required = !isNullable && defaultValue is null or "null",
-                    Description = GetXmlMemberSummary(type, prop.Name, "P"),
-                    Default = defaultValue
-                };
-
-                // Recurse into nested Core model types
-                var unwrapped = UnwrapNullable(propType);
-                if (IsCoreModelType(unwrapped) && !unwrapped.IsEnum)
-                {
-                    entry.Properties = ExtractProperties(unwrapped, depth + 1);
-                }
-
-                result.Add(entry);
-            }
         }
-        catch
+        catch { /* proceed without defaults */ }
+
+        return ExtractPropertiesCore(type, instance, depth);
+    }
+
+    private List<ParamDocEntry> ExtractPropertiesCore(Type type, object? instance, int depth)
+    {
+        var result = new List<ParamDocEntry>();
+        var properties = type.GetProperties(BindingFlags.Public | BindingFlags.Instance)
+            .Where(p => p.GetMethod?.IsPublic == true);
+
+        foreach (var prop in properties)
         {
-            // If we can't instantiate, still extract properties without defaults
-            var properties = type.GetProperties(BindingFlags.Public | BindingFlags.Instance)
-                .Where(p => p.GetMethod?.IsPublic == true);
+            var propType = prop.PropertyType;
+            var isNullable = IsNullableProperty(prop);
+            var defaultValue = GetPropertyDefault(instance, prop);
 
-            foreach (var prop in properties)
+            CollectEnumsFromType(propType);
+
+            var entry = new ParamDocEntry
             {
-                CollectEnumsFromType(prop.PropertyType);
+                Name = prop.Name,
+                Type = FormatPropertyTypeName(prop),
+                Required = !isNullable && defaultValue is null or "null",
+                Description = GetXmlMemberSummary(type, prop.Name, "P"),
+                Default = defaultValue
+            };
 
-                result.Add(new ParamDocEntry
-                {
-                    Name = prop.Name,
-                    Type = FormatPropertyTypeName(prop),
-                    Required = !IsNullableProperty(prop),
-                    Description = GetXmlMemberSummary(type, prop.Name, "P")
-                });
+            // Recurse into nested Core model types
+            var unwrapped = UnwrapNullable(propType);
+            if (IsCoreModelType(unwrapped) && !unwrapped.IsEnum)
+            {
+                entry.Properties = ExtractProperties(unwrapped, depth + 1);
             }
+
+            result.Add(entry);
         }
 
         return result;
@@ -556,6 +546,8 @@ public class ServiceDoc
 {
     public string InterfaceName { get; set; } = "";
     public string Description { get; set; } = "";
+    public string? ApiName { get; set; }
+    public string? ApiVersion { get; set; }
     public List<MethodDoc> Methods { get; set; } = [];
 }
 
