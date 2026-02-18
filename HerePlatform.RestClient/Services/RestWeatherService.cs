@@ -16,8 +16,10 @@ internal sealed class RestWeatherService : IWeatherService
         _httpClientFactory = httpClientFactory;
     }
 
-    public async Task<WeatherResult> GetWeatherAsync(WeatherRequest request)
+    public async Task<WeatherResult> GetWeatherAsync(WeatherRequest request, CancellationToken cancellationToken = default)
     {
+        ArgumentNullException.ThrowIfNull(request);
+
         var products = request.Products is { Count: > 0 }
             ? string.Join(",", request.Products.Select(p => HereApiHelper.GetEnumMemberValue(p)))
             : "observation";
@@ -29,13 +31,12 @@ internal sealed class RestWeatherService : IWeatherService
 
         var url = $"{BaseUrl}?{qs}";
 
-        var client = _httpClientFactory.CreateClient("HereApi");
-        using var response = await client.GetAsync(url).ConfigureAwait(false);
+        var client = _httpClientFactory.CreateClient(HereApiHelper.ClientName);
+        using var response = await client.GetAsync(url, cancellationToken).ConfigureAwait(false);
 
-        HereApiHelper.EnsureAuthSuccess(response, "weather");
-        response.EnsureSuccessStatusCode();
+        await HereApiHelper.EnsureSuccessOrThrowAsync(response, "weather", cancellationToken).ConfigureAwait(false);
 
-        var json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+        var json = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
         var hereResponse = JsonSerializer.Deserialize<HereWeatherResponse>(json, HereJsonDefaults.Options);
 
         return MapToResult(hereResponse);

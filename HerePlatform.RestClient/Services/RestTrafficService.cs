@@ -20,45 +20,61 @@ internal sealed class RestTrafficService : ITrafficService
     }
 
     public async Task<TrafficIncidentsResult> GetTrafficIncidentsAsync(
-        double north, double south, double east, double west)
+        double north, double south, double east, double west, CancellationToken cancellationToken = default)
     {
+        ValidateBoundingBox(north, south, east, west);
+
         var qs = HereApiHelper.BuildQueryString(
             ("in", string.Create(CultureInfo.InvariantCulture, $"bbox:{west},{south},{east},{north}")),
             ("locationReferencing", "shape"));
 
         var url = $"{IncidentsBaseUrl}?{qs}";
 
-        var client = _httpClientFactory.CreateClient("HereApi");
-        using var response = await client.GetAsync(url).ConfigureAwait(false);
+        var client = _httpClientFactory.CreateClient(HereApiHelper.ClientName);
+        using var response = await client.GetAsync(url, cancellationToken).ConfigureAwait(false);
 
-        HereApiHelper.EnsureAuthSuccess(response, "traffic");
-        response.EnsureSuccessStatusCode();
+        await HereApiHelper.EnsureSuccessOrThrowAsync(response, "traffic", cancellationToken).ConfigureAwait(false);
 
-        var json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+        var json = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
         var hereResponse = JsonSerializer.Deserialize<HereTrafficIncidentsResponse>(json, HereJsonDefaults.Options);
 
         return MapIncidents(hereResponse);
     }
 
     public async Task<TrafficFlowResult> GetTrafficFlowAsync(
-        double north, double south, double east, double west)
+        double north, double south, double east, double west, CancellationToken cancellationToken = default)
     {
+        ValidateBoundingBox(north, south, east, west);
+
         var qs = HereApiHelper.BuildQueryString(
             ("in", string.Create(CultureInfo.InvariantCulture, $"bbox:{west},{south},{east},{north}")),
             ("locationReferencing", "shape"));
 
         var url = $"{FlowBaseUrl}?{qs}";
 
-        var client = _httpClientFactory.CreateClient("HereApi");
-        using var response = await client.GetAsync(url).ConfigureAwait(false);
+        var client = _httpClientFactory.CreateClient(HereApiHelper.ClientName);
+        using var response = await client.GetAsync(url, cancellationToken).ConfigureAwait(false);
 
-        HereApiHelper.EnsureAuthSuccess(response, "traffic");
-        response.EnsureSuccessStatusCode();
+        await HereApiHelper.EnsureSuccessOrThrowAsync(response, "traffic", cancellationToken).ConfigureAwait(false);
 
-        var json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+        var json = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
         var hereResponse = JsonSerializer.Deserialize<HereTrafficFlowResponse>(json, HereJsonDefaults.Options);
 
         return MapFlow(hereResponse);
+    }
+
+    private static void ValidateBoundingBox(double north, double south, double east, double west)
+    {
+        if (north < south)
+            throw new ArgumentException("north must be >= south", nameof(north));
+        if (north is < -90 or > 90)
+            throw new ArgumentOutOfRangeException(nameof(north), "Must be between -90 and 90");
+        if (south is < -90 or > 90)
+            throw new ArgumentOutOfRangeException(nameof(south), "Must be between -90 and 90");
+        if (east is < -180 or > 180)
+            throw new ArgumentOutOfRangeException(nameof(east), "Must be between -180 and 180");
+        if (west is < -180 or > 180)
+            throw new ArgumentOutOfRangeException(nameof(west), "Must be between -180 and 180");
     }
 
     private static TrafficIncidentsResult MapIncidents(HereTrafficIncidentsResponse? hereResponse)

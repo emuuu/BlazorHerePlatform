@@ -3,7 +3,6 @@ using HerePlatform.Core.Coordinates;
 using HerePlatform.Core.Isoline;
 using HerePlatform.Core.Routing;
 using HerePlatform.Core.Services;
-using HerePlatform.Core.Utilities;
 using HerePlatform.RestClient.Internal;
 
 namespace HerePlatform.RestClient.Services;
@@ -19,8 +18,10 @@ internal sealed class RestIsolineService : IIsolineService
         _httpClientFactory = httpClientFactory;
     }
 
-    public async Task<IsolineResult> CalculateIsolineAsync(IsolineRequest request)
+    public async Task<IsolineResult> CalculateIsolineAsync(IsolineRequest request, CancellationToken cancellationToken = default)
     {
+        ArgumentNullException.ThrowIfNull(request);
+
         var rangeValues = request.Ranges is { Count: > 0 }
             ? string.Join(",", request.Ranges)
             : null;
@@ -45,13 +46,12 @@ internal sealed class RestIsolineService : IIsolineService
         var qs = HereApiHelper.BuildQueryString(parameters.ToArray());
         var url = $"{BaseUrl}?{qs}";
 
-        var client = _httpClientFactory.CreateClient("HereApi");
-        using var response = await client.GetAsync(url).ConfigureAwait(false);
+        var client = _httpClientFactory.CreateClient(HereApiHelper.ClientName);
+        using var response = await client.GetAsync(url, cancellationToken).ConfigureAwait(false);
 
-        HereApiHelper.EnsureAuthSuccess(response, "isoline");
-        response.EnsureSuccessStatusCode();
+        await HereApiHelper.EnsureSuccessOrThrowAsync(response, "isoline", cancellationToken).ConfigureAwait(false);
 
-        var json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+        var json = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
         var hereResponse = JsonSerializer.Deserialize<HereIsolineResponse>(json, HereJsonDefaults.Options);
 
         return MapToResult(hereResponse);
@@ -76,14 +76,7 @@ internal sealed class RestIsolineService : IIsolineService
                 if (!string.IsNullOrEmpty(encoded))
                 {
                     polygon.EncodedPolyline = encoded;
-                    try
-                    {
-                        polygon.Polygon = FlexiblePolyline.Decode(encoded);
-                    }
-                    catch (Exception)
-                    {
-                        // Leave Polygon null if decoding fails
-                    }
+                    polygon.Polygon = HereApiHelper.DecodeShapeSafe(encoded);
                 }
 
                 return polygon;

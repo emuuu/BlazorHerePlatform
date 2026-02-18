@@ -18,24 +18,28 @@ internal sealed class RestAutosuggestService : IAutosuggestService
         _httpClientFactory = httpClientFactory;
     }
 
-    public async Task<AutosuggestResult> SuggestAsync(string query, AutosuggestOptions? options = null)
+    public async Task<AutosuggestResult> SuggestAsync(string query, AutosuggestOptions? options = null, CancellationToken cancellationToken = default)
     {
-        var hereResponse = await ExecuteRequestAsync(AutosuggestBaseUrl, query, options, "autosuggest")
+        ArgumentException.ThrowIfNullOrWhiteSpace(query);
+
+        var hereResponse = await ExecuteRequestAsync(AutosuggestBaseUrl, query, options, "autosuggest", cancellationToken)
             .ConfigureAwait(false);
 
         return new AutosuggestResult { Items = MapItems(hereResponse) };
     }
 
-    public async Task<AutocompleteResult> AutocompleteAsync(string query, AutosuggestOptions? options = null)
+    public async Task<AutocompleteResult> AutocompleteAsync(string query, AutosuggestOptions? options = null, CancellationToken cancellationToken = default)
     {
-        var hereResponse = await ExecuteRequestAsync(AutocompleteBaseUrl, query, options, "autocomplete")
+        ArgumentException.ThrowIfNullOrWhiteSpace(query);
+
+        var hereResponse = await ExecuteRequestAsync(AutocompleteBaseUrl, query, options, "autocomplete", cancellationToken)
             .ConfigureAwait(false);
 
         return new AutocompleteResult { Items = MapItems(hereResponse) };
     }
 
     private async Task<HereAutosuggestResponse?> ExecuteRequestAsync(
-        string baseUrl, string query, AutosuggestOptions? options, string serviceName)
+        string baseUrl, string query, AutosuggestOptions? options, string serviceName, CancellationToken cancellationToken)
     {
         var opts = options ?? new AutosuggestOptions();
 
@@ -48,13 +52,12 @@ internal sealed class RestAutosuggestService : IAutosuggestService
 
         var url = $"{baseUrl}?{qs}";
 
-        var client = _httpClientFactory.CreateClient("HereApi");
-        using var response = await client.GetAsync(url).ConfigureAwait(false);
+        var client = _httpClientFactory.CreateClient(HereApiHelper.ClientName);
+        using var response = await client.GetAsync(url, cancellationToken).ConfigureAwait(false);
 
-        HereApiHelper.EnsureAuthSuccess(response, serviceName);
-        response.EnsureSuccessStatusCode();
+        await HereApiHelper.EnsureSuccessOrThrowAsync(response, serviceName, cancellationToken).ConfigureAwait(false);
 
-        var json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+        var json = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
         return JsonSerializer.Deserialize<HereAutosuggestResponse>(json, HereJsonDefaults.Options);
     }
 

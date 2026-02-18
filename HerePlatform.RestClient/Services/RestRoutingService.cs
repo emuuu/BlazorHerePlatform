@@ -18,8 +18,10 @@ internal sealed class RestRoutingService : IRoutingService
         _httpClientFactory = httpClientFactory;
     }
 
-    public async Task<RoutingResult> CalculateRouteAsync(RoutingRequest request)
+    public async Task<RoutingResult> CalculateRouteAsync(RoutingRequest request, CancellationToken cancellationToken = default)
     {
+        ArgumentNullException.ThrowIfNull(request);
+
         var returnParts = new List<string> { "summary" };
         if (request.ReturnPolyline)
             returnParts.Add("polyline");
@@ -62,13 +64,12 @@ internal sealed class RestRoutingService : IRoutingService
         var qs = HereApiHelper.BuildQueryString(parameters.ToArray());
         var url = $"{BaseUrl}?{qs}";
 
-        var client = _httpClientFactory.CreateClient("HereApi");
-        using var response = await client.GetAsync(url).ConfigureAwait(false);
+        var client = _httpClientFactory.CreateClient(HereApiHelper.ClientName);
+        using var response = await client.GetAsync(url, cancellationToken).ConfigureAwait(false);
 
-        HereApiHelper.EnsureAuthSuccess(response, "routing");
-        response.EnsureSuccessStatusCode();
+        await HereApiHelper.EnsureSuccessOrThrowAsync(response, "routing", cancellationToken).ConfigureAwait(false);
 
-        var json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+        var json = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
         var hereResponse = JsonSerializer.Deserialize<HereRoutingResponse>(json, HereJsonDefaults.Options);
 
         return MapToResult(hereResponse);
@@ -99,17 +100,7 @@ internal sealed class RestRoutingService : IRoutingService
                     };
 
                     // Decode polyline
-                    if (!string.IsNullOrEmpty(section.Polyline))
-                    {
-                        try
-                        {
-                            rs.DecodedPolyline = FlexiblePolyline.Decode(section.Polyline);
-                        }
-                        catch (Exception)
-                        {
-                            // If decoding fails, leave DecodedPolyline null
-                        }
-                    }
+                    rs.DecodedPolyline = HereApiHelper.DecodeShapeSafe(section.Polyline);
 
                     return rs;
                 }).ToList()

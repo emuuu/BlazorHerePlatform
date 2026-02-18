@@ -1,4 +1,3 @@
-using System.Globalization;
 using System.Text.Json;
 using HerePlatform.Core.Coordinates;
 using HerePlatform.Core.Services;
@@ -19,39 +18,37 @@ internal sealed class RestPublicTransitService : IPublicTransitService
         _httpClientFactory = httpClientFactory;
     }
 
-    public async Task<TransitDeparturesResult> GetDeparturesAsync(LatLngLiteral position)
+    public async Task<TransitDeparturesResult> GetDeparturesAsync(LatLngLiteral position, CancellationToken cancellationToken = default)
     {
         var qs = HereApiHelper.BuildQueryString(
             ("in", HereApiHelper.FormatCoord(position)));
 
         var url = $"{DeparturesBaseUrl}?{qs}";
 
-        var client = _httpClientFactory.CreateClient("HereApi");
-        using var response = await client.GetAsync(url).ConfigureAwait(false);
+        var client = _httpClientFactory.CreateClient(HereApiHelper.ClientName);
+        using var response = await client.GetAsync(url, cancellationToken).ConfigureAwait(false);
 
-        HereApiHelper.EnsureAuthSuccess(response, "transit");
-        response.EnsureSuccessStatusCode();
+        await HereApiHelper.EnsureSuccessOrThrowAsync(response, "transit", cancellationToken).ConfigureAwait(false);
 
-        var json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+        var json = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
         var hereResponse = JsonSerializer.Deserialize<HereTransitDeparturesResponse>(json, HereJsonDefaults.Options);
 
         return MapDepartures(hereResponse);
     }
 
-    public async Task<TransitStationsResult> SearchStationsAsync(LatLngLiteral position, double radiusMeters = 500)
+    public async Task<TransitStationsResult> SearchStationsAsync(LatLngLiteral position, double radiusMeters = 500, CancellationToken cancellationToken = default)
     {
         var qs = HereApiHelper.BuildQueryString(
             ("in", $"{HereApiHelper.FormatCoord(position)};r={HereApiHelper.Invariant(radiusMeters)}"));
 
         var url = $"{StationsBaseUrl}?{qs}";
 
-        var client = _httpClientFactory.CreateClient("HereApi");
-        using var response = await client.GetAsync(url).ConfigureAwait(false);
+        var client = _httpClientFactory.CreateClient(HereApiHelper.ClientName);
+        using var response = await client.GetAsync(url, cancellationToken).ConfigureAwait(false);
 
-        HereApiHelper.EnsureAuthSuccess(response, "transit");
-        response.EnsureSuccessStatusCode();
+        await HereApiHelper.EnsureSuccessOrThrowAsync(response, "transit", cancellationToken).ConfigureAwait(false);
 
-        var json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+        var json = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
         var hereResponse = JsonSerializer.Deserialize<HereTransitStationsResponse>(json, HereJsonDefaults.Options);
 
         return MapStations(hereResponse);

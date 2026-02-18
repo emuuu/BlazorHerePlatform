@@ -23,7 +23,8 @@ public static class ServiceCollectionExtensions
         services.AddTransient<HereAuthHandler>();
 
         // Plain HttpClient for OAuth token endpoint (no auth handler)
-        services.AddHttpClient("HereOAuthToken");
+        services.AddHttpClient("HereOAuthToken")
+            .ConfigureHttpClient(client => client.Timeout = TimeSpan.FromSeconds(15));
 
         // Named HttpClient "HereApi" with auth handler + timeout
         services.AddHttpClient("HereApi")
@@ -47,6 +48,10 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IAutosuggestService, RestAutosuggestService>();
         services.AddSingleton<IWeatherService, RestWeatherService>();
         services.AddSingleton<IRouteMatchingService, RestRouteMatchingService>();
+        services.AddSingleton<IEvChargePointsService, RestEvChargePointsService>();
+        services.AddSingleton<IMapImageService, RestMapImageService>();
+        services.AddSingleton<IIntermodalRoutingService, RestIntermodalRoutingService>();
+        services.AddSingleton<ITourPlanningService, RestTourPlanningService>();
 
         return services;
     }

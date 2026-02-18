@@ -18,13 +18,15 @@ internal sealed class RestWaypointSequenceService : IWaypointSequenceService
         _httpClientFactory = httpClientFactory;
     }
 
-    public async Task<WaypointSequenceResult> OptimizeSequenceAsync(WaypointSequenceRequest request)
+    public async Task<WaypointSequenceResult> OptimizeSequenceAsync(WaypointSequenceRequest request, CancellationToken cancellationToken = default)
     {
+        ArgumentNullException.ThrowIfNull(request);
+
         var parameters = new List<(string key, string? value)>
         {
             ("start", HereApiHelper.FormatCoord(request.Start)),
             ("end", HereApiHelper.FormatCoord(request.End)),
-            ("mode", MapTransportMode(request.TransportMode))
+            ("mode", HereApiHelper.MapTransportMode(request.TransportMode))
         };
 
         if (request.Waypoints is { Count: > 0 })
@@ -36,25 +38,16 @@ internal sealed class RestWaypointSequenceService : IWaypointSequenceService
         var qs = HereApiHelper.BuildQueryString(parameters.ToArray());
         var url = $"{BaseUrl}?{qs}";
 
-        var client = _httpClientFactory.CreateClient("HereApi");
-        using var response = await client.GetAsync(url).ConfigureAwait(false);
+        var client = _httpClientFactory.CreateClient(HereApiHelper.ClientName);
+        using var response = await client.GetAsync(url, cancellationToken).ConfigureAwait(false);
 
-        HereApiHelper.EnsureAuthSuccess(response, "waypoint-sequence");
-        response.EnsureSuccessStatusCode();
+        await HereApiHelper.EnsureSuccessOrThrowAsync(response, "waypoint-sequence", cancellationToken).ConfigureAwait(false);
 
-        var json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+        var json = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
         var hereResponse = JsonSerializer.Deserialize<HereWaypointSequenceResponse>(json, HereJsonDefaults.Options);
 
         return MapToResult(hereResponse);
     }
-
-    private static string MapTransportMode(TransportMode mode) => mode switch
-    {
-        TransportMode.Truck => "fastest;truck",
-        TransportMode.Pedestrian => "fastest;pedestrian",
-        TransportMode.Bicycle => "fastest;bicycle",
-        _ => "fastest;car"
-    };
 
     private static WaypointSequenceResult MapToResult(HereWaypointSequenceResponse? response)
     {

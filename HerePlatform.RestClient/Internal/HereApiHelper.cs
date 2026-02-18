@@ -1,6 +1,8 @@
+using System.Collections.Concurrent;
 using System.Globalization;
 using System.Net;
 using System.Runtime.Serialization;
+using System.Text.Json;
 using HerePlatform.Core.Coordinates;
 using HerePlatform.Core.Exceptions;
 using HerePlatform.Core.Routing;
@@ -9,6 +11,8 @@ namespace HerePlatform.RestClient.Internal;
 
 internal static class HereApiHelper
 {
+    internal const string ClientName = "HereApi";
+
     public static string FormatCoord(LatLngLiteral coord)
         => string.Create(CultureInfo.InvariantCulture, $"{coord.Lat},{coord.Lng}");
 
@@ -28,6 +32,30 @@ internal static class HereApiHelper
         }
     }
 
+    public static async Task EnsureSuccessOrThrowAsync(HttpResponseMessage response, string serviceName, CancellationToken cancellationToken = default)
+    {
+        EnsureAuthSuccess(response, serviceName);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            var errorBody = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+            throw new HereApiException(response.StatusCode, errorBody, serviceName);
+        }
+    }
+
+    public static async Task<T?> SendAndDeserializeAsync<T>(
+        IHttpClientFactory factory, HttpRequestMessage request, string serviceName, CancellationToken cancellationToken = default)
+    {
+        var client = factory.CreateClient(ClientName);
+        using var response = await client.SendAsync(request, cancellationToken).ConfigureAwait(false);
+
+        await EnsureSuccessOrThrowAsync(response, serviceName, cancellationToken).ConfigureAwait(false);
+
+        return await JsonSerializer.DeserializeAsync<T>(
+            await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false),
+            HereJsonDefaults.Options, cancellationToken).ConfigureAwait(false);
+    }
+
     public static string BuildQueryString(params (string key, string? value)[] parameters)
     {
         var pairs = parameters
@@ -37,13 +65,22 @@ internal static class HereApiHelper
         return string.Join("&", pairs);
     }
 
+    private static readonly ConcurrentDictionary<(Type, string), string> _enumCache = new();
+
     public static string GetEnumMemberValue<T>(T value) where T : struct, Enum
     {
-        var member = typeof(T).GetMember(value.ToString()!)[0];
-        var attr = member.GetCustomAttributes(typeof(EnumMemberAttribute), false)
-            .Cast<EnumMemberAttribute>()
-            .FirstOrDefault();
-        return attr?.Value ?? value.ToString()!.ToLowerInvariant();
+        var name = value.ToString()!;
+        return _enumCache.GetOrAdd((typeof(T), name), static key =>
+        {
+            var members = key.Item1.GetMember(key.Item2);
+            if (members.Length == 0)
+                return key.Item2.ToLowerInvariant();
+
+            var attr = members[0].GetCustomAttributes(typeof(EnumMemberAttribute), false)
+                .OfType<EnumMemberAttribute>()
+                .FirstOrDefault();
+            return attr?.Value ?? key.Item2.ToLowerInvariant();
+        });
     }
 
     public static string[] GetAvoidFeatures(RoutingAvoidFeature avoid)
@@ -71,5 +108,28 @@ internal static class HereApiHelper
         if (goods.HasFlag(HazardousGoods.HarmfulToWater)) result.Add("harmfulToWater");
         if (goods.HasFlag(HazardousGoods.Other)) result.Add("other");
         return result.ToArray();
+    }
+
+    public static string MapTransportMode(TransportMode mode) => mode switch
+    {
+        TransportMode.Truck => "fastest;truck",
+        TransportMode.Pedestrian => "fastest;pedestrian",
+        TransportMode.Bicycle => "fastest;bicycle",
+        _ => "fastest;car"
+    };
+
+    public static List<LatLngLiteral>? DecodeShapeSafe(string? shape)
+    {
+        if (string.IsNullOrEmpty(shape))
+            return null;
+
+        try
+        {
+            return Core.Utilities.FlexiblePolyline.Decode(shape);
+        }
+        catch (FormatException)
+        {
+            return null;
+        }
     }
 }

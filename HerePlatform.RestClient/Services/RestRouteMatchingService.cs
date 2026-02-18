@@ -5,7 +5,6 @@ using HerePlatform.Core.Coordinates;
 using HerePlatform.Core.RouteMatching;
 using HerePlatform.Core.Routing;
 using HerePlatform.Core.Services;
-using HerePlatform.Core.Utilities;
 using HerePlatform.RestClient.Internal;
 
 namespace HerePlatform.RestClient.Services;
@@ -21,9 +20,11 @@ internal sealed class RestRouteMatchingService : IRouteMatchingService
         _httpClientFactory = httpClientFactory;
     }
 
-    public async Task<RouteMatchingResult> MatchRouteAsync(RouteMatchingRequest request)
+    public async Task<RouteMatchingResult> MatchRouteAsync(RouteMatchingRequest request, CancellationToken cancellationToken = default)
     {
-        var mode = MapTransportMode(request.TransportMode);
+        ArgumentNullException.ThrowIfNull(request);
+
+        var mode = HereApiHelper.MapTransportMode(request.TransportMode);
 
         var qs = HereApiHelper.BuildQueryString(
             ("mode", mode),
@@ -33,26 +34,17 @@ internal sealed class RestRouteMatchingService : IRouteMatchingService
 
         var body = BuildTraceBody(request.TracePoints);
 
-        var client = _httpClientFactory.CreateClient("HereApi");
+        var client = _httpClientFactory.CreateClient(HereApiHelper.ClientName);
         using var content = new StringContent(body, Encoding.UTF8, "text/csv");
-        using var response = await client.PostAsync(url, content).ConfigureAwait(false);
+        using var response = await client.PostAsync(url, content, cancellationToken).ConfigureAwait(false);
 
-        HereApiHelper.EnsureAuthSuccess(response, "route-matching");
-        response.EnsureSuccessStatusCode();
+        await HereApiHelper.EnsureSuccessOrThrowAsync(response, "route-matching", cancellationToken).ConfigureAwait(false);
 
-        var json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+        var json = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
         var hereResponse = JsonSerializer.Deserialize<HereRouteMatchingResponse>(json, HereJsonDefaults.Options);
 
         return MapToResult(hereResponse);
     }
-
-    private static string MapTransportMode(TransportMode mode) => mode switch
-    {
-        TransportMode.Truck => "fastest;truck",
-        TransportMode.Pedestrian => "fastest;pedestrian",
-        TransportMode.Bicycle => "fastest;bicycle",
-        _ => "fastest;car"
-    };
 
     private static string BuildTraceBody(List<TracePoint>? tracePoints)
     {
@@ -98,7 +90,7 @@ internal sealed class RestRouteMatchingService : IRouteMatchingService
             Confidence = link.Confidence,
             SpeedLimit = link.SpeedLimit,
             FunctionalClass = link.FunctionalClass,
-            Geometry = !string.IsNullOrEmpty(link.Shape) ? FlexiblePolyline.Decode(link.Shape) : null
+            Geometry = HereApiHelper.DecodeShapeSafe(link.Shape)
         }).ToList();
 
         return result;

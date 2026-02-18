@@ -19,8 +19,17 @@ internal sealed class RestMatrixRoutingService : IMatrixRoutingService
         _httpClientFactory = httpClientFactory;
     }
 
-    public async Task<MatrixRoutingResult> CalculateMatrixAsync(MatrixRoutingRequest request)
+    public async Task<MatrixRoutingResult> CalculateMatrixAsync(MatrixRoutingRequest request, CancellationToken cancellationToken = default)
     {
+        ArgumentNullException.ThrowIfNull(request);
+        ArgumentNullException.ThrowIfNull(request.Origins);
+        ArgumentNullException.ThrowIfNull(request.Destinations);
+
+        if (request.Origins.Count == 0)
+            throw new ArgumentException("Origins must not be empty.", nameof(request));
+        if (request.Destinations.Count == 0)
+            throw new ArgumentException("Destinations must not be empty.", nameof(request));
+
         var body = new
         {
             origins = request.Origins.Select(o => new { lat = o.Lat, lng = o.Lng }).ToArray(),
@@ -33,15 +42,14 @@ internal sealed class RestMatrixRoutingService : IMatrixRoutingService
         };
 
         var jsonBody = JsonSerializer.Serialize(body, HereJsonDefaults.Options);
-        var content = new StringContent(jsonBody, Encoding.UTF8, "application/json");
+        using var content = new StringContent(jsonBody, Encoding.UTF8, "application/json");
 
-        var client = _httpClientFactory.CreateClient("HereApi");
-        using var response = await client.PostAsync(BaseUrl, content).ConfigureAwait(false);
+        var client = _httpClientFactory.CreateClient(HereApiHelper.ClientName);
+        using var response = await client.PostAsync(BaseUrl, content, cancellationToken).ConfigureAwait(false);
 
-        HereApiHelper.EnsureAuthSuccess(response, "matrix");
-        response.EnsureSuccessStatusCode();
+        await HereApiHelper.EnsureSuccessOrThrowAsync(response, "matrix", cancellationToken).ConfigureAwait(false);
 
-        var json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+        var json = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
         var hereResponse = JsonSerializer.Deserialize<HereMatrixResponse>(json, HereJsonDefaults.Options);
 
         return MapToResult(hereResponse, request.Origins.Count, request.Destinations.Count);

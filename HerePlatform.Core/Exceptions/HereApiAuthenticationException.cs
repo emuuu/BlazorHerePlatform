@@ -10,6 +10,11 @@ public class HereApiAuthenticationException : Exception
     /// </summary>
     public string? Service { get; }
 
+    public HereApiAuthenticationException(string message)
+        : base(message)
+    {
+    }
+
     public HereApiAuthenticationException(string message, string? service)
         : base(message)
     {

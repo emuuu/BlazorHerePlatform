@@ -6,8 +6,10 @@ namespace HerePlatform.RestClient.Services;
 
 internal sealed class RestGeofencingService : IGeofencingService
 {
-    public Task<GeofenceCheckResult> CheckPositionAsync(LatLngLiteral position, List<GeofenceZone> zones)
+    public Task<GeofenceCheckResult> CheckPositionAsync(LatLngLiteral position, List<GeofenceZone> zones, CancellationToken cancellationToken = default)
     {
+        ArgumentNullException.ThrowIfNull(zones);
+
         var matchedIds = new List<string>();
 
         foreach (var zone in zones)

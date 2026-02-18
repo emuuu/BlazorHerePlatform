@@ -19,8 +19,10 @@ internal sealed class RestPlacesService : IPlacesService
         _httpClientFactory = httpClientFactory;
     }
 
-    public async Task<PlacesResult> DiscoverAsync(PlacesRequest request)
+    public async Task<PlacesResult> DiscoverAsync(PlacesRequest request, CancellationToken cancellationToken = default)
     {
+        ArgumentNullException.ThrowIfNull(request);
+
         var qs = HereApiHelper.BuildQueryString(
             ("q", request.Query),
             ("at", request.At.HasValue ? HereApiHelper.FormatCoord(request.At.Value) : null),
@@ -29,11 +31,13 @@ internal sealed class RestPlacesService : IPlacesService
             ("lang", request.Lang));
 
         var url = $"{DiscoverBaseUrl}?{qs}";
-        return await ExecuteRequest(url).ConfigureAwait(false);
+        return await ExecuteRequest(url, cancellationToken).ConfigureAwait(false);
     }
 
-    public async Task<PlacesResult> BrowseAsync(PlacesRequest request)
+    public async Task<PlacesResult> BrowseAsync(PlacesRequest request, CancellationToken cancellationToken = default)
     {
+        ArgumentNullException.ThrowIfNull(request);
+
         var categories = request.Categories is { Count: > 0 }
             ? string.Join(",", request.Categories)
             : null;
@@ -46,24 +50,26 @@ internal sealed class RestPlacesService : IPlacesService
             ("lang", request.Lang));
 
         var url = $"{BrowseBaseUrl}?{qs}";
-        return await ExecuteRequest(url).ConfigureAwait(false);
+        return await ExecuteRequest(url, cancellationToken).ConfigureAwait(false);
     }
 
-    public async Task<PlacesResult> LookupAsync(PlacesRequest request)
+    public async Task<PlacesResult> LookupAsync(PlacesRequest request, CancellationToken cancellationToken = default)
     {
+        ArgumentNullException.ThrowIfNull(request);
+        ArgumentException.ThrowIfNullOrWhiteSpace(request.Id);
+
         var qs = HereApiHelper.BuildQueryString(
             ("id", request.Id),
             ("lang", request.Lang));
 
         var url = $"{LookupBaseUrl}?{qs}";
 
-        var client = _httpClientFactory.CreateClient("HereApi");
-        using var response = await client.GetAsync(url).ConfigureAwait(false);
+        var client = _httpClientFactory.CreateClient(HereApiHelper.ClientName);
+        using var response = await client.GetAsync(url, cancellationToken).ConfigureAwait(false);
 
-        HereApiHelper.EnsureAuthSuccess(response, "places");
-        response.EnsureSuccessStatusCode();
+        await HereApiHelper.EnsureSuccessOrThrowAsync(response, "places", cancellationToken).ConfigureAwait(false);
 
-        var json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+        var json = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
 
         // Lookup returns a single item, not a list
         var hereItem = JsonSerializer.Deserialize<HerePlaceItem>(json, HereJsonDefaults.Options);
@@ -73,15 +79,14 @@ internal sealed class RestPlacesService : IPlacesService
         return new PlacesResult { Items = [MapToPlaceItem(hereItem)] };
     }
 
-    private async Task<PlacesResult> ExecuteRequest(string url)
+    private async Task<PlacesResult> ExecuteRequest(string url, CancellationToken cancellationToken)
     {
-        var client = _httpClientFactory.CreateClient("HereApi");
-        using var response = await client.GetAsync(url).ConfigureAwait(false);
+        var client = _httpClientFactory.CreateClient(HereApiHelper.ClientName);
+        using var response = await client.GetAsync(url, cancellationToken).ConfigureAwait(false);
 
-        HereApiHelper.EnsureAuthSuccess(response, "places");
-        response.EnsureSuccessStatusCode();
+        await HereApiHelper.EnsureSuccessOrThrowAsync(response, "places", cancellationToken).ConfigureAwait(false);
 
-        var json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+        var json = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
         var hereResponse = JsonSerializer.Deserialize<HerePlacesResponse>(json, HereJsonDefaults.Options);
 
         return MapToResult(hereResponse);
@@ -130,8 +135,8 @@ internal sealed class RestPlacesService : IPlacesService
             Position = item.Position is not null
                 ? new LatLngLiteral(item.Position.Lat, item.Position.Lng)
                 : null,
-            Categories = item.Categories?.Select(c => c.Name!)
-                .Where(n => n is not null).ToList(),
+            Categories = item.Categories?.Select(c => c.Name)
+                .Where(n => n is not null).ToList()!,
             OpeningHours = item.OpeningHours?.FirstOrDefault()?.Text?.FirstOrDefault(),
             Contacts = contacts.Count > 0 ? contacts : null,
             Distance = item.Distance

@@ -18,8 +18,10 @@ internal sealed class RestGeocodingService : IGeocodingService
         _httpClientFactory = httpClientFactory;
     }
 
-    public async Task<GeocodeResult> GeocodeAsync(string query, GeocodeOptions? options = null)
+    public async Task<GeocodeResult> GeocodeAsync(string query, GeocodeOptions? options = null, CancellationToken cancellationToken = default)
     {
+        ArgumentException.ThrowIfNullOrWhiteSpace(query);
+
         var qs = HereApiHelper.BuildQueryString(
             ("q", query),
             ("lang", options?.Lang),
@@ -28,19 +30,18 @@ internal sealed class RestGeocodingService : IGeocodingService
 
         var url = $"{GeocodeBaseUrl}?{qs}";
 
-        var client = _httpClientFactory.CreateClient("HereApi");
-        using var response = await client.GetAsync(url).ConfigureAwait(false);
+        var client = _httpClientFactory.CreateClient(HereApiHelper.ClientName);
+        using var response = await client.GetAsync(url, cancellationToken).ConfigureAwait(false);
 
-        HereApiHelper.EnsureAuthSuccess(response, "geocoding");
-        response.EnsureSuccessStatusCode();
+        await HereApiHelper.EnsureSuccessOrThrowAsync(response, "geocoding", cancellationToken).ConfigureAwait(false);
 
-        var json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+        var json = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
         var hereResponse = JsonSerializer.Deserialize<HereGeocodeResponse>(json, HereJsonDefaults.Options);
 
         return MapToResult(hereResponse);
     }
 
-    public async Task<GeocodeResult> ReverseGeocodeAsync(LatLngLiteral position, GeocodeOptions? options = null)
+    public async Task<GeocodeResult> ReverseGeocodeAsync(LatLngLiteral position, GeocodeOptions? options = null, CancellationToken cancellationToken = default)
     {
         var qs = HereApiHelper.BuildQueryString(
             ("at", HereApiHelper.FormatCoord(position)),
@@ -49,13 +50,12 @@ internal sealed class RestGeocodingService : IGeocodingService
 
         var url = $"{ReverseGeocodeBaseUrl}?{qs}";
 
-        var client = _httpClientFactory.CreateClient("HereApi");
-        using var response = await client.GetAsync(url).ConfigureAwait(false);
+        var client = _httpClientFactory.CreateClient(HereApiHelper.ClientName);
+        using var response = await client.GetAsync(url, cancellationToken).ConfigureAwait(false);
 
-        HereApiHelper.EnsureAuthSuccess(response, "geocoding");
-        response.EnsureSuccessStatusCode();
+        await HereApiHelper.EnsureSuccessOrThrowAsync(response, "geocoding", cancellationToken).ConfigureAwait(false);
 
-        var json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+        var json = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
         var hereResponse = JsonSerializer.Deserialize<HereGeocodeResponse>(json, HereJsonDefaults.Options);
 
         return MapToResult(hereResponse);
