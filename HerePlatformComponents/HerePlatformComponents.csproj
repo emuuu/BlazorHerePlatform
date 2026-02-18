@@ -3,33 +3,12 @@
 	<PropertyGroup>
 		<TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
 		<IsPackable>true</IsPackable>
-		<LangVersion>latest</LangVersion>
 		<PackageId>BlazorHerePlatform</PackageId>
-		<Version>1.0.0</Version>
-		<Authors>Timm Bremekamp</Authors>
 		<Description>Blazor HERE Platform Maps components</Description>
 		<PackageTags>blazor;here;maps;components;geolocation;routing</PackageTags>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-		<PackageLicenseExpression>MIT</PackageLicenseExpression>
-		<PackageProjectUrl>https://github.com/emuuu/BlazorHerePlatform</PackageProjectUrl>
-		<RepositoryUrl>https://github.com/emuuu/BlazorHerePlatform</RepositoryUrl>
-		<RepositoryType>git</RepositoryType>
-		<Nullable>enable</Nullable>
-		<Copyright>Copyright (c) 2025 Timm Bremekamp</Copyright>
-		<PublishRepositoryUrl>true</PublishRepositoryUrl>
-		<EmbedUntrackedSources>true</EmbedUntrackedSources>
-		<IncludeSymbols>true</IncludeSymbols>
-		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageIcon>blazor-here-platform.png</PackageIcon>
-		<Deterministic>true</Deterministic>
-		<GenerateDocumentationFile>True</GenerateDocumentationFile>
-		<NoWarn>$(NoWarn);1591</NoWarn>
-	</PropertyGroup>
-
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-		<DebugType>portable</DebugType>
-		<DebugSymbols>true</DebugSymbols>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -64,7 +43,6 @@
 		<PackageReference Include="Microsoft.JSInterop" Version="8.0.24" Condition="'$(TargetFramework)' == 'net8.0'" />
 		<PackageReference Include="Microsoft.JSInterop" Version="9.0.13" Condition="'$(TargetFramework)' == 'net9.0'" />
 		<PackageReference Include="Microsoft.JSInterop" Version="10.0.3" Condition="'$(TargetFramework)' == 'net10.0'" />
-		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="9.0.2" PrivateAssets="All" />
 		<PackageReference Include="OneOf" Version="3.0.271" />
 	</ItemGroup>
 

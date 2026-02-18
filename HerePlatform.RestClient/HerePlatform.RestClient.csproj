@@ -2,35 +2,13 @@
 
 	<PropertyGroup>
 		<TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
-		<LangVersion>latest</LangVersion>
-		<ImplicitUsings>enable</ImplicitUsings>
-		<Nullable>enable</Nullable>
 		<IsPackable>true</IsPackable>
 		<PackageId>BlazorHerePlatform.RestClient</PackageId>
-		<Version>1.0.0</Version>
-		<Authors>Timm Bremekamp</Authors>
 		<Description>REST client for HERE Platform APIs (Geocoding, Routing, Places, Traffic, Transit, Isoline, Matrix)</Description>
 		<PackageTags>here;maps;rest;geocoding;routing;places;traffic;transit</PackageTags>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-		<PackageLicenseExpression>MIT</PackageLicenseExpression>
-		<PackageProjectUrl>https://github.com/emuuu/BlazorHerePlatform</PackageProjectUrl>
-		<RepositoryUrl>https://github.com/emuuu/BlazorHerePlatform</RepositoryUrl>
-		<RepositoryType>git</RepositoryType>
-		<Copyright>Copyright (c) 2025 Timm Bremekamp</Copyright>
-		<PublishRepositoryUrl>true</PublishRepositoryUrl>
-		<EmbedUntrackedSources>true</EmbedUntrackedSources>
-		<IncludeSymbols>true</IncludeSymbols>
-		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageIcon>blazor-here-platform.png</PackageIcon>
-		<Deterministic>true</Deterministic>
-		<GenerateDocumentationFile>true</GenerateDocumentationFile>
-		<NoWarn>$(NoWarn);1591</NoWarn>
-	</PropertyGroup>
-
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-		<DebugType>portable</DebugType>
-		<DebugSymbols>true</DebugSymbols>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -58,7 +36,6 @@
 		<PackageReference Include="Microsoft.Extensions.Options" Version="8.0.2" Condition="'$(TargetFramework)' == 'net8.0'" />
 		<PackageReference Include="Microsoft.Extensions.Options" Version="9.0.3" Condition="'$(TargetFramework)' == 'net9.0'" />
 		<PackageReference Include="Microsoft.Extensions.Options" Version="10.0.3" Condition="'$(TargetFramework)' == 'net10.0'" />
-		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="10.0.102" PrivateAssets="All" />
 	</ItemGroup>
 
 </Project>
