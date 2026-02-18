@@ -1,6 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.Diagnostics;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -9,8 +7,8 @@ namespace HerePlatform.Core.Serialization;
 
 public class JsonStringEnumConverterEx<TEnum> : JsonConverter<TEnum> where TEnum : struct, Enum
 {
-    private readonly Dictionary<TEnum, string> _enumToString = new Dictionary<TEnum, string>();
-    private readonly Dictionary<string, TEnum> _stringToEnum = new Dictionary<string, TEnum>();
+    private readonly Dictionary<TEnum, string> _enumToString = new();
+    private readonly Dictionary<string, TEnum> _stringToEnum = new(StringComparer.OrdinalIgnoreCase);
 
     public JsonStringEnumConverterEx()
     {
@@ -46,8 +44,9 @@ public class JsonStringEnumConverterEx<TEnum> : JsonConverter<TEnum> where TEnum
         if (_stringToEnum.TryGetValue(stringValue ?? "", out var result))
             return result;
 
-        System.Diagnostics.Debug.WriteLine(
-            $"[BlazorHerePlatform] Unknown enum value '{stringValue}' for {typeof(TEnum).Name}, falling back to default");
+        Trace.TraceWarning(
+            "[BlazorHerePlatform] Unknown enum value '{0}' for {1}, falling back to default",
+            stringValue, typeof(TEnum).Name);
         return default;
     }
 

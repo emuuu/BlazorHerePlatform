@@ -43,12 +43,12 @@
                         <div class="col-5">
                             <input type="number" step="any" class="form-control form-control-sm" placeholder="Lat"
                                    value="@_origins[idx].lat"
-                                   @onchange="e => { var v = _origins[idx]; _origins[idx] = (double.Parse(e.Value?.ToString()!, CultureInfo.InvariantCulture), v.lng); }" />
+                                   @onchange="e => { if (double.TryParse(e.Value?.ToString(), CultureInfo.InvariantCulture, out var parsed)) { var v = _origins[idx]; _origins[idx] = (parsed, v.lng); } }" />
                         </div>
                         <div class="col-5">
                             <input type="number" step="any" class="form-control form-control-sm" placeholder="Lng"
                                    value="@_origins[idx].lng"
-                                   @onchange="e => { var v = _origins[idx]; _origins[idx] = (v.lat, double.Parse(e.Value?.ToString()!, CultureInfo.InvariantCulture)); }" />
+                                   @onchange="e => { if (double.TryParse(e.Value?.ToString(), CultureInfo.InvariantCulture, out var parsed)) { var v = _origins[idx]; _origins[idx] = (v.lat, parsed); } }" />
                         </div>
                         <div class="col-2">
                             <button class="btn btn-sm btn-outline-danger w-100" @onclick="() => _origins.RemoveAt(idx)"
@@ -68,12 +68,12 @@
                         <div class="col-5">
                             <input type="number" step="any" class="form-control form-control-sm" placeholder="Lat"
                                    value="@_destinations[idx].lat"
-                                   @onchange="e => { var v = _destinations[idx]; _destinations[idx] = (double.Parse(e.Value?.ToString()!, CultureInfo.InvariantCulture), v.lng); }" />
+                                   @onchange="e => { if (double.TryParse(e.Value?.ToString(), CultureInfo.InvariantCulture, out var parsed)) { var v = _destinations[idx]; _destinations[idx] = (parsed, v.lng); } }" />
                         </div>
                         <div class="col-5">
                             <input type="number" step="any" class="form-control form-control-sm" placeholder="Lng"
                                    value="@_destinations[idx].lng"
-                                   @onchange="e => { var v = _destinations[idx]; _destinations[idx] = (v.lat, double.Parse(e.Value?.ToString()!, CultureInfo.InvariantCulture)); }" />
+                                   @onchange="e => { if (double.TryParse(e.Value?.ToString(), CultureInfo.InvariantCulture, out var parsed)) { var v = _destinations[idx]; _destinations[idx] = (v.lat, parsed); } }" />
                         </div>
                         <div class="col-2">
                             <button class="btn btn-sm btn-outline-danger w-100" @onclick="() => _destinations.RemoveAt(idx)"
