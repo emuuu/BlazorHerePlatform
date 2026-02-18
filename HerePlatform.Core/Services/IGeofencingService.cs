@@ -13,5 +13,6 @@ public interface IGeofencingService
     /// </summary>
     /// <param name="position">Position to check.</param>
     /// <param name="zones">Geofence zones (polygon or circle).</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     Task<GeofenceCheckResult> CheckPositionAsync(LatLngLiteral position, List<GeofenceZone> zones, CancellationToken cancellationToken = default);
 }
