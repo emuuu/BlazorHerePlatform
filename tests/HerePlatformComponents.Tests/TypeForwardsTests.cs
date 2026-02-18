@@ -75,8 +75,8 @@ public class TypeForwardsTests
         // + 3 MatrixRouting + 4 Isoline + 4 Traffic + 4 Transit + 4 Places
         // + 2 Geofencing + 4 RouteMatching + 5 Weather + 2 WaypointSequence
         // + 5 EvChargePoints + 3 MapImage + 7 IntermodalRouting + 15 TourPlanning
-        // + 3 Utilities + 1 Exceptions + 1 Attributes + 16 Services = 110
-        Assert.That(ForwardedTypes, Has.Length.EqualTo(110),
+        // + 3 Utilities + 2 Exceptions + 1 Attributes + 16 Services = 111
+        Assert.That(ForwardedTypes, Has.Length.EqualTo(111),
             "TypeForwardedTo count changed — update this test if types were added/removed");
     }
 }
