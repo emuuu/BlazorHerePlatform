@@ -313,7 +313,7 @@
               "name": "cancellationToken",
               "type": "CancellationToken?",
               "required": false,
-              "description": "",
+              "description": "Cancellation token.",
               "default": "null"
             }
           ]
