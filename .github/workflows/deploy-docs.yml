@@ -5,7 +5,7 @@ on:
     paths:
       - 'docs/HerePlatform.Docs/**'
       - 'docs/HerePlatform.Docs.Generator/**'
-      - 'HerePlatformComponents/**'
+      - 'HerePlatform.Blazor/**'
       - 'HerePlatform.Core/**'
       - 'HerePlatform.RestClient/**'
   workflow_dispatch:

@@ -20,11 +20,11 @@ jobs:
       - run: dotnet restore
       - run: dotnet build -c Release --no-restore
       - run: dotnet test -c Release --no-build
-        working-directory: tests/HerePlatformComponents.Tests
+        working-directory: tests/HerePlatform.Blazor.Tests
       - name: Extract version from tag
         run: echo "VERSION=${GITHUB_REF_NAME#blazor/v}" >> $GITHUB_ENV
       - name: Pack
-        run: dotnet pack HerePlatformComponents/HerePlatformComponents.csproj -c Release --no-build -p:Version=$VERSION -o ./artifacts
+        run: dotnet pack HerePlatform.Blazor/HerePlatform.Blazor.csproj -c Release --no-build -p:Version=$VERSION -o ./artifacts
       - name: Push to NuGet
         run: |
           dotnet nuget push ./artifacts/*.nupkg --skip-duplicate -s https://api.nuget.org/v3/index.json -k ${{ secrets.NUGET_API_KEY }}
