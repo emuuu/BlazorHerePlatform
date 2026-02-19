@@ -3,17 +3,17 @@
 	<PropertyGroup>
 		<TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
 		<IsPackable>true</IsPackable>
-		<PackageId>BlazorHerePlatform.RestClient</PackageId>
+		<PackageId>HerePlatform.NET.RestClient</PackageId>
 		<Description>REST client for HERE Platform APIs (Geocoding, Routing, Places, Traffic, Transit, Isoline, Matrix)</Description>
 		<PackageTags>here;maps;rest;geocoding;routing;places;traffic;transit</PackageTags>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
-		<PackageIcon>blazor-here-platform.png</PackageIcon>
+		<PackageIcon>here-platform.png</PackageIcon>
 	</PropertyGroup>
 
 	<ItemGroup>
 		<None Include="..\README.md" Pack="true" PackagePath="\" />
-		<None Include="..\blazor-here-platform.png" Pack="true" PackagePath="\" />
+		<None Include="..\here-platform.png" Pack="true" PackagePath="\" />
 	</ItemGroup>
 
 	<ItemGroup>
