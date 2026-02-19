@@ -79,18 +79,18 @@ public class StaticHtmlGenerator
             <head>
                 <meta charset="utf-8" />
                 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-                <title>{title} - BlazorHerePlatform Docs</title>
+                <title>{title} - HerePlatform.NET Docs</title>
                 <base href="/" />
                 <meta name="description" content="{description}" />
                 <link rel="canonical" href="{url}" />
                 <meta property="og:type" content="article" />
-                <meta property="og:title" content="{title} - BlazorHerePlatform" />
+                <meta property="og:title" content="{title} - HerePlatform.NET" />
                 <meta property="og:description" content="{description}" />
                 <meta property="og:url" content="{url}" />
-                <meta property="og:site_name" content="BlazorHerePlatform Docs" />
+                <meta property="og:site_name" content="HerePlatform.NET Docs" />
                 <meta property="og:image" content="{_baseUrl}/img/blazor-here-platform.svg" />
                 <meta name="twitter:card" content="summary" />
-                <meta name="twitter:title" content="{title} - BlazorHerePlatform" />
+                <meta name="twitter:title" content="{title} - HerePlatform.NET" />
                 <meta name="twitter:description" content="{description}" />
                 <script type="application/ld+json">{jsonLd}</script>
                 <link rel="icon" type="image/svg+xml" href="img/blazor-here-platform.svg" />
@@ -136,18 +136,18 @@ public class StaticHtmlGenerator
             <head>
                 <meta charset="utf-8" />
                 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-                <title>{encodedTitle} Demo - BlazorHerePlatform</title>
+                <title>{encodedTitle} Demo - HerePlatform.NET</title>
                 <base href="/" />
                 <meta name="description" content="{encodedDesc}" />
                 <link rel="canonical" href="{url}" />
                 <meta property="og:type" content="website" />
-                <meta property="og:title" content="{encodedTitle} Demo - BlazorHerePlatform" />
+                <meta property="og:title" content="{encodedTitle} Demo - HerePlatform.NET" />
                 <meta property="og:description" content="{encodedDesc}" />
                 <meta property="og:url" content="{url}" />
-                <meta property="og:site_name" content="BlazorHerePlatform Docs" />
+                <meta property="og:site_name" content="HerePlatform.NET Docs" />
                 <meta property="og:image" content="{_baseUrl}/img/blazor-here-platform.svg" />
                 <meta name="twitter:card" content="summary" />
-                <meta name="twitter:title" content="{encodedTitle} Demo - BlazorHerePlatform" />
+                <meta name="twitter:title" content="{encodedTitle} Demo - HerePlatform.NET" />
                 <meta name="twitter:description" content="{encodedDesc}" />
                 <link rel="icon" type="image/svg+xml" href="img/blazor-here-platform.svg" />
                 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
@@ -215,7 +215,7 @@ public class StaticHtmlGenerator
                 description = entry.Description,
                 url,
                 image = $"{_baseUrl}/img/blazor-here-platform.svg",
-                publisher = new { @type = "Organization", name = "BlazorHerePlatform" }
+                publisher = new { @type = "Organization", name = "HerePlatform.NET" }
             },
             new
             {
@@ -234,12 +234,12 @@ public class StaticHtmlGenerator
 
                 <meta name="description" content="Blazor components and services for the HERE Maps JavaScript API. Build interactive maps with declarative Razor syntax." />
                 <meta property="og:type" content="website" />
-                <meta property="og:title" content="BlazorHerePlatform Docs" />
+                <meta property="og:title" content="HerePlatform.NET Docs" />
                 <meta property="og:description" content="Blazor components and services for the HERE Maps JavaScript API. Build interactive maps with declarative Razor syntax." />
-                <meta property="og:site_name" content="BlazorHerePlatform Docs" />
+                <meta property="og:site_name" content="HerePlatform.NET Docs" />
                 <meta property="og:image" content="{0}/img/blazor-here-platform.svg" />
                 <meta name="twitter:card" content="summary" />
-                <meta name="twitter:title" content="BlazorHerePlatform Docs" />
+                <meta name="twitter:title" content="HerePlatform.NET Docs" />
                 <meta name="twitter:description" content="Blazor components and services for the HERE Maps JavaScript API." />
             """;
 

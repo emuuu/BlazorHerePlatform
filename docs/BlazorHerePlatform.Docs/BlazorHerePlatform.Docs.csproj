@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <PropertyGroup>
-    <BaseUrl Condition="'$(BaseUrl)' == ''">https://emuuu.github.io/BlazorHerePlatform</BaseUrl>
+    <BaseUrl Condition="'$(BaseUrl)' == ''">https://emuuu.github.io/HerePlatform.NET</BaseUrl>
   </PropertyGroup>
 
   <Target Name="GenerateDocsData" BeforeTargets="Build">

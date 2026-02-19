@@ -13,7 +13,7 @@
 Instead, report them privately via email:
 
 - **Email:** contact@emu-fake.com
-- **Subject:** `[SECURITY] BlazorHerePlatform — <brief description>`
+- **Subject:** `[SECURITY] HerePlatform.NET — <brief description>`
 
 Please include:
 

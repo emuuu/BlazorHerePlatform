@@ -34,7 +34,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           if [[ "$VERSION" == *"-preview"* ]]; then
-            gh release create ${{ github.ref_name }} ./artifacts/*.nupkg --generate-notes --prerelease --title "BlazorHerePlatform.RestClient v$VERSION"
+            gh release create ${{ github.ref_name }} ./artifacts/*.nupkg --generate-notes --prerelease --title "HerePlatform.NET.RestClient v$VERSION"
           else
-            gh release create ${{ github.ref_name }} ./artifacts/*.nupkg --generate-notes --title "BlazorHerePlatform.RestClient v$VERSION"
+            gh release create ${{ github.ref_name }} ./artifacts/*.nupkg --generate-notes --title "HerePlatform.NET.RestClient v$VERSION"
           fi

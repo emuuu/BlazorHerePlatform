@@ -1,5 +1,5 @@
 name: Feature Request
-description: Suggest a new feature for BlazorHerePlatform
+description: Suggest a new feature for HerePlatform.NET
 labels: [enhancement]
 body:
   - type: textarea

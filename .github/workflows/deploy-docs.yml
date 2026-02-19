@@ -33,9 +33,9 @@ jobs:
         run: dotnet publish docs/BlazorHerePlatform.Docs/BlazorHerePlatform.Docs.csproj -c Release -o output
       - name: Rewrite base href
         run: |
-          sed -i 's|<base href="/" />|<base href="/BlazorHerePlatform/" />|g' output/wwwroot/index.html
+          sed -i 's|<base href="/" />|<base href="/HerePlatform.NET/" />|g' output/wwwroot/index.html
           if [ -f output/wwwroot/404.html ]; then
-            sed -i 's|<base href="/" />|<base href="/BlazorHerePlatform/" />|g' output/wwwroot/404.html
+            sed -i 's|<base href="/" />|<base href="/HerePlatform.NET/" />|g' output/wwwroot/404.html
           fi
       - uses: actions/upload-pages-artifact@v4
         with:

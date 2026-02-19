@@ -2,15 +2,15 @@
   <img src="blazor-here-platform.svg" alt="BlazorHerePlatform" width="128" />
 </p>
 
-# BlazorHerePlatform
+# HerePlatform.NET
 
-A comprehensive Blazor component library for the [HERE Maps JS API](https://developer.here.com/develop/javascript-api). Declarative map rendering, markers, shapes, clustering, heatmaps, routing, geocoding, and more — all as Blazor components and services.
+.NET libraries for the [HERE Platform](https://developer.here.com/) APIs. Includes Blazor components for the HERE Maps JS API and a REST client for routing, geocoding, traffic, and more — all targeting .NET 8, 9, and 10.
 
 [![NuGet](https://img.shields.io/nuget/v/BlazorHerePlatform.svg)](https://www.nuget.org/packages/BlazorHerePlatform)
 [![NuGet Downloads](https://img.shields.io/nuget/dt/BlazorHerePlatform.svg)](https://www.nuget.org/packages/BlazorHerePlatform)
-[![CI](https://github.com/emuuu/BlazorHerePlatform/actions/workflows/ci.yml/badge.svg)](https://github.com/emuuu/BlazorHerePlatform/actions/workflows/ci.yml)
+[![CI](https://github.com/emuuu/HerePlatform.NET/actions/workflows/ci.yml/badge.svg)](https://github.com/emuuu/HerePlatform.NET/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Docs](https://img.shields.io/badge/Docs-GitHub%20Pages-blue)](https://emuuu.github.io/BlazorHerePlatform/)
+[![Docs](https://img.shields.io/badge/Docs-GitHub%20Pages-blue)](https://emuuu.github.io/HerePlatform.NET/)
 
 **Feature highlights:**
 

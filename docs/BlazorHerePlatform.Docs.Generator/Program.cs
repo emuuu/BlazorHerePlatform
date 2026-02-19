@@ -13,7 +13,7 @@ if (!Directory.Exists(wwwrootPath))
     return 1;
 }
 
-var baseUrl = "https://emuuu.github.io/BlazorHerePlatform";
+var baseUrl = "https://emuuu.github.io/HerePlatform.NET";
 var baseUrlIndex = Array.IndexOf(args, "--base-url");
 if (baseUrlIndex >= 0 && baseUrlIndex + 1 < args.Length)
 {

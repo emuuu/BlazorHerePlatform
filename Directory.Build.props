@@ -17,8 +17,8 @@
 		<Authors>Timm Bremekamp</Authors>
 		<Copyright>Copyright (c) 2025-2026 Timm Bremekamp</Copyright>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
-		<PackageProjectUrl>https://github.com/emuuu/BlazorHerePlatform</PackageProjectUrl>
-		<RepositoryUrl>https://github.com/emuuu/BlazorHerePlatform</RepositoryUrl>
+		<PackageProjectUrl>https://github.com/emuuu/HerePlatform.NET</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/emuuu/HerePlatform.NET</RepositoryUrl>
 		<RepositoryType>git</RepositoryType>
 	</PropertyGroup>
 

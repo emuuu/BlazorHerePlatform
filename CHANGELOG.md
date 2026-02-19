@@ -27,6 +27,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Multi-target support for net8.0, net9.0, and net10.0
 - Blazor Server and Blazor WebAssembly support
 
-For older versions, see [GitHub Releases](https://github.com/emuuu/BlazorHerePlatform/releases).
+For older versions, see [GitHub Releases](https://github.com/emuuu/HerePlatform.NET/releases).
 
-[1.0.0]: https://github.com/emuuu/BlazorHerePlatform/releases/tag/v1.0.0
+[1.0.0]: https://github.com/emuuu/HerePlatform.NET/releases/tag/v1.0.0

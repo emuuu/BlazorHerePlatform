@@ -1,11 +1,11 @@
-# Contributing to BlazorHerePlatform
+# Contributing to HerePlatform.NET
 
-Thank you for considering contributing to BlazorHerePlatform! Every contribution helps make this library better.
+Thank you for considering contributing to HerePlatform.NET! Every contribution helps make this library better.
 
 ## Reporting Issues
 
-- **Bug Reports:** Use the [Bug Report template](https://github.com/emuuu/BlazorHerePlatform/issues/new?template=bug_report.yml) and include reproduction steps, expected/actual behavior, and your environment (.NET version, browser, OS).
-- **Feature Requests:** Use the [Feature Request template](https://github.com/emuuu/BlazorHerePlatform/issues/new?template=feature_request.yml) and describe the use case you're trying to solve.
+- **Bug Reports:** Use the [Bug Report template](https://github.com/emuuu/HerePlatform.NET/issues/new?template=bug_report.yml) and include reproduction steps, expected/actual behavior, and your environment (.NET version, browser, OS).
+- **Feature Requests:** Use the [Feature Request template](https://github.com/emuuu/HerePlatform.NET/issues/new?template=feature_request.yml) and describe the use case you're trying to solve.
 
 ## Development Setup
 
@@ -17,8 +17,8 @@ Thank you for considering contributing to BlazorHerePlatform! Every contribution
 ### Clone & Build
 
 ```bash
-git clone https://github.com/emuuu/BlazorHerePlatform.git
-cd BlazorHerePlatform
+git clone https://github.com/emuuu/HerePlatform.NET.git
+cd HerePlatform.NET
 dotnet restore
 dotnet build
 ```
