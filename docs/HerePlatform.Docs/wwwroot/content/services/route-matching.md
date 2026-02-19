@@ -8,7 +8,7 @@ apiRef: IRouteMatchingService
 
 ## Setup
 
-Inject `IRouteMatchingService` into your component. It is registered automatically by `AddBlazorHerePlatform`.
+Inject `IRouteMatchingService` into your component. It is registered automatically by `AddHerePlatformBlazor`.
 
 ```csharp
 @inject IRouteMatchingService RouteMatchingService

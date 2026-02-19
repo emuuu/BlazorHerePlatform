@@ -30,7 +30,7 @@
             <h1>Map Image Service</h1>
             <p class="lead text-muted">Generate static map images.</p>
             <h2 id="setup">Setup</h2>
-<p>Inject <code>IMapImageService</code> into your component. It is registered automatically by <code>AddBlazorHerePlatform</code>.</p>
+<p>Inject <code>IMapImageService</code> into your component. It is registered automatically by <code>AddHerePlatformBlazor</code>.</p>
 <pre><code class="language-csharp">@inject IMapImageService MapImageService
 </code></pre>
 <h2 id="getimageasync">GetImageAsync</h2>
@@ -179,7 +179,7 @@ await File.WriteAllBytesAsync(&quot;map.png&quot;, imageBytes);
             integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <script src="lib/prismjs/prism.js"></script>
     <script src="js/docs.js"></script>
-    <script src="_content/BlazorHerePlatform/js/objectManager.js"></script>
+    <script src="_content/HerePlatform.NET.Blazor/js/objectManager.js"></script>
     <script src="_framework/blazor.webassembly.js"></script>
 </body>
 </html>

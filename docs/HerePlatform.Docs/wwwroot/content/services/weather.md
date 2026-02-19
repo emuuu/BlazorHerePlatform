@@ -8,7 +8,7 @@ apiRef: IWeatherService
 
 ## Setup
 
-Inject `IWeatherService` into your component. It is registered automatically by `AddBlazorHerePlatform`.
+Inject `IWeatherService` into your component. It is registered automatically by `AddHerePlatformBlazor`.
 
 ```csharp
 @inject IWeatherService WeatherService

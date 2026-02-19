@@ -12,8 +12,8 @@ demo: map-heatmap
 `HeatmapComponent` renders a heatmap layer on the map. Place it inside an `AdvancedHereMap` and provide a list of `HeatmapDataPoint` objects.
 
 ```csharp
-@using HerePlatformComponents.Maps
-@using HerePlatformComponents.Maps.Data
+@using HerePlatform.Blazor.Maps
+@using HerePlatform.Blazor.Maps.Data
 
 <AdvancedHereMap Options="_options" Height="500px">
     <HeatmapComponent DataPoints="_points" />

@@ -9,7 +9,7 @@ demo: map-routing
 
 ## Setup
 
-Inject `IRoutingService` into your component. It is registered automatically by `AddBlazorHerePlatform`.
+Inject `IRoutingService` into your component. It is registered automatically by `AddHerePlatformBlazor`.
 
 ```csharp
 @inject IRoutingService RoutingService

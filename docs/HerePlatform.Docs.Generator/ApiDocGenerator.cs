@@ -17,7 +17,7 @@ public class ApiDocGenerator
 
     public async Task GenerateAsync(string outputPath)
     {
-        var assembly = typeof(HerePlatformComponents.DependencyInjectionExtensions).Assembly;
+        var assembly = typeof(HerePlatform.Blazor.DependencyInjectionExtensions).Assembly;
         var xmlPath = FindXmlDocPath(assembly);
         var xmlDocs = xmlPath is not null ? LoadXmlDocs(xmlPath) : new Dictionary<string, string>();
 

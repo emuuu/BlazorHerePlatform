@@ -6,8 +6,8 @@
 
 .NET libraries for the [HERE Platform](https://developer.here.com/) APIs. Includes Blazor components for the HERE Maps JS API and a REST client for routing, geocoding, traffic, and more — all targeting .NET 8, 9, and 10.
 
-[![NuGet](https://img.shields.io/nuget/v/BlazorHerePlatform.svg)](https://www.nuget.org/packages/BlazorHerePlatform)
-[![NuGet Downloads](https://img.shields.io/nuget/dt/BlazorHerePlatform.svg)](https://www.nuget.org/packages/BlazorHerePlatform)
+[![NuGet](https://img.shields.io/nuget/v/HerePlatform.NET.Blazor.svg)](https://www.nuget.org/packages/HerePlatform.NET.Blazor)
+[![NuGet Downloads](https://img.shields.io/nuget/dt/HerePlatform.NET.Blazor.svg)](https://www.nuget.org/packages/HerePlatform.NET.Blazor)
 [![CI](https://github.com/emuuu/HerePlatform.NET/actions/workflows/ci.yml/badge.svg)](https://github.com/emuuu/HerePlatform.NET/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Docs](https://img.shields.io/badge/Docs-GitHub%20Pages-blue)](https://emuuu.github.io/HerePlatform.NET/)
@@ -36,23 +36,23 @@
 ## Installation
 
 ```bash
-dotnet add package BlazorHerePlatform
+dotnet add package HerePlatform.NET.Blazor
 ```
 
 ## Getting Started
 
 ### 1. Register services
 
-In `Program.cs`, register BlazorHerePlatform with your API key:
+In `Program.cs`, register HerePlatform.NET.Blazor with your API key:
 
 ```csharp
-builder.Services.AddBlazorHerePlatform("YOUR_HERE_API_KEY");
+builder.Services.AddHerePlatformBlazor("YOUR_HERE_API_KEY");
 ```
 
 For advanced configuration, use `HereApiLoadOptions`:
 
 ```csharp
-builder.Services.AddBlazorHerePlatform(new HereApiLoadOptions("YOUR_HERE_API_KEY")
+builder.Services.AddHerePlatformBlazor(new HereApiLoadOptions("YOUR_HERE_API_KEY")
 {
     LoadClustering = true,  // Enable marker clustering
     LoadData = true,        // Enable GeoJSON/KML support
@@ -409,7 +409,7 @@ Pin an image to geographic bounds:
 
 ## HERE REST Services
 
-All services are registered automatically via `AddBlazorHerePlatform()` and can be injected with standard DI.
+All services are registered automatically via `AddHerePlatformBlazor()` and can be injected with standard DI.
 
 | Service | Methods | Description |
 |---|---|---|

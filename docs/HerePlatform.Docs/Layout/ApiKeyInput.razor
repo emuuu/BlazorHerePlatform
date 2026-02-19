@@ -1,4 +1,4 @@
-@inject IBlazorHerePlatformKeyService KeyService
+@inject IHerePlatformKeyService KeyService
 @inject DocsApiKeyService RestApiKeyService
 @inject IJSRuntime JS
 
@@ -56,7 +56,7 @@
         if (string.IsNullOrWhiteSpace(_apiKey)) return;
 
         await JS.InvokeVoidAsync("sessionStorage.setItem", "herePlatformApiKey", _apiKey);
-        await JS.InvokeVoidAsync("blazorHerePlatform.objectManager.resetPlatform");
+        await JS.InvokeVoidAsync("herePlatform.objectManager.resetPlatform");
 
         KeyService.UpdateApiKey(_apiKey);
         RestApiKeyService.UpdateApiKey(_apiKey);

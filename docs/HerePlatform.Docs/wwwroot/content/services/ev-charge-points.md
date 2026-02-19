@@ -8,7 +8,7 @@ apiRef: IEvChargePointsService
 
 ## Setup
 
-Inject `IEvChargePointsService` into your component. It is registered automatically by `AddBlazorHerePlatform`.
+Inject `IEvChargePointsService` into your component. It is registered automatically by `AddHerePlatformBlazor`.
 
 ```csharp
 @inject IEvChargePointsService EvChargePointsService

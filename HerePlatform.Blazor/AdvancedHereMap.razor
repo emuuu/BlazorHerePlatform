@@ -1,0 +1,858 @@
+@using HerePlatform.Blazor.Maps
+@using HerePlatform.Blazor.Maps.Clustering
+@using HerePlatform.Blazor.Maps.Data
+@using HerePlatform.Blazor.Maps.Events
+@using HerePlatform.Blazor.Maps.Extension
+@using Microsoft.JSInterop
+@inherits ComponentBase
+@inject IJSRuntime Js
+@implements IAsyncDisposable
+
+<HereMap @ref="@MapRef" Id="@Id" Height="@Height" Options="@Options" OnAfterInit="@AfterInit" CssClass="@CssClass" UserAttributes="@UserAttributes" />
+
+@if (MapRef?.InteropObject is not null)
+{
+    <CascadingValue Name="HereMap" Value="@this" IsFixed="true">
+        @ChildContent
+    </CascadingValue>
+}
+
+@code {
+    public HereMap? MapRef { get; private set; }
+
+    public Map? InteropObject => MapRef?.InteropObject;
+
+    internal Guid? MapId => MapRef?.InteropObject?.Guid;
+
+    public int MarkerCount => _markerComponents.Count;
+    public IEnumerable<MarkerComponent> Markers => _markerComponents.Values.ToList();
+    private readonly Dictionary<Guid, MarkerComponent> _markerComponents = [];
+
+    public int PolygonCount => _mapPolygonComponents.Count;
+    public IEnumerable<PolygonComponent> Polygons => _mapPolygonComponents.Values.ToList();
+    private readonly Dictionary<Guid, PolygonComponent> _mapPolygonComponents = [];
+
+    public int PolylineCount => _mapPolylineComponents.Count;
+    public IEnumerable<PolylineComponent> Polylines => _mapPolylineComponents.Values.ToList();
+    private readonly Dictionary<Guid, PolylineComponent> _mapPolylineComponents = [];
+
+    public int CircleCount => _mapCircleComponents.Count;
+    public IEnumerable<CircleComponent> Circles => _mapCircleComponents.Values.ToList();
+    private readonly Dictionary<Guid, CircleComponent> _mapCircleComponents = [];
+
+    public int RectCount => _mapRectComponents.Count;
+    public IEnumerable<RectComponent> Rects => _mapRectComponents.Values.ToList();
+    private readonly Dictionary<Guid, RectComponent> _mapRectComponents = [];
+
+    public int GroupCount => _mapGroupComponents.Count;
+    public IEnumerable<GroupComponent> Groups => _mapGroupComponents.Values.ToList();
+    private readonly Dictionary<Guid, GroupComponent> _mapGroupComponents = [];
+
+    public int DomMarkerCount => _mapDomMarkerComponents.Count;
+    public IEnumerable<DomMarkerComponent> DomMarkers => _mapDomMarkerComponents.Values.ToList();
+    private readonly Dictionary<Guid, DomMarkerComponent> _mapDomMarkerComponents = [];
+
+    public int InfoBubbleCount => _mapInfoBubbleComponents.Count;
+    public IEnumerable<InfoBubbleComponent> InfoBubbles => _mapInfoBubbleComponents.Values.ToList();
+    private readonly Dictionary<Guid, InfoBubbleComponent> _mapInfoBubbleComponents = [];
+
+    private readonly Dictionary<Guid, MarkerClusterComponent> _mapClusterComponents = [];
+    private readonly Dictionary<Guid, GeoJsonReaderComponent> _mapGeoJsonComponents = [];
+    private readonly Dictionary<Guid, KmlReaderComponent> _mapKmlComponents = [];
+
+    // Unified routing map for all shape components (MapObjectComponentBase descendants).
+    private readonly Dictionary<Guid, MapObjectComponentBase> _eventRoutingMap = [];
+
+    internal DotNetObjectReference<AdvancedHereMap>? CallbackRef;
+
+    [Parameter]
+    public string? Id { get; set; }
+
+    [Parameter]
+    public MapOptions? Options { get; set; }
+
+    [Parameter]
+    public EventCallback OnAfterInit { get; set; }
+
+    /// <summary>
+    /// When true, programmatic SetCenter/SetZoom/SetTilt/SetHeading changes are animated.
+    /// </summary>
+    [Parameter]
+    public bool Animate { get; set; }
+
+    /// <summary>
+    /// Bitmask of behavior features to disable on this map.
+    /// </summary>
+    [Parameter]
+    public BehaviorFeature DisabledBehaviors { get; set; }
+
+    /// <summary>
+    /// Viewport padding. Applied when changed after map init.
+    /// </summary>
+    [Parameter]
+    public Padding? ViewportPadding { get; set; }
+
+    [Parameter]
+    public EventCallback OnMarkersChanged { get; set; }
+
+    [Parameter]
+    public EventCallback OnPolygonsChanged { get; set; }
+
+    [Parameter]
+    public EventCallback OnPolylinesChanged { get; set; }
+
+    [Parameter]
+    public EventCallback OnCirclesChanged { get; set; }
+
+    [Parameter]
+    public EventCallback OnRectsChanged { get; set; }
+
+    [Parameter]
+    public EventCallback OnDomMarkersChanged { get; set; }
+
+    [Parameter]
+    public string? CssClass { get; set; }
+
+    [Parameter]
+    public string? Height { get; set; }
+
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object?>? UserAttributes { get; set; }
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    /// <summary>
+    /// Map center position. Two-way bindable via <c>@bind-Center</c>.
+    /// When set, overrides Options.Center. Updated when the user pans the map.
+    /// </summary>
+    [Parameter]
+    public LatLngLiteral? Center { get; set; }
+
+    /// <summary>
+    /// Callback for two-way binding of <see cref="Center"/>.
+    /// Fired when the user finishes panning (on mapviewchangeend).
+    /// </summary>
+    [Parameter]
+    public EventCallback<LatLngLiteral> CenterChanged { get; set; }
+
+    /// <summary>
+    /// Map zoom level. Two-way bindable via <c>@bind-Zoom</c>.
+    /// When set, overrides Options.Zoom. Updated when the user zooms the map.
+    /// </summary>
+    [Parameter]
+    public double? Zoom { get; set; }
+
+    /// <summary>
+    /// Callback for two-way binding of <see cref="Zoom"/>.
+    /// Fired when the user finishes zooming (on mapviewchangeend).
+    /// </summary>
+    [Parameter]
+    public EventCallback<double> ZoomChanged { get; set; }
+
+    /// <summary>
+    /// Map tilt angle in degrees. Two-way bindable via <c>@bind-Tilt</c>.
+    /// When set, overrides Options.Tilt. Updated on user tilt gesture.
+    /// </summary>
+    [Parameter]
+    public double? Tilt { get; set; }
+
+    /// <summary>
+    /// Callback for two-way binding of <see cref="Tilt"/>.
+    /// Fired when the user finishes tilting (on mapviewchangeend).
+    /// </summary>
+    [Parameter]
+    public EventCallback<double> TiltChanged { get; set; }
+
+    /// <summary>
+    /// Map heading (rotation) in degrees. Two-way bindable via <c>@bind-Heading</c>.
+    /// When set, overrides Options.Heading. Updated on user rotation gesture.
+    /// </summary>
+    [Parameter]
+    public double? Heading { get; set; }
+
+    /// <summary>
+    /// Callback for two-way binding of <see cref="Heading"/>.
+    /// Fired when the user finishes rotating (on mapviewchangeend).
+    /// </summary>
+    [Parameter]
+    public EventCallback<double> HeadingChanged { get; set; }
+
+    /// <summary>
+    /// Fired when the map background is tapped/clicked (no object hit).
+    /// </summary>
+    [Parameter]
+    public EventCallback<MapPointerEventArgs> OnClick { get; set; }
+
+    /// <summary>
+    /// Fired on double-tap/double-click on the map.
+    /// </summary>
+    [Parameter]
+    public EventCallback<MapPointerEventArgs> OnDoubleClick { get; set; }
+
+    /// <summary>
+    /// Fired on long press on the map.
+    /// </summary>
+    [Parameter]
+    public EventCallback<MapPointerEventArgs> OnLongPress { get; set; }
+
+    /// <summary>
+    /// Fired on right-click on the map.
+    /// </summary>
+    [Parameter]
+    public EventCallback<MapPointerEventArgs> OnContextMenu { get; set; }
+
+    /// <summary>
+    /// Fired when context menu interaction ends.
+    /// </summary>
+    [Parameter]
+    public EventCallback OnContextMenuClose { get; set; }
+
+    /// <summary>
+    /// Fired when a pointer touches the map surface.
+    /// </summary>
+    [Parameter]
+    public EventCallback<MapPointerEventArgs> OnPointerDown { get; set; }
+
+    /// <summary>
+    /// Fired when a pointer leaves the map surface.
+    /// </summary>
+    [Parameter]
+    public EventCallback<MapPointerEventArgs> OnPointerUp { get; set; }
+
+    /// <summary>
+    /// Fired when a pointer moves over the map.
+    /// </summary>
+    [Parameter]
+    public EventCallback<MapPointerEventArgs> OnPointerMove { get; set; }
+
+    /// <summary>
+    /// Fired when a pointer enters the map area.
+    /// </summary>
+    [Parameter]
+    public EventCallback<MapPointerEventArgs> OnPointerEnter { get; set; }
+
+    /// <summary>
+    /// Fired when a pointer leaves the map area.
+    /// </summary>
+    [Parameter]
+    public EventCallback<MapPointerEventArgs> OnPointerLeave { get; set; }
+
+    /// <summary>
+    /// Fired when a pointer action is cancelled.
+    /// </summary>
+    [Parameter]
+    public EventCallback OnPointerCancel { get; set; }
+
+    /// <summary>
+    /// Fired when a drag operation starts on the map.
+    /// </summary>
+    [Parameter]
+    public EventCallback<MapDragEventArgs> OnDragStart { get; set; }
+
+    /// <summary>
+    /// Fired continuously during a map drag.
+    /// </summary>
+    [Parameter]
+    public EventCallback<MapDragEventArgs> OnDrag { get; set; }
+
+    /// <summary>
+    /// Fired when a drag operation ends on the map.
+    /// </summary>
+    [Parameter]
+    public EventCallback<MapDragEventArgs> OnDragEnd { get; set; }
+
+    /// <summary>
+    /// Fired on mouse wheel scroll over the map.
+    /// </summary>
+    [Parameter]
+    public EventCallback<MapWheelEventArgs> OnWheel { get; set; }
+
+    /// <summary>
+    /// Fired when the base layer changes.
+    /// </summary>
+    [Parameter]
+    public EventCallback<BaseLayerChangeEventArgs> OnBaseLayerChange { get; set; }
+
+    /// <summary>
+    /// Fired when the render engine state changes.
+    /// </summary>
+    [Parameter]
+    public EventCallback<EngineStateChangeEventArgs> OnEngineStateChange { get; set; }
+
+    /// <summary>
+    /// Fired when the map container is resized.
+    /// </summary>
+    [Parameter]
+    public EventCallback<MapResizeEventArgs> OnResize { get; set; }
+
+    /// <summary>
+    /// Fired continuously while the map view changes (zoom, pan, tilt).
+    /// </summary>
+    [Parameter]
+    public EventCallback<MapViewChangeEventArgs> OnMapViewChange { get; set; }
+
+    /// <summary>
+    /// Fired when a map view change starts.
+    /// </summary>
+    [Parameter]
+    public EventCallback<MapViewChangeEventArgs> OnMapViewChangeStart { get; set; }
+
+    /// <summary>
+    /// Fired when a map view change ends.
+    /// </summary>
+    [Parameter]
+    public EventCallback<MapViewChangeEventArgs> OnMapViewChangeEnd { get; set; }
+
+    /// <summary>
+    /// Fired when an error is detected, such as an API key authentication failure.
+    /// </summary>
+    [Parameter]
+    public EventCallback<MapErrorEventArgs> OnError { get; set; }
+
+    protected override void OnInitialized()
+    {
+        CallbackRef = DotNetObjectReference.Create(this);
+        base.OnInitialized();
+    }
+
+    public override async Task SetParametersAsync(ParameterView parameters)
+    {
+        // Before map is initialized: merge individual params into Options for initial render
+        if (MapRef?.InteropObject is null)
+        {
+            await base.SetParametersAsync(parameters);
+
+            if (Options != null)
+            {
+                if (Center.HasValue) Options.Center = Center.Value;
+                if (Zoom.HasValue) Options.Zoom = Zoom.Value;
+                if (Tilt.HasValue) Options.Tilt = Tilt;
+                if (Heading.HasValue) Options.Heading = Heading;
+            }
+
+            return;
+        }
+
+        // After init: detect which view parameters changed before base updates them
+        var centerChanged = parameters.DidParameterChange(Center);
+        var zoomChanged = parameters.DidParameterChange(Zoom);
+        var tiltChanged = parameters.DidParameterChange(Tilt);
+        var headingChanged = parameters.DidParameterChange(Heading);
+
+        await base.SetParametersAsync(parameters);
+
+        // Push programmatic changes to the JS map
+        if (centerChanged && Center.HasValue)
+            await MapRef.InteropObject.SetCenter(Center.Value, Animate);
+        if (zoomChanged && Zoom.HasValue)
+            await MapRef.InteropObject.SetZoom(Zoom.Value, Animate);
+        if (tiltChanged && Tilt.HasValue)
+            await MapRef.InteropObject.SetTilt(Tilt.Value);
+        if (headingChanged && Heading.HasValue)
+            await MapRef.InteropObject.SetHeading(Heading.Value);
+    }
+
+    private async Task AfterInit()
+    {
+        // Wire up map-level events now that the map is ready
+        if (MapId.HasValue)
+        {
+            await Js.InvokeVoidAsync(JsInteropIdentifiers.SetupMapEvents, MapId.Value, CallbackRef);
+        }
+
+        // Apply initial DisabledBehaviors
+        if (DisabledBehaviors != BehaviorFeature.None && MapRef?.InteropObject != null)
+        {
+            await MapRef.InteropObject.DisableBehavior(DisabledBehaviors);
+        }
+
+        // Apply initial ViewportPadding
+        if (ViewportPadding != null && MapRef?.InteropObject != null)
+        {
+            await MapRef.InteropObject.SetViewportPadding(
+                ViewportPadding.Top, ViewportPadding.Right,
+                ViewportPadding.Bottom, ViewportPadding.Left);
+        }
+
+        await OnAfterInit.InvokeAsync();
+    }
+
+    [JSInvokable]
+    public async Task OnMarkerClicked(Guid markerId)
+    {
+        // Legacy compat: still called by old JS for simple tap without event data.
+        // New path uses OnObjectPointerEvent instead.
+        if (_markerComponents.TryGetValue(markerId, out var markerComponent))
+        {
+            await markerComponent.HandlePointerEvent("tap", new MapPointerEventArgs { Type = "tap" });
+        }
+    }
+
+    [JSInvokable]
+    public async Task OnMarkerDrag(Guid markerId, LatLngLiteral position)
+    {
+        // Legacy compat: still called by old JS for dragend.
+        if (_markerComponents.TryGetValue(markerId, out var markerComponent))
+        {
+            await markerComponent.HandleDragEvent("dragend", new MapDragEventArgs
+            {
+                Position = position,
+                Type = "dragend"
+            });
+        }
+    }
+
+    [JSInvokable]
+    public async Task OnPolygonClicked(Guid polygonId)
+    {
+        // Legacy compat
+        if (_mapPolygonComponents.TryGetValue(polygonId, out var polygonComponent))
+        {
+            await polygonComponent.HandlePointerEvent("tap", new MapPointerEventArgs { Type = "tap" });
+        }
+    }
+
+    /// <summary>
+    /// Called from JS for pointer events on markers and polygons.
+    /// </summary>
+    [JSInvokable]
+    public async Task OnObjectPointerEvent(string objectType, Guid objectId, string eventName, MapPointerEventArgs args)
+    {
+        if (_eventRoutingMap.TryGetValue(objectId, out var component))
+            await component.HandlePointerEvent(eventName, args);
+    }
+
+    [JSInvokable]
+    public async Task OnObjectSimpleEvent(string objectType, Guid objectId, string eventName)
+    {
+        if (_eventRoutingMap.TryGetValue(objectId, out var component))
+        {
+            if (eventName == "contextmenuclose") await component.HandleContextMenuClose();
+            else if (eventName == "pointercancel") await component.HandlePointerCancel();
+        }
+    }
+
+    [JSInvokable]
+    public async Task OnObjectDragEvent(string objectType, Guid objectId, string eventName, MapDragEventArgs args)
+    {
+        if (_eventRoutingMap.TryGetValue(objectId, out var component))
+            await component.HandleDragEvent(eventName, args);
+    }
+
+    /// <summary>
+    /// Called from JS after a shape drag ends with the updated geometry.
+    /// Updates the C# component state and fires two-way binding callbacks.
+    /// </summary>
+    [JSInvokable]
+    public async Task OnShapeDragEndGeometry(string objectType, Guid objectId, ShapeDragGeometry geometry)
+    {
+        if (!_eventRoutingMap.TryGetValue(objectId, out var component))
+            return;
+
+        switch (component)
+        {
+            case CircleComponent circle when geometry.CenterLat.HasValue && geometry.CenterLng.HasValue:
+                await circle.HandleGeometryChanged(geometry.CenterLat.Value, geometry.CenterLng.Value);
+                break;
+            case RectComponent rect when geometry.Top.HasValue:
+                await rect.HandleGeometryChanged(geometry.Top.Value, geometry.Left!.Value, geometry.Bottom!.Value, geometry.Right!.Value);
+                break;
+            case PolygonComponent polygon when geometry.Path != null:
+                await polygon.HandleGeometryChanged(geometry.Path);
+                break;
+            case PolylineComponent polyline when geometry.Path != null:
+                await polyline.HandleGeometryChanged(geometry.Path);
+                break;
+        }
+    }
+
+    [JSInvokable]
+    public async Task OnInfoBubbleClosed(Guid bubbleId)
+    {
+        if (_mapInfoBubbleComponents.TryGetValue(bubbleId, out var bubble))
+        {
+            await bubble.HandleClosed();
+        }
+    }
+
+    [JSInvokable]
+    public async Task OnClusterTapped(Guid clusterId, ClusterTapEventArgs args)
+    {
+        if (_mapClusterComponents.TryGetValue(clusterId, out var cluster))
+        {
+            await cluster.HandleClusterTap(args);
+        }
+    }
+
+    [JSInvokable]
+    public async Task OnNoiseTapped(Guid clusterId, ClusterTapEventArgs args)
+    {
+        if (_mapClusterComponents.TryGetValue(clusterId, out var cluster))
+        {
+            await cluster.HandleNoiseTap(args);
+        }
+    }
+
+    [JSInvokable]
+    public async Task OnGeoJsonLoaded(Guid componentId, GeoJsonLoadedEventArgs args)
+    {
+        if (_mapGeoJsonComponents.TryGetValue(componentId, out var reader))
+        {
+            await reader.HandleLoaded(args);
+        }
+    }
+
+    [JSInvokable]
+    public async Task OnKmlLoaded(Guid componentId, GeoJsonLoadedEventArgs args)
+    {
+        if (_mapKmlComponents.TryGetValue(componentId, out var reader))
+        {
+            await reader.HandleLoaded(args);
+        }
+    }
+
+    [JSInvokable]
+    public async Task OnMapPointerEvent(string eventName, MapPointerEventArgs args)
+    {
+        var callback = eventName switch
+        {
+            "tap" => OnClick,
+            "dbltap" => OnDoubleClick,
+            "longpress" => OnLongPress,
+            "contextmenu" => OnContextMenu,
+            "pointerdown" => OnPointerDown,
+            "pointerup" => OnPointerUp,
+            "pointermove" => OnPointerMove,
+            "pointerenter" => OnPointerEnter,
+            "pointerleave" => OnPointerLeave,
+            _ => default
+        };
+
+        if (callback.HasDelegate)
+            await callback.InvokeAsync(args);
+
+        // Forward to registered context menu handler (ContextMenuComponent)
+        if (eventName == "contextmenu" && _contextMenuHandler != null)
+            await _contextMenuHandler(args);
+    }
+
+    [JSInvokable]
+    public async Task OnMapSimpleEvent(string eventName)
+    {
+        if (eventName == "contextmenuclose" && OnContextMenuClose.HasDelegate)
+            await OnContextMenuClose.InvokeAsync();
+        else if (eventName == "pointercancel" && OnPointerCancel.HasDelegate)
+            await OnPointerCancel.InvokeAsync();
+    }
+
+    [JSInvokable]
+    public async Task OnMapDragEvent(string eventName, MapDragEventArgs args)
+    {
+        var callback = eventName switch
+        {
+            "dragstart" => OnDragStart,
+            "drag" => OnDrag,
+            "dragend" => OnDragEnd,
+            _ => default
+        };
+
+        if (callback.HasDelegate)
+            await callback.InvokeAsync(args);
+    }
+
+    [JSInvokable]
+    public async Task OnMapWheelEvent(MapWheelEventArgs args)
+    {
+        if (OnWheel.HasDelegate)
+            await OnWheel.InvokeAsync(args);
+    }
+
+    [JSInvokable]
+    public async Task OnMapViewChangeEvent(string eventName, MapViewChangeEventArgs args)
+    {
+        var callback = eventName switch
+        {
+            "mapviewchange" => OnMapViewChange,
+            "mapviewchangestart" => OnMapViewChangeStart,
+            "mapviewchangeend" => OnMapViewChangeEnd,
+            _ => default
+        };
+
+        if (callback.HasDelegate)
+            await callback.InvokeAsync(args);
+
+        // Two-way binding: update bound parameters on view change end
+        if (eventName == "mapviewchangeend")
+        {
+            if (CenterChanged.HasDelegate && args.Center.HasValue)
+            {
+                Center = args.Center.Value;
+                await CenterChanged.InvokeAsync(args.Center.Value);
+            }
+            if (ZoomChanged.HasDelegate)
+            {
+                Zoom = args.Zoom;
+                await ZoomChanged.InvokeAsync(args.Zoom);
+            }
+            if (TiltChanged.HasDelegate)
+            {
+                Tilt = args.Tilt;
+                await TiltChanged.InvokeAsync(args.Tilt);
+            }
+            if (HeadingChanged.HasDelegate)
+            {
+                Heading = args.Heading;
+                await HeadingChanged.InvokeAsync(args.Heading);
+            }
+        }
+    }
+
+    [JSInvokable]
+    public async Task OnMapBaseLayerChangeEvent(BaseLayerChangeEventArgs args)
+    {
+        if (OnBaseLayerChange.HasDelegate)
+            await OnBaseLayerChange.InvokeAsync(args);
+    }
+
+    [JSInvokable]
+    public async Task OnMapEngineStateChangeEvent(EngineStateChangeEventArgs args)
+    {
+        if (OnEngineStateChange.HasDelegate)
+            await OnEngineStateChange.InvokeAsync(args);
+    }
+
+    [JSInvokable]
+    public async Task OnMapResizeEvent(MapResizeEventArgs args)
+    {
+        if (OnResize.HasDelegate)
+            await OnResize.InvokeAsync(args);
+    }
+
+    [JSInvokable]
+    public async Task OnMapError(MapErrorEventArgs args)
+    {
+        if (OnError.HasDelegate)
+            await OnError.InvokeAsync(args);
+    }
+
+    private Func<MapPointerEventArgs, Task>? _contextMenuHandler;
+
+    internal void RegisterContextMenuHandler(Func<MapPointerEventArgs, Task> handler)
+    {
+        _contextMenuHandler = handler;
+    }
+
+    internal void UnregisterContextMenuHandler()
+    {
+        _contextMenuHandler = null;
+    }
+
+    /// <summary>
+    /// Sets the minimum zoom level at runtime.
+    /// </summary>
+    public Task SetMinZoom(double minZoom)
+    {
+        return InteropObject?.SetMinZoom(minZoom) ?? Task.CompletedTask;
+    }
+
+    /// <summary>
+    /// Sets the maximum zoom level at runtime.
+    /// </summary>
+    public Task SetMaxZoom(double maxZoom)
+    {
+        return InteropObject?.SetMaxZoom(maxZoom) ?? Task.CompletedTask;
+    }
+
+    /// <summary>
+    /// Adds an overlay layer by path (e.g. "vector.normal.traffic").
+    /// </summary>
+    public Task AddLayerAsync(string layerPath)
+    {
+        return InteropObject?.AddLayerAsync(layerPath) ?? Task.CompletedTask;
+    }
+
+    /// <summary>
+    /// Removes an overlay layer by path.
+    /// </summary>
+    public Task RemoveLayerAsync(string layerPath)
+    {
+        return InteropObject?.RemoveLayerAsync(layerPath) ?? Task.CompletedTask;
+    }
+
+    /// <summary>
+    /// Adjusts the viewport to fit all current markers.
+    /// </summary>
+    public async Task ZoomToMarkersAsync(bool animate = true)
+    {
+        if (MapRef?.InteropObject == null || _markerComponents.Count == 0) return;
+
+        var points = new List<LatLngLiteral>();
+        foreach (var marker in _markerComponents.Values.ToList())
+        {
+            points.Add(new LatLngLiteral(marker.Lat, marker.Lng));
+        }
+
+        await MapRef.InteropObject.ZoomToBoundsAsync(points, animate);
+    }
+
+    internal async Task AddMarker(MarkerComponent marker)
+    {
+        _markerComponents.TryAdd(marker.Guid, marker);
+        _eventRoutingMap[marker.Guid] = marker;
+        await OnMarkersChanged.InvokeAsync();
+    }
+
+    internal async Task RemoveMarker(MarkerComponent marker)
+    {
+        _markerComponents.Remove(marker.Guid);
+        _eventRoutingMap.Remove(marker.Guid);
+        await OnMarkersChanged.InvokeAsync();
+    }
+
+    internal async Task AddPolygon(PolygonComponent polygon)
+    {
+        _mapPolygonComponents.TryAdd(polygon.Guid, polygon);
+        _eventRoutingMap[polygon.Guid] = polygon;
+        await OnPolygonsChanged.InvokeAsync();
+    }
+
+    internal async Task RemovePolygon(PolygonComponent polygon)
+    {
+        _mapPolygonComponents.Remove(polygon.Guid);
+        _eventRoutingMap.Remove(polygon.Guid);
+        await OnPolygonsChanged.InvokeAsync();
+    }
+
+    internal async Task AddPolyline(PolylineComponent polyline)
+    {
+        _mapPolylineComponents.TryAdd(polyline.Guid, polyline);
+        _eventRoutingMap[polyline.Guid] = polyline;
+        await OnPolylinesChanged.InvokeAsync();
+    }
+
+    internal async Task RemovePolyline(PolylineComponent polyline)
+    {
+        _mapPolylineComponents.Remove(polyline.Guid);
+        _eventRoutingMap.Remove(polyline.Guid);
+        await OnPolylinesChanged.InvokeAsync();
+    }
+
+    internal async Task AddCircle(CircleComponent circle)
+    {
+        _mapCircleComponents.TryAdd(circle.Guid, circle);
+        _eventRoutingMap[circle.Guid] = circle;
+        await OnCirclesChanged.InvokeAsync();
+    }
+
+    internal async Task RemoveCircle(CircleComponent circle)
+    {
+        _mapCircleComponents.Remove(circle.Guid);
+        _eventRoutingMap.Remove(circle.Guid);
+        await OnCirclesChanged.InvokeAsync();
+    }
+
+    internal async Task AddRect(RectComponent rect)
+    {
+        _mapRectComponents.TryAdd(rect.Guid, rect);
+        _eventRoutingMap[rect.Guid] = rect;
+        await OnRectsChanged.InvokeAsync();
+    }
+
+    internal async Task RemoveRect(RectComponent rect)
+    {
+        _mapRectComponents.Remove(rect.Guid);
+        _eventRoutingMap.Remove(rect.Guid);
+        await OnRectsChanged.InvokeAsync();
+    }
+
+    // Group, InfoBubble, Cluster, GeoJson, Kml: sync, keine Changed-Events
+    // (Infrastruktur-Komponenten, kein Consumer-Tracking noetig)
+    internal void AddGroup(GroupComponent group)
+    {
+        _mapGroupComponents.TryAdd(group.Guid, group);
+    }
+
+    internal void RemoveGroup(GroupComponent group)
+    {
+        _mapGroupComponents.Remove(group.Guid);
+    }
+
+    internal async Task AddDomMarker(DomMarkerComponent domMarker)
+    {
+        _mapDomMarkerComponents.TryAdd(domMarker.Guid, domMarker);
+        _eventRoutingMap[domMarker.Guid] = domMarker;
+        await OnDomMarkersChanged.InvokeAsync();
+    }
+
+    internal async Task RemoveDomMarker(DomMarkerComponent domMarker)
+    {
+        _mapDomMarkerComponents.Remove(domMarker.Guid);
+        _eventRoutingMap.Remove(domMarker.Guid);
+        await OnDomMarkersChanged.InvokeAsync();
+    }
+
+    internal void AddInfoBubble(InfoBubbleComponent bubble)
+    {
+        _mapInfoBubbleComponents.TryAdd(bubble.Guid, bubble);
+    }
+
+    internal void RemoveInfoBubble(InfoBubbleComponent bubble)
+    {
+        _mapInfoBubbleComponents.Remove(bubble.Guid);
+    }
+
+    internal void AddCluster(MarkerClusterComponent cluster)
+    {
+        _mapClusterComponents.TryAdd(cluster.Guid, cluster);
+    }
+
+    internal void RemoveCluster(MarkerClusterComponent cluster)
+    {
+        _mapClusterComponents.Remove(cluster.Guid);
+    }
+
+    internal void AddGeoJsonReader(GeoJsonReaderComponent reader)
+    {
+        _mapGeoJsonComponents.TryAdd(reader.Guid, reader);
+    }
+
+    internal void RemoveGeoJsonReader(GeoJsonReaderComponent reader)
+    {
+        _mapGeoJsonComponents.Remove(reader.Guid);
+    }
+
+    internal void AddKmlReader(KmlReaderComponent reader)
+    {
+        _mapKmlComponents.TryAdd(reader.Guid, reader);
+    }
+
+    internal void RemoveKmlReader(KmlReaderComponent reader)
+    {
+        _mapKmlComponents.Remove(reader.Guid);
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        // Mark all shape components (via unified routing map)
+        foreach (var (_, component) in _eventRoutingMap)
+            component.MarkDisposed();
+
+        // Mark non-shape components individually
+        foreach (var c in _mapGroupComponents.Values) c.MarkDisposed();
+        foreach (var c in _mapInfoBubbleComponents.Values) c.MarkDisposed();
+        foreach (var c in _mapClusterComponents.Values) c.MarkDisposed();
+        foreach (var c in _mapGeoJsonComponents.Values) c.MarkDisposed();
+        foreach (var c in _mapKmlComponents.Values) c.MarkDisposed();
+
+        // disposeMap (JS) marks the safeCallbackRef wrapper as disposed,
+        // so any in-flight JS events are silently ignored.
+        if (MapRef != null)
+        {
+            await MapRef.DisposeAsync();
+        }
+
+        CallbackRef?.Dispose();
+        CallbackRef = null;
+    }
+}

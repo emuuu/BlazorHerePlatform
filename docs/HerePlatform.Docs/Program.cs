@@ -1,8 +1,8 @@
 using HerePlatform.Docs;
 using HerePlatform.Docs.Services;
 using HerePlatform.RestClient;
-using HerePlatformComponents;
-using HerePlatformComponents.Maps;
+using HerePlatform.Blazor;
+using HerePlatform.Blazor.Maps;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 
@@ -11,7 +11,7 @@ builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
-builder.Services.AddBlazorHerePlatform(new HereApiLoadOptions("YOUR_API_KEY") { LoadClustering = true, LoadData = true });
+builder.Services.AddHerePlatformBlazor(new HereApiLoadOptions("YOUR_API_KEY") { LoadClustering = true, LoadData = true });
 builder.Services.AddScoped<IDocContentService, DocContentService>();
 builder.Services.AddScoped<IApiDocService, ApiDocService>();
 

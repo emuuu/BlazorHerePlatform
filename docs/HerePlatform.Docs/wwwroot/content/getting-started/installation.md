@@ -2,26 +2,26 @@
 title: Installation
 category: Getting Started
 order: 1
-description: Install the BlazorHerePlatform NuGet package and add it to your Blazor Server or WebAssembly project.
+description: Install the HerePlatform.NET.Blazor NuGet package and add it to your Blazor Server or WebAssembly project.
 ---
 
 ## NuGet Package
 
-Install the `BlazorHerePlatform` package from NuGet:
+Install the `HerePlatform.NET.Blazor` package from NuGet:
 
 ```xml
-<PackageReference Include="BlazorHerePlatform" Version="1.0.0" />
+<PackageReference Include="HerePlatform.NET.Blazor" Version="1.0.0" />
 ```
 
 Or via the .NET CLI:
 
 ```
-dotnet add package BlazorHerePlatform
+dotnet add package HerePlatform.NET.Blazor
 ```
 
 ## Supported Frameworks
 
-BlazorHerePlatform multi-targets three .NET versions:
+HerePlatform.NET.Blazor multi-targets three .NET versions:
 
 | Framework | Status |
 |-----------|--------|
@@ -36,14 +36,14 @@ Your project only needs to target one of these. The correct dependency set is se
 Add the package reference, then register services in `Program.cs`:
 
 ```csharp
-using HerePlatformComponents;
+using HerePlatform.Blazor;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
-builder.Services.AddBlazorHerePlatform("YOUR_API_KEY");
+builder.Services.AddHerePlatformBlazor("YOUR_API_KEY");
 
 var app = builder.Build();
 app.MapRazorComponents<App>()
@@ -66,13 +66,13 @@ builder.Services.Configure<Microsoft.AspNetCore.SignalR.HubOptions>(options =>
 Add the package reference and register services in the WASM `Program.cs`:
 
 ```csharp
-using HerePlatformComponents;
+using HerePlatform.Blazor;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
-builder.Services.AddBlazorHerePlatform("YOUR_API_KEY");
+builder.Services.AddHerePlatformBlazor("YOUR_API_KEY");
 
 await builder.Build().RunAsync();
 ```
@@ -82,9 +82,9 @@ await builder.Build().RunAsync();
 For convenience, add these to your `_Imports.razor`:
 
 ```csharp
-@using HerePlatformComponents
-@using HerePlatformComponents.Maps
-@using HerePlatformComponents.Maps.Coordinates
+@using HerePlatform.Blazor
+@using HerePlatform.Blazor.Maps
+@using HerePlatform.Blazor.Maps.Coordinates
 ```
 
 ## JavaScript
@@ -93,9 +93,9 @@ All required JavaScript is loaded automatically via a [Blazor JavaScript initial
 
 ## What Gets Registered
 
-Calling `AddBlazorHerePlatform` registers the following scoped services automatically:
+Calling `AddHerePlatformBlazor` registers the following scoped services automatically:
 
-- `IBlazorHerePlatformKeyService` -- manages the HERE API key and load state
+- `IHerePlatformKeyService` -- manages the HERE API key and load state
 - `IRoutingService`, `IGeocodingService`, `ITrafficService`
 - `IPublicTransitService`, `IWaypointSequenceService`, `IGeofencingService`
 - `IPlacesService`, `IIsolineService`, `IMatrixRoutingService`

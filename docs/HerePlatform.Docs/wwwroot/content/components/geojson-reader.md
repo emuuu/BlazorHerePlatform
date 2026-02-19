@@ -12,7 +12,7 @@ demo: map-data
 `GeoJsonReaderComponent` loads GeoJSON data and renders the features on the map. It requires the data module to be enabled:
 
 ```csharp
-builder.Services.AddBlazorHerePlatform("YOUR_KEY", opts =>
+builder.Services.AddHerePlatformBlazor("YOUR_KEY", opts =>
 {
     opts.LoadData = true;
 });
@@ -21,8 +21,8 @@ builder.Services.AddBlazorHerePlatform("YOUR_KEY", opts =>
 Place the component inside an `AdvancedHereMap`:
 
 ```csharp
-@using HerePlatformComponents.Maps
-@using HerePlatformComponents.Maps.Data
+@using HerePlatform.Blazor.Maps
+@using HerePlatform.Blazor.Maps.Data
 
 <AdvancedHereMap Options="_options" Height="500px">
     <GeoJsonReaderComponent Url="data/districts.geojson"

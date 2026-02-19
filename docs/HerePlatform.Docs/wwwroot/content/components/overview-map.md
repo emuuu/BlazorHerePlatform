@@ -11,8 +11,8 @@ apiRef: OverviewMapComponent
 `OverviewMapComponent` displays a small overview (mini-map) that shows the main map's current viewport at a wider zoom level. It automatically tracks the main map's center position.
 
 ```csharp
-@using HerePlatformComponents.Maps
-@using HerePlatformComponents.Maps.UI
+@using HerePlatform.Blazor.Maps
+@using HerePlatform.Blazor.Maps.UI
 
 <AdvancedHereMap Options="_options" Height="500px">
     <OverviewMapComponent />

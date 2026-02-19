@@ -11,8 +11,8 @@ apiRef: DistanceMeasurementComponent
 `DistanceMeasurementComponent` adds an interactive distance measurement tool to the map. Users click points on the map to measure distances between them.
 
 ```csharp
-@using HerePlatformComponents.Maps
-@using HerePlatformComponents.Maps.UI
+@using HerePlatform.Blazor.Maps
+@using HerePlatform.Blazor.Maps.UI
 
 <AdvancedHereMap Options="_options" Height="500px">
     <DistanceMeasurementComponent Active="@_measuring"

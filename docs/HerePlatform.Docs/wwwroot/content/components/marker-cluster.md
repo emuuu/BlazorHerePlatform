@@ -14,15 +14,15 @@ demo: map-clustering
 Clustering requires the clustering module. Enable it in your API load options:
 
 ```csharp
-builder.Services.AddBlazorHerePlatform("YOUR_KEY", opts =>
+builder.Services.AddHerePlatformBlazor("YOUR_KEY", opts =>
 {
     opts.LoadClustering = true;
 });
 ```
 
 ```csharp
-@using HerePlatformComponents.Maps
-@using HerePlatformComponents.Maps.Clustering
+@using HerePlatform.Blazor.Maps
+@using HerePlatform.Blazor.Maps.Clustering
 
 <AdvancedHereMap Options="_options" Height="500px">
     <MarkerClusterComponent DataPoints="_points" />

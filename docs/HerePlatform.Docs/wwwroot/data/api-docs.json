@@ -1,7 +1,7 @@
 [
   {
     "typeName": "AdvancedHereMap",
-    "fullName": "HerePlatformComponents.AdvancedHereMap",
+    "fullName": "HerePlatform.Blazor.AdvancedHereMap",
     "members": [
       {
         "name": "Animate",
@@ -296,7 +296,7 @@
   },
   {
     "typeName": "AutosuggestInputContext",
-    "fullName": "HerePlatformComponents.Maps.Search.AutosuggestInputContext",
+    "fullName": "HerePlatform.Blazor.Maps.Search.AutosuggestInputContext",
     "members": [
       {
         "name": "Value",
@@ -326,7 +326,7 @@
   },
   {
     "typeName": "AutosuggestListContext",
-    "fullName": "HerePlatformComponents.Maps.Search.AutosuggestListContext",
+    "fullName": "HerePlatform.Blazor.Maps.Search.AutosuggestListContext",
     "members": [
       {
         "name": "Items",
@@ -350,7 +350,7 @@
   },
   {
     "typeName": "BaseLayerChangeEventArgs",
-    "fullName": "HerePlatformComponents.Maps.Events.BaseLayerChangeEventArgs",
+    "fullName": "HerePlatform.Blazor.Maps.Events.BaseLayerChangeEventArgs",
     "members": [
       {
         "name": "Type",
@@ -361,38 +361,8 @@
     ]
   },
   {
-    "typeName": "BlazorHerePlatformKeyService",
-    "fullName": "HerePlatformComponents.BlazorHerePlatformKeyService",
-    "members": [
-      {
-        "name": "IsApiInitialized",
-        "kind": "Property",
-        "type": "bool",
-        "description": ""
-      },
-      {
-        "name": "MarkApiInitialized()",
-        "kind": "Method",
-        "type": "void",
-        "description": ""
-      },
-      {
-        "name": "GetApiOptions()",
-        "kind": "Method",
-        "type": "Task\u003CHereApiLoadOptions\u003E",
-        "description": ""
-      },
-      {
-        "name": "UpdateApiKey(string apiKey)",
-        "kind": "Method",
-        "type": "void",
-        "description": ""
-      }
-    ]
-  },
-  {
     "typeName": "Circle",
-    "fullName": "HerePlatformComponents.Maps.Circle",
+    "fullName": "HerePlatform.Blazor.Maps.Circle",
     "members": [
       {
         "name": "SetCenter(LatLngLiteral center)",
@@ -458,7 +428,7 @@
   },
   {
     "typeName": "CircleComponent",
-    "fullName": "HerePlatformComponents.Maps.CircleComponent",
+    "fullName": "HerePlatform.Blazor.Maps.CircleComponent",
     "members": [
       {
         "name": "CenterLat",
@@ -692,7 +662,7 @@
   },
   {
     "typeName": "CircleOptions",
-    "fullName": "HerePlatformComponents.Maps.CircleOptions",
+    "fullName": "HerePlatform.Blazor.Maps.CircleOptions",
     "members": [
       {
         "name": "Center",
@@ -734,7 +704,7 @@
   },
   {
     "typeName": "ClusterDataPoint",
-    "fullName": "HerePlatformComponents.Maps.Clustering.ClusterDataPoint",
+    "fullName": "HerePlatform.Blazor.Maps.Clustering.ClusterDataPoint",
     "members": [
       {
         "name": "Lat",
@@ -764,7 +734,7 @@
   },
   {
     "typeName": "ClusteringOptions",
-    "fullName": "HerePlatformComponents.Maps.Clustering.ClusteringOptions",
+    "fullName": "HerePlatform.Blazor.Maps.Clustering.ClusteringOptions",
     "members": [
       {
         "name": "Eps",
@@ -788,7 +758,7 @@
   },
   {
     "typeName": "ClusterTapEventArgs",
-    "fullName": "HerePlatformComponents.Maps.Clustering.ClusterTapEventArgs",
+    "fullName": "HerePlatform.Blazor.Maps.Clustering.ClusterTapEventArgs",
     "members": [
       {
         "name": "Position",
@@ -818,7 +788,7 @@
   },
   {
     "typeName": "ContextMenuComponent",
-    "fullName": "HerePlatformComponents.Maps.ContextMenuComponent",
+    "fullName": "HerePlatform.Blazor.Maps.ContextMenuComponent",
     "members": [
       {
         "name": "ChildContent",
@@ -837,7 +807,7 @@
   },
   {
     "typeName": "ContextMenuEventArgs",
-    "fullName": "HerePlatformComponents.Maps.Events.ContextMenuEventArgs",
+    "fullName": "HerePlatform.Blazor.Maps.Events.ContextMenuEventArgs",
     "members": [
       {
         "name": "Position",
@@ -873,7 +843,7 @@
   },
   {
     "typeName": "ContextMenuItem",
-    "fullName": "HerePlatformComponents.Maps.ContextMenuItem",
+    "fullName": "HerePlatform.Blazor.Maps.ContextMenuItem",
     "members": [
       {
         "name": "Data",
@@ -900,7 +870,7 @@
   },
   {
     "typeName": "CustomTileLayerComponent",
-    "fullName": "HerePlatformComponents.Maps.CustomTileLayerComponent",
+    "fullName": "HerePlatform.Blazor.Maps.CustomTileLayerComponent",
     "members": [
       {
         "name": "Max",
@@ -948,22 +918,22 @@
   },
   {
     "typeName": "DependencyInjectionExtensions",
-    "fullName": "HerePlatformComponents.DependencyInjectionExtensions",
+    "fullName": "HerePlatform.Blazor.DependencyInjectionExtensions",
     "members": [
       {
-        "name": "AddBlazorHerePlatform(IServiceCollection services, string apiKey)",
+        "name": "AddHerePlatformBlazor(IServiceCollection services, string apiKey)",
         "kind": "Method",
         "type": "IServiceCollection",
         "description": ""
       },
       {
-        "name": "AddBlazorHerePlatform(IServiceCollection services, HereApiLoadOptions opts)",
+        "name": "AddHerePlatformBlazor(IServiceCollection services, HereApiLoadOptions opts)",
         "kind": "Method",
         "type": "IServiceCollection",
         "description": ""
       },
       {
-        "name": "AddBlazorHerePlatform(IServiceCollection services, IBlazorHerePlatformKeyService keyService)",
+        "name": "AddHerePlatformBlazor(IServiceCollection services, IHerePlatformKeyService keyService)",
         "kind": "Method",
         "type": "IServiceCollection",
         "description": ""
@@ -972,7 +942,7 @@
   },
   {
     "typeName": "DistanceMeasurementComponent",
-    "fullName": "HerePlatformComponents.Maps.UI.DistanceMeasurementComponent",
+    "fullName": "HerePlatform.Blazor.Maps.UI.DistanceMeasurementComponent",
     "members": [
       {
         "name": "Active",
@@ -998,7 +968,7 @@
   },
   {
     "typeName": "DomIcon",
-    "fullName": "HerePlatformComponents.Maps.DomIcon",
+    "fullName": "HerePlatform.Blazor.Maps.DomIcon",
     "members": [
       {
         "name": "Guid",
@@ -1010,7 +980,7 @@
   },
   {
     "typeName": "DomMarker",
-    "fullName": "HerePlatformComponents.Maps.DomMarker",
+    "fullName": "HerePlatform.Blazor.Maps.DomMarker",
     "members": [
       {
         "name": "GetGeometry()",
@@ -1034,7 +1004,7 @@
   },
   {
     "typeName": "DomMarkerComponent",
-    "fullName": "HerePlatformComponents.Maps.DomMarkerComponent",
+    "fullName": "HerePlatform.Blazor.Maps.DomMarkerComponent",
     "members": [
       {
         "name": "ChildContent",
@@ -1213,7 +1183,7 @@
   },
   {
     "typeName": "DomMarkerOptions",
-    "fullName": "HerePlatformComponents.Maps.DomMarkerOptions",
+    "fullName": "HerePlatform.Blazor.Maps.DomMarkerOptions",
     "members": [
       {
         "name": "Position",
@@ -1237,7 +1207,7 @@
   },
   {
     "typeName": "EngineStateChangeEventArgs",
-    "fullName": "HerePlatformComponents.Maps.Events.EngineStateChangeEventArgs",
+    "fullName": "HerePlatform.Blazor.Maps.Events.EngineStateChangeEventArgs",
     "members": [
       {
         "name": "State",
@@ -1255,7 +1225,7 @@
   },
   {
     "typeName": "GeocodingService",
-    "fullName": "HerePlatformComponents.Maps.Services.GeocodingService",
+    "fullName": "HerePlatform.Blazor.Maps.Services.GeocodingService",
     "members": [
       {
         "name": "GeocodeAsync(string query, GeocodeOptions options, CancellationToken cancellationToken)",
@@ -1273,7 +1243,7 @@
   },
   {
     "typeName": "GeofencingService",
-    "fullName": "HerePlatformComponents.Maps.Services.GeofencingService",
+    "fullName": "HerePlatform.Blazor.Maps.Services.GeofencingService",
     "members": [
       {
         "name": "CheckPositionAsync(LatLngLiteral position, List\u003CGeofenceZone\u003E zones, CancellationToken cancellationToken)",
@@ -1285,7 +1255,7 @@
   },
   {
     "typeName": "GeoJsonLoadedEventArgs",
-    "fullName": "HerePlatformComponents.Maps.Data.GeoJsonLoadedEventArgs",
+    "fullName": "HerePlatform.Blazor.Maps.Data.GeoJsonLoadedEventArgs",
     "members": [
       {
         "name": "ObjectCount",
@@ -1297,7 +1267,7 @@
   },
   {
     "typeName": "GeoJsonReaderComponent",
-    "fullName": "HerePlatformComponents.Maps.Data.GeoJsonReaderComponent",
+    "fullName": "HerePlatform.Blazor.Maps.Data.GeoJsonReaderComponent",
     "members": [
       {
         "name": "DefaultStyle",
@@ -1337,7 +1307,7 @@
   },
   {
     "typeName": "Group",
-    "fullName": "HerePlatformComponents.Maps.Group",
+    "fullName": "HerePlatform.Blazor.Maps.Group",
     "members": [
       {
         "name": "AddObject(IJsObjectRef mapObject)",
@@ -1379,7 +1349,7 @@
   },
   {
     "typeName": "GroupComponent",
-    "fullName": "HerePlatformComponents.Maps.GroupComponent",
+    "fullName": "HerePlatform.Blazor.Maps.GroupComponent",
     "members": [
       {
         "name": "ChildContent",
@@ -1413,7 +1383,7 @@
   },
   {
     "typeName": "GroupOptions",
-    "fullName": "HerePlatformComponents.Maps.GroupOptions",
+    "fullName": "HerePlatform.Blazor.Maps.GroupOptions",
     "members": [
       {
         "name": "Objects",
@@ -1425,7 +1395,7 @@
   },
   {
     "typeName": "HeatmapComponent",
-    "fullName": "HerePlatformComponents.Maps.Data.HeatmapComponent",
+    "fullName": "HerePlatform.Blazor.Maps.Data.HeatmapComponent",
     "members": [
       {
         "name": "Colors",
@@ -1466,7 +1436,7 @@
   },
   {
     "typeName": "HeatmapDataPoint",
-    "fullName": "HerePlatformComponents.Maps.Data.HeatmapDataPoint",
+    "fullName": "HerePlatform.Blazor.Maps.Data.HeatmapDataPoint",
     "members": [
       {
         "name": "Lat",
@@ -1490,7 +1460,7 @@
   },
   {
     "typeName": "HereApiLoadOptions",
-    "fullName": "HerePlatformComponents.Maps.HereApiLoadOptions",
+    "fullName": "HerePlatform.Blazor.Maps.HereApiLoadOptions",
     "members": [
       {
         "name": "ApiKey",
@@ -1550,7 +1520,7 @@
   },
   {
     "typeName": "HereAutosuggest",
-    "fullName": "HerePlatformComponents.Maps.Search.HereAutosuggest",
+    "fullName": "HerePlatform.Blazor.Maps.Search.HereAutosuggest",
     "members": [
       {
         "name": "CssClass",
@@ -1664,7 +1634,7 @@
   },
   {
     "typeName": "HereMap",
-    "fullName": "HerePlatformComponents.HereMap",
+    "fullName": "HerePlatform.Blazor.HereMap",
     "members": [
       {
         "name": "CssClass",
@@ -1710,19 +1680,25 @@
     ]
   },
   {
-    "typeName": "IBlazorHerePlatformKeyService",
-    "fullName": "HerePlatformComponents.IBlazorHerePlatformKeyService",
+    "typeName": "HerePlatformKeyService",
+    "fullName": "HerePlatform.Blazor.HerePlatformKeyService",
     "members": [
       {
-        "name": "GetApiOptions()",
-        "kind": "Method",
-        "type": "Task\u003CHereApiLoadOptions\u003E",
+        "name": "IsApiInitialized",
+        "kind": "Property",
+        "type": "bool",
         "description": ""
       },
       {
         "name": "MarkApiInitialized()",
         "kind": "Method",
         "type": "void",
+        "description": ""
+      },
+      {
+        "name": "GetApiOptions()",
+        "kind": "Method",
+        "type": "Task\u003CHereApiLoadOptions\u003E",
         "description": ""
       },
       {
@@ -1735,7 +1711,7 @@
   },
   {
     "typeName": "Icon",
-    "fullName": "HerePlatformComponents.Maps.Icon",
+    "fullName": "HerePlatform.Blazor.Maps.Icon",
     "members": [
       {
         "name": "Guid",
@@ -1770,8 +1746,32 @@
     ]
   },
   {
+    "typeName": "IHerePlatformKeyService",
+    "fullName": "HerePlatform.Blazor.IHerePlatformKeyService",
+    "members": [
+      {
+        "name": "GetApiOptions()",
+        "kind": "Method",
+        "type": "Task\u003CHereApiLoadOptions\u003E",
+        "description": ""
+      },
+      {
+        "name": "MarkApiInitialized()",
+        "kind": "Method",
+        "type": "void",
+        "description": ""
+      },
+      {
+        "name": "UpdateApiKey(string apiKey)",
+        "kind": "Method",
+        "type": "void",
+        "description": ""
+      }
+    ]
+  },
+  {
     "typeName": "IJsObjectRef",
-    "fullName": "HerePlatformComponents.IJsObjectRef",
+    "fullName": "HerePlatform.Blazor.IJsObjectRef",
     "members": [
       {
         "name": "Guid",
@@ -1783,7 +1783,7 @@
   },
   {
     "typeName": "ImageOverlayComponent",
-    "fullName": "HerePlatformComponents.Maps.ImageOverlayComponent",
+    "fullName": "HerePlatform.Blazor.Maps.ImageOverlayComponent",
     "members": [
       {
         "name": "Bottom",
@@ -1838,7 +1838,7 @@
   },
   {
     "typeName": "InfoBubble",
-    "fullName": "HerePlatformComponents.Maps.InfoBubble",
+    "fullName": "HerePlatform.Blazor.Maps.InfoBubble",
     "members": [
       {
         "name": "Guid",
@@ -1886,7 +1886,7 @@
   },
   {
     "typeName": "InfoBubbleComponent",
-    "fullName": "HerePlatformComponents.Maps.InfoBubbleComponent",
+    "fullName": "HerePlatform.Blazor.Maps.InfoBubbleComponent",
     "members": [
       {
         "name": "AutoPan",
@@ -1933,7 +1933,7 @@
   },
   {
     "typeName": "InfoBubbleOptions",
-    "fullName": "HerePlatformComponents.Maps.InfoBubbleOptions",
+    "fullName": "HerePlatform.Blazor.Maps.InfoBubbleOptions",
     "members": [
       {
         "name": "Content",
@@ -1945,7 +1945,7 @@
   },
   {
     "typeName": "IsolineService",
-    "fullName": "HerePlatformComponents.Maps.Services.IsolineService",
+    "fullName": "HerePlatform.Blazor.Maps.Services.IsolineService",
     "members": [
       {
         "name": "CalculateIsolineAsync(IsolineRequest request, CancellationToken cancellationToken)",
@@ -1957,7 +1957,7 @@
   },
   {
     "typeName": "JsObjectRef",
-    "fullName": "HerePlatformComponents.JsObjectRef",
+    "fullName": "HerePlatform.Blazor.JsObjectRef",
     "members": [
       {
         "name": "JSRuntime",
@@ -2071,7 +2071,7 @@
   },
   {
     "typeName": "KmlReaderComponent",
-    "fullName": "HerePlatformComponents.Maps.Data.KmlReaderComponent",
+    "fullName": "HerePlatform.Blazor.Maps.Data.KmlReaderComponent",
     "members": [
       {
         "name": "DefaultStyle",
@@ -2104,7 +2104,7 @@
   },
   {
     "typeName": "ListableEntityBase\u00601",
-    "fullName": "HerePlatformComponents.Maps.ListableEntityBase\u00601",
+    "fullName": "HerePlatform.Blazor.Maps.ListableEntityBase\u00601",
     "members": [
       {
         "name": "Guid",
@@ -2200,7 +2200,7 @@
   },
   {
     "typeName": "Map",
-    "fullName": "HerePlatformComponents.Maps.Map",
+    "fullName": "HerePlatform.Blazor.Maps.Map",
     "members": [
       {
         "name": "Guid",
@@ -2422,7 +2422,7 @@
   },
   {
     "typeName": "MapComponent",
-    "fullName": "HerePlatformComponents.MapComponent",
+    "fullName": "HerePlatform.Blazor.MapComponent",
     "members": [
       {
         "name": "UserAttributes",
@@ -2435,7 +2435,7 @@
   },
   {
     "typeName": "MapDragEventArgs",
-    "fullName": "HerePlatformComponents.Maps.Events.MapDragEventArgs",
+    "fullName": "HerePlatform.Blazor.Maps.Events.MapDragEventArgs",
     "members": [
       {
         "name": "ViewportX",
@@ -2465,7 +2465,7 @@
   },
   {
     "typeName": "MapErrorEventArgs",
-    "fullName": "HerePlatformComponents.Maps.Events.MapErrorEventArgs",
+    "fullName": "HerePlatform.Blazor.Maps.Events.MapErrorEventArgs",
     "members": [
       {
         "name": "Source",
@@ -2489,7 +2489,7 @@
   },
   {
     "typeName": "MapEventListener",
-    "fullName": "HerePlatformComponents.Maps.MapEventListener",
+    "fullName": "HerePlatform.Blazor.Maps.MapEventListener",
     "members": [
       {
         "name": "IsRemoved",
@@ -2525,7 +2525,7 @@
   },
   {
     "typeName": "MapOptions",
-    "fullName": "HerePlatformComponents.Maps.MapOptions",
+    "fullName": "HerePlatform.Blazor.Maps.MapOptions",
     "members": [
       {
         "name": "Center",
@@ -2627,7 +2627,7 @@
   },
   {
     "typeName": "MapPointerEventArgs",
-    "fullName": "HerePlatformComponents.Maps.Events.MapPointerEventArgs",
+    "fullName": "HerePlatform.Blazor.Maps.Events.MapPointerEventArgs",
     "members": [
       {
         "name": "ViewportX",
@@ -2675,7 +2675,7 @@
   },
   {
     "typeName": "MapResizeEventArgs",
-    "fullName": "HerePlatformComponents.Maps.Events.MapResizeEventArgs",
+    "fullName": "HerePlatform.Blazor.Maps.Events.MapResizeEventArgs",
     "members": [
       {
         "name": "Width",
@@ -2693,7 +2693,7 @@
   },
   {
     "typeName": "MapViewChangeEventArgs",
-    "fullName": "HerePlatformComponents.Maps.Events.MapViewChangeEventArgs",
+    "fullName": "HerePlatform.Blazor.Maps.Events.MapViewChangeEventArgs",
     "members": [
       {
         "name": "Center",
@@ -2729,7 +2729,7 @@
   },
   {
     "typeName": "MapWheelEventArgs",
-    "fullName": "HerePlatformComponents.Maps.Events.MapWheelEventArgs",
+    "fullName": "HerePlatform.Blazor.Maps.Events.MapWheelEventArgs",
     "members": [
       {
         "name": "Delta",
@@ -2753,7 +2753,7 @@
   },
   {
     "typeName": "Marker",
-    "fullName": "HerePlatformComponents.Maps.Marker",
+    "fullName": "HerePlatform.Blazor.Maps.Marker",
     "members": [
       {
         "name": "GetGeometry()",
@@ -2795,7 +2795,7 @@
   },
   {
     "typeName": "MarkerClusterComponent",
-    "fullName": "HerePlatformComponents.Maps.Clustering.MarkerClusterComponent",
+    "fullName": "HerePlatform.Blazor.Maps.Clustering.MarkerClusterComponent",
     "members": [
       {
         "name": "ClusterSvgTemplate",
@@ -2862,7 +2862,7 @@
   },
   {
     "typeName": "MarkerComponent",
-    "fullName": "HerePlatformComponents.Maps.MarkerComponent",
+    "fullName": "HerePlatform.Blazor.Maps.MarkerComponent",
     "members": [
       {
         "name": "ChildContent",
@@ -3048,7 +3048,7 @@
   },
   {
     "typeName": "MarkerOptions",
-    "fullName": "HerePlatformComponents.Maps.MarkerOptions",
+    "fullName": "HerePlatform.Blazor.Maps.MarkerOptions",
     "members": [
       {
         "name": "Position",
@@ -3072,7 +3072,7 @@
   },
   {
     "typeName": "MatrixRoutingService",
-    "fullName": "HerePlatformComponents.Maps.Services.MatrixRoutingService",
+    "fullName": "HerePlatform.Blazor.Maps.Services.MatrixRoutingService",
     "members": [
       {
         "name": "CalculateMatrixAsync(MatrixRoutingRequest request, CancellationToken cancellationToken)",
@@ -3084,7 +3084,7 @@
   },
   {
     "typeName": "OverviewMapComponent",
-    "fullName": "HerePlatformComponents.Maps.UI.OverviewMapComponent",
+    "fullName": "HerePlatform.Blazor.Maps.UI.OverviewMapComponent",
     "members": [
       {
         "name": "Alignment",
@@ -3104,7 +3104,7 @@
   },
   {
     "typeName": "Padding",
-    "fullName": "HerePlatformComponents.Maps.Coordinates.Padding",
+    "fullName": "HerePlatform.Blazor.Maps.Coordinates.Padding",
     "members": [
       {
         "name": "Top",
@@ -3134,7 +3134,7 @@
   },
   {
     "typeName": "PlacesService",
-    "fullName": "HerePlatformComponents.Maps.Services.PlacesService",
+    "fullName": "HerePlatform.Blazor.Maps.Services.PlacesService",
     "members": [
       {
         "name": "DiscoverAsync(PlacesRequest request, CancellationToken cancellationToken)",
@@ -3158,7 +3158,7 @@
   },
   {
     "typeName": "Point",
-    "fullName": "HerePlatformComponents.Maps.Coordinates.Point",
+    "fullName": "HerePlatform.Blazor.Maps.Coordinates.Point",
     "members": [
       {
         "name": "X",
@@ -3176,7 +3176,7 @@
   },
   {
     "typeName": "Polygon",
-    "fullName": "HerePlatformComponents.Maps.Polygon",
+    "fullName": "HerePlatform.Blazor.Maps.Polygon",
     "members": [
       {
         "name": "SetStyle(StyleOptions style)",
@@ -3212,7 +3212,7 @@
   },
   {
     "typeName": "PolygonComponent",
-    "fullName": "HerePlatformComponents.Maps.PolygonComponent",
+    "fullName": "HerePlatform.Blazor.Maps.PolygonComponent",
     "members": [
       {
         "name": "Clickable",
@@ -3420,7 +3420,7 @@
   },
   {
     "typeName": "PolygonOptions",
-    "fullName": "HerePlatformComponents.Maps.PolygonOptions",
+    "fullName": "HerePlatform.Blazor.Maps.PolygonOptions",
     "members": [
       {
         "name": "Path",
@@ -3450,7 +3450,7 @@
   },
   {
     "typeName": "Polyline",
-    "fullName": "HerePlatformComponents.Maps.Polyline",
+    "fullName": "HerePlatform.Blazor.Maps.Polyline",
     "members": [
       {
         "name": "SetStyle(StyleOptions style)",
@@ -3474,7 +3474,7 @@
   },
   {
     "typeName": "PolylineComponent",
-    "fullName": "HerePlatformComponents.Maps.PolylineComponent",
+    "fullName": "HerePlatform.Blazor.Maps.PolylineComponent",
     "members": [
       {
         "name": "Arrows",
@@ -3675,7 +3675,7 @@
   },
   {
     "typeName": "PolylineOptions",
-    "fullName": "HerePlatformComponents.Maps.PolylineOptions",
+    "fullName": "HerePlatform.Blazor.Maps.PolylineOptions",
     "members": [
       {
         "name": "Path",
@@ -3693,7 +3693,7 @@
   },
   {
     "typeName": "PublicTransitService",
-    "fullName": "HerePlatformComponents.Maps.Services.PublicTransitService",
+    "fullName": "HerePlatform.Blazor.Maps.Services.PublicTransitService",
     "members": [
       {
         "name": "GetDeparturesAsync(LatLngLiteral position, CancellationToken cancellationToken)",
@@ -3711,7 +3711,7 @@
   },
   {
     "typeName": "Rect",
-    "fullName": "HerePlatformComponents.Maps.Rect",
+    "fullName": "HerePlatform.Blazor.Maps.Rect",
     "members": [
       {
         "name": "SetBounds(GeoRect bounds)",
@@ -3753,7 +3753,7 @@
   },
   {
     "typeName": "RectComponent",
-    "fullName": "HerePlatformComponents.Maps.RectComponent",
+    "fullName": "HerePlatform.Blazor.Maps.RectComponent",
     "members": [
       {
         "name": "Bottom",
@@ -3993,7 +3993,7 @@
   },
   {
     "typeName": "RectOptions",
-    "fullName": "HerePlatformComponents.Maps.RectOptions",
+    "fullName": "HerePlatform.Blazor.Maps.RectOptions",
     "members": [
       {
         "name": "Bounds",
@@ -4023,7 +4023,7 @@
   },
   {
     "typeName": "RouteComponent",
-    "fullName": "HerePlatformComponents.Maps.Services.Routing.RouteComponent",
+    "fullName": "HerePlatform.Blazor.Maps.Services.Routing.RouteComponent",
     "members": [
       {
         "name": "Avoid",
@@ -4102,7 +4102,7 @@
   },
   {
     "typeName": "RoutingService",
-    "fullName": "HerePlatformComponents.Maps.Services.RoutingService",
+    "fullName": "HerePlatform.Blazor.Maps.Services.RoutingService",
     "members": [
       {
         "name": "CalculateRouteAsync(RoutingRequest request, CancellationToken cancellationToken)",
@@ -4114,7 +4114,7 @@
   },
   {
     "typeName": "ShapeDragGeometry",
-    "fullName": "HerePlatformComponents.Maps.Events.ShapeDragGeometry",
+    "fullName": "HerePlatform.Blazor.Maps.Events.ShapeDragGeometry",
     "members": [
       {
         "name": "CenterLat",
@@ -4162,7 +4162,7 @@
   },
   {
     "typeName": "StateChangeEventArgs",
-    "fullName": "HerePlatformComponents.Maps.Events.StateChangeEventArgs",
+    "fullName": "HerePlatform.Blazor.Maps.Events.StateChangeEventArgs",
     "members": [
       {
         "name": "State",
@@ -4180,7 +4180,7 @@
   },
   {
     "typeName": "StyleOptions",
-    "fullName": "HerePlatformComponents.Maps.StyleOptions",
+    "fullName": "HerePlatform.Blazor.Maps.StyleOptions",
     "members": [
       {
         "name": "StrokeColor",
@@ -4246,7 +4246,7 @@
   },
   {
     "typeName": "TrafficService",
-    "fullName": "HerePlatformComponents.Maps.Services.TrafficService",
+    "fullName": "HerePlatform.Blazor.Maps.Services.TrafficService",
     "members": [
       {
         "name": "GetTrafficIncidentsAsync(double north, double south, double east, double west, CancellationToken cancellationToken)",
@@ -4264,7 +4264,7 @@
   },
   {
     "typeName": "WaypointSequenceService",
-    "fullName": "HerePlatformComponents.Maps.Services.WaypointSequenceService",
+    "fullName": "HerePlatform.Blazor.Maps.Services.WaypointSequenceService",
     "members": [
       {
         "name": "OptimizeSequenceAsync(WaypointSequenceRequest request, CancellationToken cancellationToken)",
@@ -4276,7 +4276,7 @@
   },
   {
     "typeName": "ZoomRectangleComponent",
-    "fullName": "HerePlatformComponents.Maps.UI.ZoomRectangleComponent",
+    "fullName": "HerePlatform.Blazor.Maps.UI.ZoomRectangleComponent",
     "members": [
       {
         "name": "Active",

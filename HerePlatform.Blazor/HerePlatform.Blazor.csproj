@@ -1,0 +1,49 @@
+<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+	<PropertyGroup>
+		<TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
+		<IsPackable>true</IsPackable>
+		<PackageId>HerePlatform.NET.Blazor</PackageId>
+		<Description>Blazor HERE Platform Maps components</Description>
+		<PackageTags>blazor;here;maps;components;geolocation;routing</PackageTags>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<PackageIcon>here-platform.png</PackageIcon>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<SupportedPlatform Include="browser" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Include="..\README.md" Pack="true" PackagePath="\" />
+		<None Include="..\here-platform.png" Pack="true" PackagePath="\" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<InternalsVisibleTo Include="HerePlatform.Blazor.Tests" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\HerePlatform.Core\HerePlatform.Core.csproj" PrivateAssets="all" />
+	</ItemGroup>
+
+	<!-- Embed HerePlatform.Core DLL into the NuGet package so consumers don't need a separate package -->
+	<ItemGroup>
+		<BuildOutputInPackage Include="$(OutputPath)HerePlatform.Core.dll" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.AspNetCore.Components" Version="8.0.24" Condition="'$(TargetFramework)' == 'net8.0'" />
+		<PackageReference Include="Microsoft.AspNetCore.Components" Version="9.0.13" Condition="'$(TargetFramework)' == 'net9.0'" />
+		<PackageReference Include="Microsoft.AspNetCore.Components" Version="10.0.3" Condition="'$(TargetFramework)' == 'net10.0'" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="8.0.24" Condition="'$(TargetFramework)' == 'net8.0'" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="9.0.13" Condition="'$(TargetFramework)' == 'net9.0'" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="10.0.3" Condition="'$(TargetFramework)' == 'net10.0'" />
+		<PackageReference Include="Microsoft.JSInterop" Version="8.0.24" Condition="'$(TargetFramework)' == 'net8.0'" />
+		<PackageReference Include="Microsoft.JSInterop" Version="9.0.13" Condition="'$(TargetFramework)' == 'net9.0'" />
+		<PackageReference Include="Microsoft.JSInterop" Version="10.0.3" Condition="'$(TargetFramework)' == 'net10.0'" />
+		<PackageReference Include="OneOf" Version="3.0.271" />
+	</ItemGroup>
+
+</Project>

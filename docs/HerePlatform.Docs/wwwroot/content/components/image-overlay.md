@@ -11,7 +11,7 @@ apiRef: ImageOverlayComponent
 `ImageOverlayComponent` stretches a static image (PNG, JPEG, or SVG) over a geographic bounding box on the map. Place it inside an `AdvancedHereMap`.
 
 ```csharp
-@using HerePlatformComponents.Maps
+@using HerePlatform.Blazor.Maps
 
 <AdvancedHereMap Options="_options" Height="500px">
     <ImageOverlayComponent ImageUrl="images/floor-plan.png"

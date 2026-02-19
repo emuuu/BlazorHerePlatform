@@ -29,21 +29,21 @@
         <article style="max-width:800px;margin:2rem auto;padding:0 1rem;">
             <h1>Configuration</h1>
             <p class="lead text-muted">Configure API loading options, map appearance, and API key management.</p>
-            <h2 id="addblazorhereplatform-overloads">AddBlazorHerePlatform Overloads</h2>
+            <h2 id="addhereplatformblazor-overloads">AddHerePlatformBlazor Overloads</h2>
 <p>Three overloads are available for service registration:</p>
 <p><strong>String API key</strong> -- simplest form, uses default load options:</p>
-<pre><code class="language-csharp">builder.Services.AddBlazorHerePlatform(&quot;YOUR_API_KEY&quot;);
+<pre><code class="language-csharp">builder.Services.AddHerePlatformBlazor(&quot;YOUR_API_KEY&quot;);
 </code></pre>
 <p><strong>HereApiLoadOptions</strong> -- full control over which HERE JS modules are loaded:</p>
-<pre><code class="language-csharp">builder.Services.AddBlazorHerePlatform(new HereApiLoadOptions(&quot;YOUR_API_KEY&quot;)
+<pre><code class="language-csharp">builder.Services.AddHerePlatformBlazor(new HereApiLoadOptions(&quot;YOUR_API_KEY&quot;)
 {
     Language = &quot;de&quot;,
     LoadClustering = true,
     LoadData = true
 });
 </code></pre>
-<p><strong>Custom IBlazorHerePlatformKeyService</strong> -- for dynamic key resolution or multi-tenant scenarios:</p>
-<pre><code class="language-csharp">builder.Services.AddBlazorHerePlatform(myCustomKeyService);
+<p><strong>Custom IHerePlatformKeyService</strong> -- for dynamic key resolution or multi-tenant scenarios:</p>
+<pre><code class="language-csharp">builder.Services.AddHerePlatformBlazor(myCustomKeyService);
 </code></pre>
 <h2 id="hereapiloadoptions">HereApiLoadOptions</h2>
 <p>Controls how the HERE Maps JS API is loaded on the page.</p>
@@ -223,8 +223,8 @@
 };
 </code></pre>
 <h2 id="api-key-management">API Key Management</h2>
-<p>The <code>IBlazorHerePlatformKeyService</code> interface manages the API key lifecycle:</p>
-<pre><code class="language-csharp">public interface IBlazorHerePlatformKeyService
+<p>The <code>IHerePlatformKeyService</code> interface manages the API key lifecycle:</p>
+<pre><code class="language-csharp">public interface IHerePlatformKeyService
 {
     Task&lt;HereApiLoadOptions&gt; GetApiOptions();
     bool IsApiInitialized { get; }
@@ -232,7 +232,7 @@
     void UpdateApiKey(string apiKey);
 }
 </code></pre>
-<p>The built-in <code>BlazorHerePlatformKeyService</code> stores the key in memory. Implement <code>IBlazorHerePlatformKeyService</code> yourself to load keys from a database, vault, or per-user configuration. Call <code>UpdateApiKey</code> to swap the key at runtime; this resets <code>IsApiInitialized</code>, so the next map render reloads the HERE JS API with the new key.</p>
+<p>The built-in <code>HerePlatformKeyService</code> stores the key in memory. Implement <code>IHerePlatformKeyService</code> yourself to load keys from a database, vault, or per-user configuration. Call <code>UpdateApiKey</code> to swap the key at runtime; this resets <code>IsApiInitialized</code>, so the next map render reloads the HERE JS API with the new key.</p>
 <h2 id="per-map-load-options-override">Per-Map Load Options Override</h2>
 <p>You can also attach <code>HereApiLoadOptions</code> directly to a specific map's <code>MapOptions</code>:</p>
 <pre><code class="language-csharp">var options = new MapOptions
@@ -258,7 +258,7 @@
             integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <script src="lib/prismjs/prism.js"></script>
     <script src="js/docs.js"></script>
-    <script src="_content/BlazorHerePlatform/js/objectManager.js"></script>
+    <script src="_content/HerePlatform.NET.Blazor/js/objectManager.js"></script>
     <script src="_framework/blazor.webassembly.js"></script>
 </body>
 </html>

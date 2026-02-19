@@ -342,7 +342,7 @@
     "title": "Installation",
     "category": "Getting Started",
     "order": 1,
-    "description": "Install the BlazorHerePlatform NuGet package and add it to your Blazor Server or WebAssembly project.",
+    "description": "Install the HerePlatform.NET.Blazor NuGet package and add it to your Blazor Server or WebAssembly project.",
     "headings": [
       "NuGet Package",
       "Supported Frameworks",
@@ -352,7 +352,7 @@
       "JavaScript",
       "What Gets Registered"
     ],
-    "searchText": "NuGet Package Install the BlazorHerePlatform package from NuGet: Or via the .NET CLI: Supported Frameworks BlazorHerePlatform multi-targets three .NET versions: | Framework | Status | |-----------|--------| | .NET 8.0 | Supported | | .NET 9.0 | Supported | | .NET 10.0 | Supported (LTS) | Your project only needs to target one of these. The correct dependency set is selected automatically based on your \u003CTargetFramework\u003E. Blazor Server Projects Add the package reference, then register services in P"
+    "searchText": "NuGet Package Install the HerePlatform.NET.Blazor package from NuGet: Or via the .NET CLI: Supported Frameworks HerePlatform.NET.Blazor multi-targets three .NET versions: | Framework | Status | |-----------|--------| | .NET 8.0 | Supported | | .NET 9.0 | Supported | | .NET 10.0 | Supported (LTS) | Your project only needs to target one of these. The correct dependency set is selected automatically based on your \u003CTargetFramework\u003E. Blazor Server Projects Add the package reference, then register ser"
   },
   {
     "slug": "getting-started/quick-start",
@@ -369,7 +369,7 @@
       "Satellite View",
       "Next Steps"
     ],
-    "searchText": "Prerequisites You need a HERE API key. Sign up at the HERE Developer Portal to get a free key. Register Services In your Program.cs, call AddBlazorHerePlatform with your API key: Never hard-code your key in source. Use configuration or user secrets instead: Add the Map Component In any .razor page or component, add a HereMap: This renders an interactive vector map centered on Berlin at zoom level 12. The default height is 500px; the example above overrides it to 600px. Run After Init Use the OnA"
+    "searchText": "Prerequisites You need a HERE API key. Sign up at the HERE Developer Portal to get a free key. Register Services In your Program.cs, call AddHerePlatformBlazor with your API key: Never hard-code your key in source. Use configuration or user secrets instead: Add the Map Component In any .razor page or component, add a HereMap: This renders an interactive vector map centered on Berlin at zoom level 12. The default height is 500px; the example above overrides it to 600px. Run After Init Use the OnA"
   },
   {
     "slug": "getting-started/configuration",
@@ -378,20 +378,20 @@
     "order": 3,
     "description": "Configure API loading options, map appearance, and API key management.",
     "headings": [
-      "AddBlazorHerePlatform Overloads",
+      "AddHerePlatformBlazor Overloads",
       "HereApiLoadOptions",
       "MapOptions",
       "API Key Management",
       "Per-Map Load Options Override"
     ],
-    "searchText": "AddBlazorHerePlatform Overloads Three overloads are available for service registration: String API key -- simplest form, uses default load options: HereApiLoadOptions -- full control over which HERE JS modules are loaded: Custom IBlazorHerePlatformKeyService -- for dynamic key resolution or multi-tenant scenarios: HereApiLoadOptions Controls how the HERE Maps JS API is loaded on the page. | Property | Type | Default | Description | |----------|------|---------|-------------| | ApiKey | string | "
+    "searchText": "AddHerePlatformBlazor Overloads Three overloads are available for service registration: String API key -- simplest form, uses default load options: HereApiLoadOptions -- full control over which HERE JS modules are loaded: Custom IHerePlatformKeyService -- for dynamic key resolution or multi-tenant scenarios: HereApiLoadOptions Controls how the HERE Maps JS API is loaded on the page. | Property | Type | Default | Description | |----------|------|---------|-------------| | ApiKey | string | (requi"
   },
   {
     "slug": "getting-started/blazor-server",
     "title": "Blazor Server Notes",
     "category": "Getting Started",
     "order": 4,
-    "description": "Important considerations when using BlazorHerePlatform in Blazor Server apps.",
+    "description": "Important considerations when using HerePlatform.NET.Blazor in Blazor Server apps.",
     "headings": [
       "Server vs. WebAssembly",
       "Scoped Services",
@@ -463,7 +463,7 @@
       "RoutingRequest Options",
       "Route Result"
     ],
-    "searchText": "Setup Inject IRoutingService into your component. It is registered automatically by AddBlazorHerePlatform. CalculateRouteAsync Calculate a route between an origin and destination. The service returns decoded polyline coordinates and section summaries. RoutingRequest Options RoutingRequest supports the following properties: | Property | Type | Default | Description | |----------|------|---------|-------------| | Origin | LatLngLiteral | -- | Start position (required). | | Destination | LatLngLite"
+    "searchText": "Setup Inject IRoutingService into your component. It is registered automatically by AddHerePlatformBlazor. CalculateRouteAsync Calculate a route between an origin and destination. The service returns decoded polyline coordinates and section summaries. RoutingRequest Options RoutingRequest supports the following properties: | Property | Type | Default | Description | |----------|------|---------|-------------| | Origin | LatLngLiteral | -- | Start position (required). | | Destination | LatLngLite"
   },
   {
     "slug": "services/geocoding",
@@ -591,7 +591,7 @@
       "AutosuggestOptions",
       "Result Types"
     ],
-    "searchText": "Setup Inject IAutosuggestService into your component. It is registered automatically by AddBlazorHerePlatform. SuggestAsync Return rich place and address suggestions as the user types. Results include position coordinates and highlight ranges for matched text. AutocompleteAsync Return lightweight address completions optimized for type-ahead input fields. Faster than SuggestAsync but returns fewer details. AutosuggestOptions Both methods accept an optional AutosuggestOptions parameter: | Property"
+    "searchText": "Setup Inject IAutosuggestService into your component. It is registered automatically by AddHerePlatformBlazor. SuggestAsync Return rich place and address suggestions as the user types. Results include position coordinates and highlight ranges for matched text. AutocompleteAsync Return lightweight address completions optimized for type-ahead input fields. Faster than SuggestAsync but returns fewer details. AutosuggestOptions Both methods accept an optional AutosuggestOptions parameter: | Property"
   },
   {
     "slug": "services/weather",
@@ -608,7 +608,7 @@
       "WeatherObservation",
       "WeatherForecast"
     ],
-    "searchText": "Setup Inject IWeatherService into your component. It is registered automatically by AddBlazorHerePlatform. GetWeatherAsync Retrieve current weather observations and multi-day forecasts for a location. WeatherRequest Options | Property | Type | Default | Description | |----------|------|---------|-------------| | Location | LatLngLiteral | -- | Position to query (required). | | Products | List\u003CWeatherProduct\u003E? | null | Weather products to include. | | Lang | string? | null | Language (BCP 47). | "
+    "searchText": "Setup Inject IWeatherService into your component. It is registered automatically by AddHerePlatformBlazor. GetWeatherAsync Retrieve current weather observations and multi-day forecasts for a location. WeatherRequest Options | Property | Type | Default | Description | |----------|------|---------|-------------| | Location | LatLngLiteral | -- | Position to query (required). | | Products | List\u003CWeatherProduct\u003E? | null | Weather products to include. | | Lang | string? | null | Language (BCP 47). | "
   },
   {
     "slug": "services/route-matching",
@@ -624,7 +624,7 @@
       "TracePoint",
       "MatchedLink"
     ],
-    "searchText": "Setup Inject IRouteMatchingService into your component. It is registered automatically by AddBlazorHerePlatform. MatchRouteAsync Match a sequence of GPS trace points to road links on the HERE map. Useful for fleet telemetry, trip reconstruction, and speed analysis. RouteMatchingRequest Options | Property | Type | Default | Description | |----------|------|---------|-------------| | TracePoints | List\u003CTracePoint\u003E? | null | Ordered GPS points (required). | | TransportMode | TransportMode | Car | C"
+    "searchText": "Setup Inject IRouteMatchingService into your component. It is registered automatically by AddHerePlatformBlazor. MatchRouteAsync Match a sequence of GPS trace points to road links on the HERE map. Useful for fleet telemetry, trip reconstruction, and speed analysis. RouteMatchingRequest Options | Property | Type | Default | Description | |----------|------|---------|-------------| | TracePoints | List\u003CTracePoint\u003E? | null | Ordered GPS points (required). | | TransportMode | TransportMode | Car | C"
   },
   {
     "slug": "services/ev-charge-points",
@@ -641,7 +641,7 @@
       "EvStation",
       "EvConnector"
     ],
-    "searchText": "Setup Inject IEvChargePointsService into your component. It is registered automatically by AddBlazorHerePlatform. SearchStationsAsync Search for EV charging stations near a location. Filter by connector type and radius. EvChargePointsRequest Options | Property | Type | Default | Description | |----------|------|---------|-------------| | Position | LatLngLiteral | -- | Search center (required). | | Radius | double | 5000 | Search radius in meters. | | ConnectorTypes | List\u003CConnectorType\u003E? | null"
+    "searchText": "Setup Inject IEvChargePointsService into your component. It is registered automatically by AddHerePlatformBlazor. SearchStationsAsync Search for EV charging stations near a location. Filter by connector type and radius. EvChargePointsRequest Options | Property | Type | Default | Description | |----------|------|---------|-------------| | Position | LatLngLiteral | -- | Search center (required). | | Radius | double | 5000 | Search radius in meters. | | ConnectorTypes | List\u003CConnectorType\u003E? | null"
   },
   {
     "slug": "services/map-image",
@@ -658,7 +658,7 @@
       "MapImageStyle Enum",
       "Displaying Images"
     ],
-    "searchText": "Setup Inject IMapImageService into your component. It is registered automatically by AddBlazorHerePlatform. GetImageAsync Generate a static map image centered on a location. Returns raw image bytes that can be displayed directly or saved to disk. MapImageRequest Options | Property | Type | Default | Description | |----------|------|---------|-------------| | Center | LatLngLiteral | -- | Map center (required). | | Zoom | int | 12 | Zoom level (0\u201322). | | Width | int | 512 | Image width in pixels"
+    "searchText": "Setup Inject IMapImageService into your component. It is registered automatically by AddHerePlatformBlazor. GetImageAsync Generate a static map image centered on a location. Returns raw image bytes that can be displayed directly or saved to disk. MapImageRequest Options | Property | Type | Default | Description | |----------|------|---------|-------------| | Center | LatLngLiteral | -- | Map center (required). | | Zoom | int | 12 | Zoom level (0\u201322). | | Width | int | 512 | Image width in pixels"
   },
   {
     "slug": "services/intermodal-routing",
@@ -674,7 +674,7 @@
       "IntermodalSection",
       "IntermodalTransport"
     ],
-    "searchText": "Setup Inject IIntermodalRoutingService into your component. It is registered automatically by AddBlazorHerePlatform. CalculateRouteAsync Calculate routes that combine public transit and pedestrian segments. Returns multi-section routes with departure/arrival times, transit line details, and polylines. IntermodalRoutingRequest Options | Property | Type | Default | Description | |----------|------|---------|-------------| | Origin | LatLngLiteral | -- | Start position (required). | | Destination |"
+    "searchText": "Setup Inject IIntermodalRoutingService into your component. It is registered automatically by AddHerePlatformBlazor. CalculateRouteAsync Calculate routes that combine public transit and pedestrian segments. Returns multi-section routes with departure/arrival times, transit line details, and polylines. IntermodalRoutingRequest Options | Property | Type | Default | Description | |----------|------|---------|-------------| | Origin | LatLngLiteral | -- | Start position (required). | | Destination |"
   },
   {
     "slug": "services/tour-planning",
@@ -695,7 +695,7 @@
       "TourVehicleCosts",
       "Result Structure"
     ],
-    "searchText": "Setup Inject ITourPlanningService into your component. It is registered automatically by AddBlazorHerePlatform. SolveAsync Solve a vehicle routing problem with jobs (deliveries/pickups) and a fleet of vehicles. The optimizer assigns jobs to vehicles and determines the optimal stop sequence. Problem Structure TourPlan | Property | Type | Description | |----------|------|-------------| | Jobs | List\u003CTourJob\u003E? | Jobs to be assigned to vehicles. | TourJob | Property | Type | Description | |---------"
+    "searchText": "Setup Inject ITourPlanningService into your component. It is registered automatically by AddHerePlatformBlazor. SolveAsync Solve a vehicle routing problem with jobs (deliveries/pickups) and a fleet of vehicles. The optimizer assigns jobs to vehicles and determines the optimal stop sequence. Problem Structure TourPlan | Property | Type | Description | |----------|------|-------------| | Jobs | List\u003CTourJob\u003E? | Jobs to be assigned to vehicles. | TourJob | Property | Type | Description | |---------"
   },
   {
     "slug": "utilities/wkt-parser",

@@ -31,7 +31,7 @@
             <p class="lead text-muted">Custom tile layer for external tile providers.</p>
             <h2 id="basic-usage">Basic Usage</h2>
 <p><code>CustomTileLayerComponent</code> overlays raster tiles from an external tile provider on top of the HERE base map. Place it inside an <code>AdvancedHereMap</code> and provide a URL pattern.</p>
-<pre><code class="language-csharp">@using HerePlatformComponents.Maps
+<pre><code class="language-csharp">@using HerePlatform.Blazor.Maps
 
 &lt;AdvancedHereMap Options=&quot;_options&quot; Height=&quot;500px&quot;&gt;
     &lt;CustomTileLayerComponent UrlPattern=&quot;@_tileUrl&quot;
@@ -137,7 +137,7 @@ var customUrl = &quot;https://tiles.example.com/overlay/{z}/{x}/{y}.png&quot;;
             integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <script src="lib/prismjs/prism.js"></script>
     <script src="js/docs.js"></script>
-    <script src="_content/BlazorHerePlatform/js/objectManager.js"></script>
+    <script src="_content/HerePlatform.NET.Blazor/js/objectManager.js"></script>
     <script src="_framework/blazor.webassembly.js"></script>
 </body>
 </html>

@@ -45,7 +45,7 @@ public class JsonStringEnumConverterEx<TEnum> : JsonConverter<TEnum> where TEnum
             return result;
 
         Trace.TraceWarning(
-            "[BlazorHerePlatform] Unknown enum value '{0}' for {1}, falling back to default",
+            "[HerePlatform] Unknown enum value '{0}' for {1}, falling back to default",
             stringValue, typeof(TEnum).Name);
         return default;
     }

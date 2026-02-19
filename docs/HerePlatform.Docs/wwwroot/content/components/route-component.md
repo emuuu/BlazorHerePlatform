@@ -11,14 +11,14 @@ demo: map-routing
 `RouteComponent` calculates a route between an origin and destination using the HERE Routing API, then renders it as a polyline on the map. It requires `IRoutingService` to be registered:
 
 ```csharp
-builder.Services.AddBlazorHerePlatform("YOUR_KEY");
+builder.Services.AddHerePlatformBlazor("YOUR_KEY");
 ```
 
 Place it inside an `AdvancedHereMap`:
 
 ```csharp
-@using HerePlatformComponents.Maps
-@using HerePlatformComponents.Maps.Services.Routing
+@using HerePlatform.Blazor.Maps
+@using HerePlatform.Blazor.Maps.Services.Routing
 
 <AdvancedHereMap Options="_options" Height="500px">
     <RouteComponent Origin="new LatLngLiteral(52.52, 13.405)"

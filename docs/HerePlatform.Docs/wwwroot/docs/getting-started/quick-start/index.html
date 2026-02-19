@@ -32,22 +32,22 @@
             <h2 id="prerequisites">Prerequisites</h2>
 <p>You need a <strong>HERE API key</strong>. Sign up at the <a href="https://developer.here.com/">HERE Developer Portal</a> to get a free key.</p>
 <h2 id="register-services">Register Services</h2>
-<p>In your <code>Program.cs</code>, call <code>AddBlazorHerePlatform</code> with your API key:</p>
-<pre><code class="language-csharp">using HerePlatformComponents;
+<p>In your <code>Program.cs</code>, call <code>AddHerePlatformBlazor</code> with your API key:</p>
+<pre><code class="language-csharp">using HerePlatform.Blazor;
 
-builder.Services.AddBlazorHerePlatform(&quot;YOUR_API_KEY&quot;);
+builder.Services.AddHerePlatformBlazor(&quot;YOUR_API_KEY&quot;);
 </code></pre>
 <p>Never hard-code your key in source. Use configuration or user secrets instead:</p>
 <pre><code class="language-csharp">var apiKey = builder.Configuration[&quot;HerePlatform:ApiKey&quot;]
     ?? throw new InvalidOperationException(&quot;HERE API key not configured.&quot;);
 
-builder.Services.AddBlazorHerePlatform(apiKey);
+builder.Services.AddHerePlatformBlazor(apiKey);
 </code></pre>
 <h2 id="add-the-map-component">Add the Map Component</h2>
 <p>In any <code>.razor</code> page or component, add a <code>HereMap</code>:</p>
-<pre><code class="language-csharp">@using HerePlatformComponents
-@using HerePlatformComponents.Maps
-@using HerePlatformComponents.Maps.Coordinates
+<pre><code class="language-csharp">@using HerePlatform.Blazor
+@using HerePlatform.Blazor.Maps
+@using HerePlatform.Blazor.Maps.Coordinates
 
 &lt;HereMap @ref=&quot;_map&quot; Options=&quot;_options&quot; Height=&quot;600px&quot; /&gt;
 
@@ -116,7 +116,7 @@ builder.Services.AddBlazorHerePlatform(apiKey);
             integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <script src="lib/prismjs/prism.js"></script>
     <script src="js/docs.js"></script>
-    <script src="_content/BlazorHerePlatform/js/objectManager.js"></script>
+    <script src="_content/HerePlatform.NET.Blazor/js/objectManager.js"></script>
     <script src="_framework/blazor.webassembly.js"></script>
 </body>
 </html>

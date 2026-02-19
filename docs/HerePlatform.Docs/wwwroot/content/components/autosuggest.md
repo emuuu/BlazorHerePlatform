@@ -12,7 +12,7 @@ demo: map-autosuggest
 `HereAutosuggest` is a standalone search input with autocomplete powered by the HERE Autosuggest API. It does not require an `AdvancedHereMap` parent -- it can be used anywhere on the page.
 
 ```csharp
-@using HerePlatformComponents.Maps.Search
+@using HerePlatform.Blazor.Maps.Search
 @using HerePlatform.Core.Search
 
 <HereAutosuggest Placeholder="Search for an address..."

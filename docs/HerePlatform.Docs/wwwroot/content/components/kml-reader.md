@@ -11,7 +11,7 @@ apiRef: KmlReaderComponent
 `KmlReaderComponent` loads KML (Keyhole Markup Language) data and renders it on the map. Like `GeoJsonReaderComponent`, it requires the data module:
 
 ```csharp
-builder.Services.AddBlazorHerePlatform("YOUR_KEY", opts =>
+builder.Services.AddHerePlatformBlazor("YOUR_KEY", opts =>
 {
     opts.LoadData = true;
 });
@@ -20,8 +20,8 @@ builder.Services.AddBlazorHerePlatform("YOUR_KEY", opts =>
 Place it inside an `AdvancedHereMap` and provide a `Url`:
 
 ```csharp
-@using HerePlatformComponents.Maps
-@using HerePlatformComponents.Maps.Data
+@using HerePlatform.Blazor.Maps
+@using HerePlatform.Blazor.Maps.Data
 
 <AdvancedHereMap Options="_options" Height="500px">
     <KmlReaderComponent Url="data/routes.kml"

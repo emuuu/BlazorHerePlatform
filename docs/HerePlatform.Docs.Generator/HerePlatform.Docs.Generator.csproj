@@ -14,7 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="../../HerePlatformComponents/HerePlatformComponents.csproj" />
+    <ProjectReference Include="../../HerePlatform.Blazor/HerePlatform.Blazor.csproj" />
     <ProjectReference Include="../../HerePlatform.Core/HerePlatform.Core.csproj" />
   </ItemGroup>
 

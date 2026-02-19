@@ -2,16 +2,16 @@
 @inject IDocContentService ContentService
 @inject IApiDocService ApiDocService
 
-<PageTitle>@(_article?.Title ?? "Loading...") - BlazorHerePlatform Docs</PageTitle>
+<PageTitle>@(_article?.Title ?? "Loading...") - HerePlatform.NET Docs</PageTitle>
 
 @if (_article is not null)
 {
     <HeadContent>
         <meta name="description" content="@_article.Description" />
         <meta property="og:type" content="article" />
-        <meta property="og:title" content="@(_article.Title) - BlazorHerePlatform" />
+        <meta property="og:title" content="@(_article.Title) - HerePlatform.NET" />
         <meta property="og:description" content="@_article.Description" />
-        <meta property="og:site_name" content="BlazorHerePlatform Docs" />
+        <meta property="og:site_name" content="HerePlatform.NET Docs" />
     </HeadContent>
 }
 

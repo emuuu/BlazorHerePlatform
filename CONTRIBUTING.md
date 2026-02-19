@@ -26,7 +26,7 @@ dotnet build
 ### Run Tests
 
 ```bash
-dotnet test tests/HerePlatformComponents.Tests/
+dotnet test tests/HerePlatform.Blazor.Tests/
 ```
 
 ## Pull Request Guidelines

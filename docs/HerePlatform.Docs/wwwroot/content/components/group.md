@@ -12,7 +12,7 @@ demo: map-groups
 `GroupComponent` is a container that organizes map objects (markers, polylines, polygons, etc.) into a logical group. Place it inside an `AdvancedHereMap` and nest child components within it.
 
 ```csharp
-@using HerePlatformComponents.Maps
+@using HerePlatform.Blazor.Maps
 
 <AdvancedHereMap Options="_options" Height="500px">
     <GroupComponent @ref="_group">

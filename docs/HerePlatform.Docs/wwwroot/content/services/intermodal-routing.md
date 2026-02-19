@@ -8,7 +8,7 @@ apiRef: IIntermodalRoutingService
 
 ## Setup
 
-Inject `IIntermodalRoutingService` into your component. It is registered automatically by `AddBlazorHerePlatform`.
+Inject `IIntermodalRoutingService` into your component. It is registered automatically by `AddHerePlatformBlazor`.
 
 ```csharp
 @inject IIntermodalRoutingService IntermodalRoutingService

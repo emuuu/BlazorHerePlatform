@@ -11,7 +11,7 @@ apiRef: CustomTileLayerComponent
 `CustomTileLayerComponent` overlays raster tiles from an external tile provider on top of the HERE base map. Place it inside an `AdvancedHereMap` and provide a URL pattern.
 
 ```csharp
-@using HerePlatformComponents.Maps
+@using HerePlatform.Blazor.Maps
 
 <AdvancedHereMap Options="_options" Height="500px">
     <CustomTileLayerComponent UrlPattern="@_tileUrl"

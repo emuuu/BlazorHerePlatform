@@ -31,14 +31,14 @@
             <p class="lead text-muted">Load and display KML data on the map.</p>
             <h2 id="basic-usage">Basic Usage</h2>
 <p><code>KmlReaderComponent</code> loads KML (Keyhole Markup Language) data and renders it on the map. Like <code>GeoJsonReaderComponent</code>, it requires the data module:</p>
-<pre><code class="language-csharp">builder.Services.AddBlazorHerePlatform(&quot;YOUR_KEY&quot;, opts =&gt;
+<pre><code class="language-csharp">builder.Services.AddHerePlatformBlazor(&quot;YOUR_KEY&quot;, opts =&gt;
 {
     opts.LoadData = true;
 });
 </code></pre>
 <p>Place it inside an <code>AdvancedHereMap</code> and provide a <code>Url</code>:</p>
-<pre><code class="language-csharp">@using HerePlatformComponents.Maps
-@using HerePlatformComponents.Maps.Data
+<pre><code class="language-csharp">@using HerePlatform.Blazor.Maps
+@using HerePlatform.Blazor.Maps.Data
 
 &lt;AdvancedHereMap Options=&quot;_options&quot; Height=&quot;500px&quot;&gt;
     &lt;KmlReaderComponent Url=&quot;data/routes.kml&quot;
@@ -133,7 +133,7 @@
             integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <script src="lib/prismjs/prism.js"></script>
     <script src="js/docs.js"></script>
-    <script src="_content/BlazorHerePlatform/js/objectManager.js"></script>
+    <script src="_content/HerePlatform.NET.Blazor/js/objectManager.js"></script>
     <script src="_framework/blazor.webassembly.js"></script>
 </body>
 </html>

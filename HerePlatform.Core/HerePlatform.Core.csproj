@@ -5,7 +5,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<InternalsVisibleTo Include="HerePlatformComponents.Tests" />
+		<InternalsVisibleTo Include="HerePlatform.Blazor.Tests" />
 	</ItemGroup>
 
 </Project>

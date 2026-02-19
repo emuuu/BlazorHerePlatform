@@ -11,8 +11,8 @@ apiRef: ZoomRectangleComponent
 `ZoomRectangleComponent` lets users draw a rectangle on the map to zoom into that area. When active, the user clicks and drags to define a bounding box, and the map zooms to fit the selected region.
 
 ```csharp
-@using HerePlatformComponents.Maps
-@using HerePlatformComponents.Maps.UI
+@using HerePlatform.Blazor.Maps
+@using HerePlatform.Blazor.Maps.UI
 
 <AdvancedHereMap Options="_options" Height="500px">
     <ZoomRectangleComponent Active="@_zoomRectActive"

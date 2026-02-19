@@ -30,7 +30,7 @@
             <h1>Route Matching Service</h1>
             <p class="lead text-muted">Match GPS traces to road segments.</p>
             <h2 id="setup">Setup</h2>
-<p>Inject <code>IRouteMatchingService</code> into your component. It is registered automatically by <code>AddBlazorHerePlatform</code>.</p>
+<p>Inject <code>IRouteMatchingService</code> into your component. It is registered automatically by <code>AddHerePlatformBlazor</code>.</p>
 <pre><code class="language-csharp">@inject IRouteMatchingService RouteMatchingService
 </code></pre>
 <h2 id="matchrouteasync">MatchRouteAsync</h2>
@@ -174,7 +174,7 @@ foreach (var link in result.MatchedLinks ?? [])
             integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <script src="lib/prismjs/prism.js"></script>
     <script src="js/docs.js"></script>
-    <script src="_content/BlazorHerePlatform/js/objectManager.js"></script>
+    <script src="_content/HerePlatform.NET.Blazor/js/objectManager.js"></script>
     <script src="_framework/blazor.webassembly.js"></script>
 </body>
 </html>

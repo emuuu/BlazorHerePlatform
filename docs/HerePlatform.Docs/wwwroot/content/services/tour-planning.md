@@ -8,7 +8,7 @@ apiRef: ITourPlanningService
 
 ## Setup
 
-Inject `ITourPlanningService` into your component. It is registered automatically by `AddBlazorHerePlatform`.
+Inject `ITourPlanningService` into your component. It is registered automatically by `AddHerePlatformBlazor`.
 
 ```csharp
 @inject ITourPlanningService TourPlanningService

@@ -5,20 +5,20 @@ order: 3
 description: Configure API loading options, map appearance, and API key management.
 ---
 
-## AddBlazorHerePlatform Overloads
+## AddHerePlatformBlazor Overloads
 
 Three overloads are available for service registration:
 
 **String API key** -- simplest form, uses default load options:
 
 ```csharp
-builder.Services.AddBlazorHerePlatform("YOUR_API_KEY");
+builder.Services.AddHerePlatformBlazor("YOUR_API_KEY");
 ```
 
 **HereApiLoadOptions** -- full control over which HERE JS modules are loaded:
 
 ```csharp
-builder.Services.AddBlazorHerePlatform(new HereApiLoadOptions("YOUR_API_KEY")
+builder.Services.AddHerePlatformBlazor(new HereApiLoadOptions("YOUR_API_KEY")
 {
     Language = "de",
     LoadClustering = true,
@@ -26,10 +26,10 @@ builder.Services.AddBlazorHerePlatform(new HereApiLoadOptions("YOUR_API_KEY")
 });
 ```
 
-**Custom IBlazorHerePlatformKeyService** -- for dynamic key resolution or multi-tenant scenarios:
+**Custom IHerePlatformKeyService** -- for dynamic key resolution or multi-tenant scenarios:
 
 ```csharp
-builder.Services.AddBlazorHerePlatform(myCustomKeyService);
+builder.Services.AddHerePlatformBlazor(myCustomKeyService);
 ```
 
 ## HereApiLoadOptions
@@ -86,10 +86,10 @@ var options = new MapOptions
 
 ## API Key Management
 
-The `IBlazorHerePlatformKeyService` interface manages the API key lifecycle:
+The `IHerePlatformKeyService` interface manages the API key lifecycle:
 
 ```csharp
-public interface IBlazorHerePlatformKeyService
+public interface IHerePlatformKeyService
 {
     Task<HereApiLoadOptions> GetApiOptions();
     bool IsApiInitialized { get; }
@@ -98,7 +98,7 @@ public interface IBlazorHerePlatformKeyService
 }
 ```
 
-The built-in `BlazorHerePlatformKeyService` stores the key in memory. Implement `IBlazorHerePlatformKeyService` yourself to load keys from a database, vault, or per-user configuration. Call `UpdateApiKey` to swap the key at runtime; this resets `IsApiInitialized`, so the next map render reloads the HERE JS API with the new key.
+The built-in `HerePlatformKeyService` stores the key in memory. Implement `IHerePlatformKeyService` yourself to load keys from a database, vault, or per-user configuration. Call `UpdateApiKey` to swap the key at runtime; this resets `IsApiInitialized`, so the next map render reloads the HERE JS API with the new key.
 
 ## Per-Map Load Options Override
 

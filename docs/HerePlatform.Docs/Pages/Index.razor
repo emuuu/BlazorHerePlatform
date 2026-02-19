@@ -117,7 +117,7 @@
             <div class="card">
                 <div class="card-body">
                     <h5 class="card-title">Quick Start</h5>
-                    <CodeBlock Language="bash" Code="dotnet add package BlazorHerePlatform" />
+                    <CodeBlock Language="bash" Code="dotnet add package HerePlatform.NET.Blazor" />
                     <CodeBlock Language="csharp" Code="@_programCs" />
                 </div>
             </div>
@@ -145,7 +145,7 @@
 
 @code {
     private const string _programCs = """
-        builder.Services.AddBlazorHerePlatform(
+        builder.Services.AddHerePlatformBlazor(
             new HereApiLoadOptions("YOUR_API_KEY"));
         """;
 

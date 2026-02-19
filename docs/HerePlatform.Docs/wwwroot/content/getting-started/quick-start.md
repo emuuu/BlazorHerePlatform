@@ -11,12 +11,12 @@ You need a **HERE API key**. Sign up at the [HERE Developer Portal](https://deve
 
 ## Register Services
 
-In your `Program.cs`, call `AddBlazorHerePlatform` with your API key:
+In your `Program.cs`, call `AddHerePlatformBlazor` with your API key:
 
 ```csharp
-using HerePlatformComponents;
+using HerePlatform.Blazor;
 
-builder.Services.AddBlazorHerePlatform("YOUR_API_KEY");
+builder.Services.AddHerePlatformBlazor("YOUR_API_KEY");
 ```
 
 Never hard-code your key in source. Use configuration or user secrets instead:
@@ -25,7 +25,7 @@ Never hard-code your key in source. Use configuration or user secrets instead:
 var apiKey = builder.Configuration["HerePlatform:ApiKey"]
     ?? throw new InvalidOperationException("HERE API key not configured.");
 
-builder.Services.AddBlazorHerePlatform(apiKey);
+builder.Services.AddHerePlatformBlazor(apiKey);
 ```
 
 ## Add the Map Component
@@ -33,9 +33,9 @@ builder.Services.AddBlazorHerePlatform(apiKey);
 In any `.razor` page or component, add a `HereMap`:
 
 ```csharp
-@using HerePlatformComponents
-@using HerePlatformComponents.Maps
-@using HerePlatformComponents.Maps.Coordinates
+@using HerePlatform.Blazor
+@using HerePlatform.Blazor.Maps
+@using HerePlatform.Blazor.Maps.Coordinates
 
 <HereMap @ref="_map" Options="_options" Height="600px" />
 

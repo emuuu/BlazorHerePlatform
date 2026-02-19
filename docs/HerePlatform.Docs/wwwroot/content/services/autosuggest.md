@@ -8,7 +8,7 @@ apiRef: IAutosuggestService
 
 ## Setup
 
-Inject `IAutosuggestService` into your component. It is registered automatically by `AddBlazorHerePlatform`.
+Inject `IAutosuggestService` into your component. It is registered automatically by `AddHerePlatformBlazor`.
 
 ```csharp
 @inject IAutosuggestService AutosuggestService

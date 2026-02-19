@@ -2,7 +2,7 @@
 title: Blazor Server Notes
 category: Getting Started
 order: 4
-description: Important considerations when using BlazorHerePlatform in Blazor Server apps.
+description: Important considerations when using HerePlatform.NET.Blazor in Blazor Server apps.
 ---
 
 ## Server vs. WebAssembly
@@ -15,20 +15,20 @@ In Blazor WebAssembly, all code runs in the browser. In Blazor Server, C# runs o
 
 ## Scoped Services
 
-All services registered by `AddBlazorHerePlatform` are **scoped**. In Blazor Server, a scope corresponds to a single circuit (user connection). Each user gets their own:
+All services registered by `AddHerePlatformBlazor` are **scoped**. In Blazor Server, a scope corresponds to a single circuit (user connection). Each user gets their own:
 
-- `IBlazorHerePlatformKeyService`
+- `IHerePlatformKeyService`
 - `IRoutingService`, `IGeocodingService`, and other service instances
 
 This means `IsApiInitialized` state is tracked per circuit. When a user disconnects and reconnects, a new scope is created and the HERE JS API is re-initialized.
 
 ## Shared Key Service Instance
 
-When you pass a custom `IBlazorHerePlatformKeyService` instance directly:
+When you pass a custom `IHerePlatformKeyService` instance directly:
 
 ```csharp
-var keyService = new BlazorHerePlatformKeyService("YOUR_API_KEY");
-builder.Services.AddBlazorHerePlatform(keyService);
+var keyService = new HerePlatformKeyService("YOUR_API_KEY");
+builder.Services.AddHerePlatformBlazor(keyService);
 ```
 
 That **same object** is shared across all circuits. This means:
@@ -39,11 +39,11 @@ That **same object** is shared across all circuits. This means:
 If you need per-user key isolation, register a factory instead:
 
 ```csharp
-builder.Services.AddScoped<IBlazorHerePlatformKeyService>(sp =>
-    new BlazorHerePlatformKeyService("YOUR_API_KEY"));
+builder.Services.AddScoped<IHerePlatformKeyService>(sp =>
+    new HerePlatformKeyService("YOUR_API_KEY"));
 ```
 
-Or implement `IBlazorHerePlatformKeyService` with per-user logic and register it as scoped.
+Or implement `IHerePlatformKeyService` with per-user logic and register it as scoped.
 
 ## SignalR Message Size
 

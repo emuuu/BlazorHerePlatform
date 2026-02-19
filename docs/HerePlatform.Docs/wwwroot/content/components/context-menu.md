@@ -11,8 +11,8 @@ apiRef: ContextMenuComponent
 `ContextMenuComponent` adds a right-click context menu to an `AdvancedHereMap`. Define menu entries with `ContextMenuItem` children and handle selections via `OnItemClick`.
 
 ```csharp
-@using HerePlatformComponents.Maps
-@using HerePlatformComponents.Maps.Events
+@using HerePlatform.Blazor.Maps
+@using HerePlatform.Blazor.Maps.Events
 
 <AdvancedHereMap Options="_options" Height="500px">
     <ContextMenuComponent OnItemClick="HandleMenuClick">
