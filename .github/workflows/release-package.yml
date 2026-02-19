@@ -43,7 +43,12 @@ jobs:
       - run: dotnet test -c Release --no-build
         working-directory: ${{ inputs.test-directory }}
       - name: Extract version from tag
-        run: echo "VERSION=${GITHUB_REF_NAME#${{ inputs.package }}/v}" >> $GITHUB_ENV
+        run: |
+          if [[ ! "$GITHUB_REF_NAME" =~ ^${{ inputs.package }}/v ]]; then
+            echo "::error::This workflow must be triggered by a tag matching '${{ inputs.package }}/v*', got: $GITHUB_REF_NAME"
+            exit 1
+          fi
+          echo "VERSION=${GITHUB_REF_NAME#${{ inputs.package }}/v}" >> $GITHUB_ENV
       - name: Find previous release tag
         id: prev-tag
         run: |
