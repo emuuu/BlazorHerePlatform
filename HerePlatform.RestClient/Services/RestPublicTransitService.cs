@@ -21,7 +21,7 @@ internal sealed class RestPublicTransitService : IPublicTransitService
     public async Task<TransitDeparturesResult> GetDeparturesAsync(LatLngLiteral position, CancellationToken cancellationToken = default)
     {
         var qs = HereApiHelper.BuildQueryString(
-            ("in", HereApiHelper.FormatCoord(position)));
+            ("in", $"{HereApiHelper.FormatCoord(position)};r=500"));
 
         var url = $"{DeparturesBaseUrl}?{qs}";
 
