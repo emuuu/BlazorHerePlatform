@@ -56,6 +56,8 @@ foreach (var fc in result.Forecasts ?? [])
 | `Forecast7DaysSimple` | Simplified 7-day forecast. |
 | `ForecastHourly` | Hourly forecast. |
 | `ForecastAstronomy` | Sunrise/sunset and moon phases. |
+| `Alerts` | Weather alerts. |
+| `NwsAlerts` | NWS (National Weather Service) alerts. |
 
 ## WeatherObservation
 
