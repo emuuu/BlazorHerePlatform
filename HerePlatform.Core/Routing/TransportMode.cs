@@ -23,5 +23,8 @@ public enum TransportMode
     Bicycle,
 
     [EnumMember(Value = "scooter")]
-    Scooter
+    Scooter,
+
+    [EnumMember(Value = "taxi")]
+    Taxi
 }

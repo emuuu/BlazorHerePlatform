@@ -76,6 +76,10 @@ internal static class HereApiHelper
         if (avoid.HasFlag(RoutingAvoidFeature.Highways)) features.Add("controlledAccessHighway");
         if (avoid.HasFlag(RoutingAvoidFeature.Ferries)) features.Add("ferry");
         if (avoid.HasFlag(RoutingAvoidFeature.Tunnels)) features.Add("tunnel");
+        if (avoid.HasFlag(RoutingAvoidFeature.DirtRoad)) features.Add("dirtRoad");
+        if (avoid.HasFlag(RoutingAvoidFeature.CarShuttleTrain)) features.Add("carShuttleTrain");
+        if (avoid.HasFlag(RoutingAvoidFeature.SeasonalClosure)) features.Add("seasonalClosure");
+        if (avoid.HasFlag(RoutingAvoidFeature.DifficultTurns)) features.Add("difficultTurns");
         return features.ToArray();
     }
 
