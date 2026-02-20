@@ -145,6 +145,10 @@
                 @onclick="@(() => SetTransportMode(TransportMode.Bicycle))">Bicycle</button>
             <button class="btn btn-sm @(_transportMode == TransportMode.Truck ? "btn-primary" : "btn-outline-primary")"
                 @onclick="@(() => SetTransportMode(TransportMode.Truck))">Truck</button>
+            <button class="btn btn-sm @(_transportMode == TransportMode.Scooter ? "btn-primary" : "btn-outline-primary")"
+                @onclick="@(() => SetTransportMode(TransportMode.Scooter))">Scooter</button>
+            <button class="btn btn-sm @(_transportMode == TransportMode.Taxi ? "btn-primary" : "btn-outline-primary")"
+                @onclick="@(() => SetTransportMode(TransportMode.Taxi))">Taxi</button>
             <button class="btn btn-sm @(_isEvMode ? "btn-success" : "btn-outline-success")"
                 @onclick="ToggleEvMode">EV</button>
         </div>
@@ -354,6 +358,8 @@
             TransportMode.Pedestrian => "#FF6600",
             TransportMode.Bicycle => "#00CC00",
             TransportMode.Truck => "#CC0000",
+            TransportMode.Scooter => "#9933CC",
+            TransportMode.Taxi => "#DDAA00",
             _ => "#0066FF"
         });
 
@@ -371,6 +377,8 @@
             TransportMode.Pedestrian => "#FF6600",
             TransportMode.Bicycle => "#00CC00",
             TransportMode.Truck => "#CC0000",
+            TransportMode.Scooter => "#9933CC",
+            TransportMode.Taxi => "#DDAA00",
             _ => "#0066FF"
         };
 

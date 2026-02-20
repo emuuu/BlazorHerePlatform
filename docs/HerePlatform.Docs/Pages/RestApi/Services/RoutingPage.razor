@@ -51,6 +51,7 @@
                         <option value="@TransportMode.Pedestrian">Pedestrian</option>
                         <option value="@TransportMode.Bicycle">Bicycle</option>
                         <option value="@TransportMode.Scooter">Scooter</option>
+                        <option value="@TransportMode.Taxi">Taxi</option>
                     </select>
                 </div>
                 <div class="col-md-3">
@@ -95,6 +96,22 @@
                             <input type="checkbox" class="form-check-input" id="avTunnel" @bind="_avoidTunnels" />
                             <label class="form-check-label" for="avTunnel">Tunnels</label>
                         </div>
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" id="avDirt" @bind="_avoidDirtRoad" />
+                            <label class="form-check-label" for="avDirt">Dirt Roads</label>
+                        </div>
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" id="avShuttle" @bind="_avoidCarShuttleTrain" />
+                            <label class="form-check-label" for="avShuttle">Car Shuttle Train</label>
+                        </div>
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" id="avSeasonal" @bind="_avoidSeasonalClosure" />
+                            <label class="form-check-label" for="avSeasonal">Seasonal Closure</label>
+                        </div>
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" id="avDifficult" @bind="_avoidDifficultTurns" />
+                            <label class="form-check-label" for="avDifficult">Difficult Turns</label>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -136,6 +153,7 @@
     private bool _returnPolyline = true;
     private bool _returnInstructions;
     private bool _avoidTolls, _avoidHighways, _avoidFerries, _avoidTunnels;
+    private bool _avoidDirtRoad, _avoidCarShuttleTrain, _avoidSeasonalClosure, _avoidDifficultTurns;
     private List<(double lat, double lng)> _viaPoints = [];
 
     private Task<RoutingResult> ExecuteRoute()
@@ -145,6 +163,10 @@
         if (_avoidHighways) avoid |= RoutingAvoidFeature.Highways;
         if (_avoidFerries) avoid |= RoutingAvoidFeature.Ferries;
         if (_avoidTunnels) avoid |= RoutingAvoidFeature.Tunnels;
+        if (_avoidDirtRoad) avoid |= RoutingAvoidFeature.DirtRoad;
+        if (_avoidCarShuttleTrain) avoid |= RoutingAvoidFeature.CarShuttleTrain;
+        if (_avoidSeasonalClosure) avoid |= RoutingAvoidFeature.SeasonalClosure;
+        if (_avoidDifficultTurns) avoid |= RoutingAvoidFeature.DifficultTurns;
 
         return RoutingService.CalculateRouteAsync(new RoutingRequest
         {

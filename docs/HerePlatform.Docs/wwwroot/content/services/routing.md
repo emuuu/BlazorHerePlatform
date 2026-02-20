@@ -49,12 +49,12 @@ foreach (var route in result.Routes ?? [])
 | `Origin` | `LatLngLiteral` | -- | Start position (required). |
 | `Destination` | `LatLngLiteral` | -- | End position (required). |
 | `Via` | `List<LatLngLiteral>?` | `null` | Intermediate waypoints. |
-| `TransportMode` | `TransportMode` | `Car` | `Car`, `Truck`, `Pedestrian`, `Bicycle`, `Scooter`. |
+| `TransportMode` | `TransportMode` | `Car` | `Car`, `Truck`, `Pedestrian`, `Bicycle`, `Scooter`, `Taxi`. |
 | `RoutingMode` | `RoutingMode` | `Fast` | `Fast` (time) or `Short` (distance). |
 | `Alternatives` | `int` | `0` | Number of alternative routes. |
 | `ReturnPolyline` | `bool` | `true` | Include decoded polyline coordinates. |
 | `ReturnInstructions` | `bool` | `false` | Include turn-by-turn instructions. |
-| `Avoid` | `RoutingAvoidFeature` | `None` | Flags: `Tolls`, `Highways`, `Ferries`, `Tunnels`. |
+| `Avoid` | `RoutingAvoidFeature` | `None` | Flags: `Tolls`, `Highways`, `Ferries`, `Tunnels`, `DirtRoad`, `CarShuttleTrain`, `SeasonalClosure`, `DifficultTurns`. |
 | `Truck` | `TruckOptions?` | `null` | Truck-specific parameters (Truck mode only). |
 | `Ev` | `EvOptions?` | `null` | Electric vehicle parameters. |
 
