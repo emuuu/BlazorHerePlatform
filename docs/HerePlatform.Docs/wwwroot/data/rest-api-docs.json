@@ -1613,6 +1613,22 @@
         {
           "name": "Tunnels",
           "serializedValue": "tunnel"
+        },
+        {
+          "name": "DirtRoad",
+          "serializedValue": "dirtRoad"
+        },
+        {
+          "name": "CarShuttleTrain",
+          "serializedValue": "carShuttleTrain"
+        },
+        {
+          "name": "SeasonalClosure",
+          "serializedValue": "seasonalClosure"
+        },
+        {
+          "name": "DifficultTurns",
+          "serializedValue": "difficultTurns"
         }
       ]
     },
@@ -1655,6 +1671,10 @@
         {
           "name": "Scooter",
           "serializedValue": "scooter"
+        },
+        {
+          "name": "Taxi",
+          "serializedValue": "taxi"
         }
       ]
     },
@@ -1705,6 +1725,14 @@
         {
           "name": "ForecastAstronomy",
           "serializedValue": "forecastAstronomy"
+        },
+        {
+          "name": "Alerts",
+          "serializedValue": "alerts"
+        },
+        {
+          "name": "NwsAlerts",
+          "serializedValue": "nwsAlerts"
         }
       ]
     }
