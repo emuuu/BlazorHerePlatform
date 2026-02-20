@@ -38,14 +38,15 @@ internal sealed class RestMatrixRoutingService : IMatrixRoutingService
             {
                 type = "world"
             },
-            profile = HereApiHelper.GetEnumMemberValue(request.TransportMode)
+            transportMode = HereApiHelper.GetEnumMemberValue(request.TransportMode),
+            routingMode = "fast"
         };
 
         var jsonBody = JsonSerializer.Serialize(body, HereJsonDefaults.Options);
         using var content = new StringContent(jsonBody, Encoding.UTF8, "application/json");
 
         var client = _httpClientFactory.CreateClient(HereApiHelper.ClientName);
-        using var response = await client.PostAsync(BaseUrl, content, cancellationToken).ConfigureAwait(false);
+        using var response = await client.PostAsync($"{BaseUrl}?async=false", content, cancellationToken).ConfigureAwait(false);
 
         await HereApiHelper.EnsureSuccessOrThrowAsync(response, "matrix", cancellationToken).ConfigureAwait(false);
 
@@ -66,18 +67,44 @@ internal sealed class RestMatrixRoutingService : IMatrixRoutingService
             };
 
         var matrix = hereResponse.Matrix;
+        var entries = new List<MatrixEntry>(numOrigins * numDestinations);
+
+        for (var i = 0; i < numOrigins; i++)
+        {
+            for (var j = 0; j < numDestinations; j++)
+            {
+                var idx = i * numDestinations + j;
+
+                var errorCode = matrix.ErrorCodes is not null && idx < matrix.ErrorCodes.Count
+                    ? matrix.ErrorCodes[idx]
+                    : 0;
+
+                if (errorCode != 0)
+                    continue;
+
+                var travelTime = matrix.TravelTimes is not null && idx < matrix.TravelTimes.Count
+                    ? matrix.TravelTimes[idx]
+                    : 0;
+
+                var distance = matrix.Distances is not null && idx < matrix.Distances.Count
+                    ? matrix.Distances[idx]
+                    : 0;
+
+                entries.Add(new MatrixEntry
+                {
+                    OriginIndex = i,
+                    DestinationIndex = j,
+                    Duration = travelTime,
+                    Length = distance
+                });
+            }
+        }
 
         return new MatrixRoutingResult
         {
             NumOrigins = matrix.NumOrigins,
             NumDestinations = matrix.NumDestinations,
-            Matrix = matrix.Entries?.Select(e => new MatrixEntry
-            {
-                OriginIndex = e.OriginIndex,
-                DestinationIndex = e.DestinationIndex,
-                Duration = e.TravelTime ?? 0,
-                Length = e.Distance ?? 0
-            }).ToList() ?? []
+            Matrix = entries
         };
     }
 }

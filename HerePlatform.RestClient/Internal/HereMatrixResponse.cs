@@ -2,6 +2,8 @@ namespace HerePlatform.RestClient.Internal;
 
 /// <summary>
 /// Internal DTOs matching HERE Matrix Routing v8 response structure.
+/// The API returns flat arrays (travelTimes[], distances[]) where
+/// index = originIndex * numDestinations + destinationIndex.
 /// </summary>
 internal sealed class HereMatrixResponse
 {
@@ -12,13 +14,7 @@ internal sealed class HereMatrix
 {
     public int NumOrigins { get; set; }
     public int NumDestinations { get; set; }
-    public List<HereMatrixEntry>? Entries { get; set; }
-}
-
-internal sealed class HereMatrixEntry
-{
-    public int OriginIndex { get; set; }
-    public int DestinationIndex { get; set; }
-    public int? TravelTime { get; set; }
-    public int? Distance { get; set; }
+    public List<int>? TravelTimes { get; set; }
+    public List<int>? Distances { get; set; }
+    public List<int>? ErrorCodes { get; set; }
 }

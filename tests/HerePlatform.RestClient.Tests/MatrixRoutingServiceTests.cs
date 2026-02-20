@@ -24,7 +24,8 @@ public class MatrixRoutingServiceTests
             "matrix": {
                 "numOrigins": 2,
                 "numDestinations": 2,
-                "entries": []
+                "travelTimes": [],
+                "distances": []
             }
         }
         """;
@@ -52,7 +53,8 @@ public class MatrixRoutingServiceTests
             "matrix": {
                 "numOrigins": 1,
                 "numDestinations": 1,
-                "entries": []
+                "travelTimes": [],
+                "distances": []
             }
         }
         """;
@@ -71,7 +73,8 @@ public class MatrixRoutingServiceTests
         var body = handler.LastRequestBody;
         Assert.That(body, Does.Contain("\"lat\":52.5"));
         Assert.That(body, Does.Contain("\"lng\":13.4"));
-        Assert.That(body, Does.Contain("\"profile\":\"truck\""));
+        Assert.That(body, Does.Contain("\"transportMode\":\"truck\""));
+        Assert.That(body, Does.Contain("\"routingMode\":\"fast\""));
     }
 
     [Test]
@@ -82,12 +85,8 @@ public class MatrixRoutingServiceTests
             "matrix": {
                 "numOrigins": 2,
                 "numDestinations": 2,
-                "entries": [
-                    {"originIndex": 0, "destinationIndex": 0, "travelTime": 0, "distance": 0},
-                    {"originIndex": 0, "destinationIndex": 1, "travelTime": 3600, "distance": 50000},
-                    {"originIndex": 1, "destinationIndex": 0, "travelTime": 3700, "distance": 51000},
-                    {"originIndex": 1, "destinationIndex": 1, "travelTime": 0, "distance": 0}
-                ]
+                "travelTimes": [0, 3600, 3700, 0],
+                "distances": [0, 50000, 51000, 0]
             }
         }
         """;
