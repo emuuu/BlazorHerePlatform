@@ -38,5 +38,17 @@ public enum WeatherProduct
     /// Astronomy forecast (sunrise, sunset, moonrise, moonset).
     /// </summary>
     [EnumMember(Value = "forecastAstronomy")]
-    ForecastAstronomy
+    ForecastAstronomy,
+
+    /// <summary>
+    /// Weather alerts.
+    /// </summary>
+    [EnumMember(Value = "alerts")]
+    Alerts,
+
+    /// <summary>
+    /// NWS (National Weather Service) alerts.
+    /// </summary>
+    [EnumMember(Value = "nwsAlerts")]
+    NwsAlerts
 }
