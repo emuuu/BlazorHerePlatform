@@ -1,6 +1,4 @@
-<p align="center">
-  <img src="here-platform.svg" alt="HerePlatform.NET" width="128" />
-</p>
+![HerePlatform.NET](https://raw.githubusercontent.com/emuuu/HerePlatform.NET/main/here-platform.png)
 
 # HerePlatform.NET
 
